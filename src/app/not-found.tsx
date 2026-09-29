@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function RootNotFound() {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="en" dir="ltr">
       <body
         style={{
           fontFamily: "Arial, Helvetica, sans-serif",
@@ -18,9 +18,9 @@ export default function RootNotFound() {
           padding: "2rem",
         }}
       >
-        <h1 style={{ fontSize: "2rem", fontWeight: 800 }}>404 - الصفحة غير موجودة</h1>
+        <h1 style={{ fontSize: "2rem", fontWeight: 800 }}>404 – Page not found</h1>
         <Link
-          href="/ar"
+          href="/"
           style={{
             background: "#1c1917",
             color: "#fff",
@@ -30,7 +30,7 @@ export default function RootNotFound() {
             fontWeight: 700,
           }}
         >
-          العودة للرئيسية
+          Back to home
         </Link>
       </body>
     </html>

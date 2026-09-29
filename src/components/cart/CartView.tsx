@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { startCheckout } from "@/app/actions/checkout";
 import { MinusIcon, PlusIcon, WhatsAppIcon } from "@/components/Icons";
-import type { Locale } from "@/i18n/config";
+import { type Locale, localePath } from "@/i18n/config";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "./CartProvider";
 
@@ -59,7 +59,7 @@ export function CartView({ locale, labels, whatsappUrl }: { locale: Locale; labe
       <div className="py-20 text-center">
         <p className="text-lg text-taupe">{labels.empty}</p>
         <Link
-          href={`/${locale}/collections/all`}
+          href={localePath(locale, "/collections/all")}
           className="mt-6 inline-block rounded-full bg-espresso px-8 py-3.5 font-bold text-white hover:bg-ink"
         >
           {labels.continue}
@@ -73,13 +73,13 @@ export function CartView({ locale, labels, whatsappUrl }: { locale: Locale; labe
       <ul className="divide-y divide-line border-y border-line">
         {lines.map((line) => (
           <li key={line.variantId} className="flex gap-4 py-5">
-            <Link href={`/${locale}/products/${line.handle}`} className="relative aspect-[3/4] w-24 shrink-0 overflow-hidden rounded-xl bg-sand sm:w-28">
+            <Link href={localePath(locale, `/products/${line.handle}`)} className="relative aspect-[3/4] w-24 shrink-0 overflow-hidden rounded-xl bg-sand sm:w-28">
               {line.image && <Image src={line.image} alt={line.title} fill sizes="112px" className="object-cover" />}
             </Link>
             <div className="flex flex-1 flex-col">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <Link href={`/${locale}/products/${line.handle}`} className="font-semibold hover:text-caramel" dir="auto">
+                  <Link href={localePath(locale, `/products/${line.handle}`)} className="font-semibold hover:text-caramel" dir="auto">
                     {line.title}
                   </Link>
                   {line.variantTitle && (
@@ -149,7 +149,7 @@ export function CartView({ locale, labels, whatsappUrl }: { locale: Locale; labe
             {labels.orderOnWhatsApp}
           </a>
         )}
-        <Link href={`/${locale}/collections/all`} className="mt-4 block text-center text-sm font-semibold underline underline-offset-4">
+        <Link href={localePath(locale, "/collections/all")} className="mt-4 block text-center text-sm font-semibold underline underline-offset-4">
           {labels.continue}
         </Link>
       </aside>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { isLocale, locales } from "@/i18n/config";
+import { isLocale, locales, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/getDictionary";
 import { getCollectionInfo, getProduct, getProducts, getRelatedProducts, minPrice } from "@/lib/catalog";
 import { ProductGrid } from "@/components/product/ProductCard";
@@ -49,7 +49,7 @@ export default async function ProductPage({ params }: Props) {
   const related = await getRelatedProducts(product);
   const category = getCollectionInfo(product.collections.find((c) => c !== "new-collection") ?? "");
 
-  const url = `${siteConfig.url}/${locale}/products/${product.handle}`;
+  const url = `${siteConfig.url}${localePath(locale, `/products/${product.handle}`)}`;
   const prices = product.variants.map((v) => Number(v.price));
   const jsonLd = [
     {
@@ -77,9 +77,9 @@ export default async function ProductPage({ params }: Props) {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: dict.nav.home, item: `${siteConfig.url}/${locale}` },
+        { "@type": "ListItem", position: 1, name: dict.nav.home, item: `${siteConfig.url}${localePath(locale, "")}` },
         ...(category
-          ? [{ "@type": "ListItem", position: 2, name: category.title[locale], item: `${siteConfig.url}/${locale}/collections/${category.handle}` }]
+          ? [{ "@type": "ListItem", position: 2, name: category.title[locale], item: `${siteConfig.url}${localePath(locale, `/collections/${category.handle}`)}` }]
           : []),
         { "@type": "ListItem", position: category ? 3 : 2, name: product.title },
       ],
@@ -92,13 +92,13 @@ export default async function ProductPage({ params }: Props) {
       <nav className="mb-6 text-sm text-taupe" aria-label="Breadcrumb">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
-            <Link href={`/${locale}`} className="hover:text-espresso">{dict.nav.home}</Link>
+            <Link href={localePath(locale)} className="hover:text-espresso">{dict.nav.home}</Link>
           </li>
           {category && (
             <>
               <li aria-hidden>/</li>
               <li>
-                <Link href={`/${locale}/collections/${category.handle}`} className="hover:text-espresso">
+                <Link href={localePath(locale, `/collections/${category.handle}`)} className="hover:text-espresso">
                   {category.title[locale]}
                 </Link>
               </li>

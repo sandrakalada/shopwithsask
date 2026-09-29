@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { Locale } from "@/i18n/config";
+import { type Locale, localePath } from "@/i18n/config";
 import { minPrice, type Product } from "@/lib/catalog";
 import { formatPrice } from "@/lib/format";
 
@@ -11,7 +11,7 @@ export function ProductCard({ product, locale, priority = false }: { product: Pr
   const varies = prices.some((p) => p !== from);
 
   return (
-    <Link href={`/${locale}/products/${product.handle}`} className="group block">
+    <Link href={localePath(locale, `/products/${product.handle}`)} className="group block">
       <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-sand">
         {first && (
           <Image

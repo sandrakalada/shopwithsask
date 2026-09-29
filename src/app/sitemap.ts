@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { defaultLocale, locales } from "@/i18n/config";
+import { defaultLocale, localePath, locales } from "@/i18n/config";
 import { siteConfig } from "@/data/siteConfig";
 import { collections, getProducts } from "@/lib/catalog";
 
@@ -7,14 +7,14 @@ export const revalidate = 3600;
 
 const entry = (path: string, priority: number, images?: string[]): MetadataRoute.Sitemap =>
   locales.map((locale) => ({
-    url: `${siteConfig.url}/${locale}${path}`,
+    url: `${siteConfig.url}${localePath(locale, path)}`,
     changeFrequency: "weekly",
     priority,
     images,
     alternates: {
       languages: {
-        ...Object.fromEntries(locales.map((l) => [l, `${siteConfig.url}/${l}${path}`])),
-        "x-default": `${siteConfig.url}/${defaultLocale}${path}`,
+        ...Object.fromEntries(locales.map((l) => [l, `${siteConfig.url}${localePath(l, path)}`])),
+        "x-default": `${siteConfig.url}${localePath(defaultLocale, path)}`,
       },
     },
   }));

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { defaultLocale, locales, type Locale } from "@/i18n/config";
+import { defaultLocale, localePath, locales, type Locale } from "@/i18n/config";
 
-/** Canonical + hreflang links for a page that exists under every locale. `path` starts with "/" or is "". */
+/** Canonical + hreflang links for a page that exists in every language. `path` starts with "/" or is "". */
 export function alternatesFor(locale: Locale, path = ""): Metadata["alternates"] {
   return {
-    canonical: `/${locale}${path}`,
+    canonical: localePath(locale, path),
     languages: {
-      ...Object.fromEntries(locales.map((l) => [l, `/${l}${path}`])),
-      "x-default": `/${defaultLocale}${path}`,
+      ...Object.fromEntries(locales.map((l) => [l, localePath(l, path)])),
+      "x-default": localePath(defaultLocale, path),
     },
   };
 }

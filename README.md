@@ -11,8 +11,9 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) — it redirects to `/ar`
-(primary locale) or `/en` based on browser language / a `NEXT_LOCALE` cookie.
+Open [http://localhost:3000](http://localhost:3000). English is the main site
+at `/` (e.g. `/collections/dresses`) and Arabic lives under `/ar`
+(e.g. `/ar/collections/dresses`). Old `/en/…` links redirect to the English root.
 
 ## Shopify connection
 
@@ -32,8 +33,10 @@ imported products (images served from Shopify's CDN) — and checkout shows a
 
 ## Project Structure
 
-- `src/app/[locale]/...` — all routes, localized under `/ar` and `/en`.
-- `src/proxy.ts` — locale detection/redirect (Next.js "Proxy", formerly middleware).
+- `src/app/[locale]/...` — all routes. English pages are served from the root
+  through a rewrite to `/en/...`; Arabic pages are served at `/ar/...`.
+- `src/proxy.ts` — the English root rewrite and `/en` redirect (Next.js "Proxy", formerly middleware).
+- `localePath()` in `src/i18n/config.ts` — builds every internal link, so always use it for URLs.
 - `src/i18n/` — locale config and Arabic/English UI dictionaries.
 - `src/lib/catalog/` — catalog data layer (Shopify Storefront API or snapshot)
   and the bilingual category list.

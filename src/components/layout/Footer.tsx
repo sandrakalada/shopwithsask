@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { Locale } from "@/i18n/config";
+import { type Locale, localePath } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { collections } from "@/lib/catalog/collections";
 import { siteConfig } from "@/data/siteConfig";
@@ -21,7 +21,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           <ul className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-[15px]">
             {collections.map((c) => (
               <li key={c.handle}>
-                <Link href={`/${locale}/collections/${c.handle}`} className="hover:text-white">
+                <Link href={localePath(locale, `/collections/${c.handle}`)} className="hover:text-white">
                   {c.title[locale]}
                 </Link>
               </li>
@@ -32,10 +32,10 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-white">{dict.footer.help}</h2>
           <ul className="flex flex-col gap-2.5 text-[15px]">
             <li>
-              <Link href={`/${locale}/search`} className="hover:text-white">{dict.nav.search}</Link>
+              <Link href={localePath(locale, "/search")} className="hover:text-white">{dict.nav.search}</Link>
             </li>
             <li>
-              <Link href={`/${locale}/cart`} className="hover:text-white">{dict.nav.cart}</Link>
+              <Link href={localePath(locale, "/cart")} className="hover:text-white">{dict.nav.cart}</Link>
             </li>
             <li>
               <a href={siteConfig.whatsapp.url} target="_blank" rel="noopener noreferrer" className="hover:text-white">

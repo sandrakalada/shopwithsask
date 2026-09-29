@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { fill, isLocale, locales } from "@/i18n/config";
+import { fill, isLocale, locales, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/getDictionary";
 import { collections, getCollectionInfo, getCollectionProducts } from "@/lib/catalog";
 import { ProductGrid } from "@/components/product/ProductCard";
@@ -51,12 +51,12 @@ export default async function CollectionPage({ params }: Props) {
     "@type": "CollectionPage",
     name: title,
     description: info?.seo[locale].description ?? dict.meta.description,
-    url: `${siteConfig.url}/${locale}/collections/${handle}`,
+    url: `${siteConfig.url}${localePath(locale, `/collections/${handle}`)}`,
     inLanguage: locale,
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: dict.nav.home, item: `${siteConfig.url}/${locale}` },
+        { "@type": "ListItem", position: 1, name: dict.nav.home, item: `${siteConfig.url}${localePath(locale, "")}` },
         { "@type": "ListItem", position: 2, name: title },
       ],
     },
@@ -76,7 +76,7 @@ export default async function CollectionPage({ params }: Props) {
             return (
               <li key={c.handle} className="shrink-0">
                 <Link
-                  href={`/${locale}/collections/${c.handle}`}
+                  href={localePath(locale, `/collections/${c.handle}`)}
                   aria-current={current ? "page" : undefined}
                   className={`block rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
                     current ? "border-espresso bg-espresso text-white" : "border-line hover:border-espresso"

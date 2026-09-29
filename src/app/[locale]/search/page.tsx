@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { fill, isLocale } from "@/i18n/config";
+import { fill, isLocale, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/getDictionary";
 import { searchProducts } from "@/lib/catalog";
 import { SearchIcon } from "@/components/Icons";
@@ -34,7 +34,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
   return (
     <div className="mx-auto max-w-7xl px-4 pt-10 sm:px-6">
       <h1 className="text-3xl font-bold sm:text-4xl">{dict.search.title}</h1>
-      <form action={`/${locale}/search`} className="relative mt-6 max-w-xl" role="search">
+      <form action={localePath(locale, "/search")} className="relative mt-6 max-w-xl" role="search">
         <SearchIcon className="pointer-events-none absolute start-4 top-1/2 size-5 -translate-y-1/2 text-taupe" />
         <input
           type="search"

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { isLocale } from "@/i18n/config";
+import { isLocale, localePath } from "@/i18n/config";
 import { siteConfig } from "@/data/siteConfig";
 import { alternatesFor } from "@/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
@@ -43,7 +43,7 @@ export default async function HomePage({ params }: Props) {
       "@context": "https://schema.org",
       "@type": "OnlineStore",
       name: dict.brand.name,
-      url: `${siteConfig.url}/${locale}`,
+      url: `${siteConfig.url}${localePath(locale, "")}`,
       logo: `${siteConfig.url}/brand/wordmark-black.png`,
       description: dict.meta.description,
       currenciesAccepted: "EGP",
@@ -54,11 +54,11 @@ export default async function HomePage({ params }: Props) {
       "@context": "https://schema.org",
       "@type": "WebSite",
       name: dict.brand.name,
-      url: `${siteConfig.url}/${locale}`,
+      url: `${siteConfig.url}${localePath(locale, "")}`,
       inLanguage: locale,
       potentialAction: {
         "@type": "SearchAction",
-        target: `${siteConfig.url}/${locale}/search?q={search_term_string}`,
+        target: `${siteConfig.url}${localePath(locale, "/search?q={search_term_string}")}`,
         "query-input": "required name=search_term_string",
       },
     },
@@ -81,7 +81,7 @@ export default async function HomePage({ params }: Props) {
             <h1 className="text-4xl font-bold tracking-tight text-ink sm:text-5xl">{dict.home.heroTitle}</h1>
             <p className="mx-auto mt-4 max-w-md text-lg leading-relaxed text-taupe md:mx-0">{dict.home.heroSubtitle}</p>
             <Link
-              href={`/${locale}/collections/new-collection`}
+              href={localePath(locale, "/collections/new-collection")}
               className="mt-8 inline-block rounded-full bg-espresso px-8 py-3.5 font-bold text-white transition-colors hover:bg-ink"
             >
               {dict.home.heroCta}
@@ -91,7 +91,7 @@ export default async function HomePage({ params }: Props) {
             {newArrivals.slice(0, 2).map((p, i) => (
               <Link
                 key={p.handle}
-                href={`/${locale}/products/${p.handle}`}
+                href={localePath(locale, `/products/${p.handle}`)}
                 className={`relative aspect-[3/4] overflow-hidden rounded-3xl bg-sand ${i === 1 ? "mt-10" : ""}`}
               >
                 <Image src={p.images[0].url} alt={p.images[0].alt} fill priority sizes="(min-width: 768px) 25vw, 50vw" className="object-cover" />
@@ -106,7 +106,7 @@ export default async function HomePage({ params }: Props) {
         <ul className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-3 sm:px-0 lg:grid-cols-5">
           {categoryTiles.map((c) => (
             <li key={c.handle} className="w-36 shrink-0 snap-start sm:w-auto">
-              <Link href={`/${locale}/collections/${c.handle}`} className="group block">
+              <Link href={localePath(locale, `/collections/${c.handle}`)} className="group block">
                 <div className="relative aspect-square overflow-hidden rounded-2xl bg-sand">
                   <Image
                     src={c.cover!.url}
@@ -126,7 +126,7 @@ export default async function HomePage({ params }: Props) {
       <section className="mx-auto max-w-7xl px-4 pt-16 sm:px-6">
         <div className="mb-6 flex items-end justify-between gap-4">
           <h2 className="text-2xl font-bold sm:text-3xl">{dict.home.newTitle}</h2>
-          <Link href={`/${locale}/collections/new-collection`} className="shrink-0 font-semibold text-caramel hover:text-espresso">
+          <Link href={localePath(locale, "/collections/new-collection")} className="shrink-0 font-semibold text-caramel hover:text-espresso">
             {dict.home.viewAll}
           </Link>
         </div>

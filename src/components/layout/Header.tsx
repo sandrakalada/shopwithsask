@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import type { Locale } from "@/i18n/config";
+import { type Locale, localePath } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { collections } from "@/lib/catalog/collections";
 import { SearchIcon } from "@/components/Icons";
@@ -11,8 +11,8 @@ import { MobileMenu } from "./MobileMenu";
 
 export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const items = [
-    { href: `/${locale}/collections/all`, label: dict.nav.shopAll },
-    ...collections.map((c) => ({ href: `/${locale}/collections/${c.handle}`, label: c.title[locale] })),
+    { href: localePath(locale, "/collections/all"), label: dict.nav.shopAll },
+    ...collections.map((c) => ({ href: localePath(locale, `/collections/${c.handle}`), label: c.title[locale] })),
   ];
 
   return (
@@ -21,24 +21,24 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         <div className="flex flex-1 items-center gap-1">
           <MobileMenu items={items} labels={{ menu: dict.nav.menu, close: dict.nav.close }} />
           <Link
-            href={`/${locale}/search`}
+            href={localePath(locale, "/search")}
             className="grid size-10 place-items-center rounded-full hover:bg-sand lg:hidden"
             aria-label={dict.nav.search}
           >
             <SearchIcon />
           </Link>
-          <Link href={`/${locale}`} className="hidden lg:block" aria-label={dict.brand.name}>
+          <Link href={localePath(locale)} className="hidden lg:block" aria-label={dict.brand.name}>
             <Image src="/brand/wordmark-black.png" alt={dict.brand.name} width={112} height={40} priority className="h-8 w-auto" />
           </Link>
         </div>
 
-        <Link href={`/${locale}`} className="lg:hidden" aria-label={dict.brand.name}>
+        <Link href={localePath(locale)} className="lg:hidden" aria-label={dict.brand.name}>
           <Image src="/brand/wordmark-black.png" alt={dict.brand.name} width={90} height={32} priority className="h-7 w-auto" />
         </Link>
 
         <div className="flex flex-1 items-center justify-end gap-1 sm:gap-2">
           <Link
-            href={`/${locale}/search`}
+            href={localePath(locale, "/search")}
             className="hidden size-10 place-items-center rounded-full hover:bg-sand lg:grid"
             aria-label={dict.nav.search}
           >
@@ -47,7 +47,7 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           <Suspense>
             <LanguageSwitch locale={locale} label={dict.switchLanguage} />
           </Suspense>
-          <CartButton href={`/${locale}/cart`} label={dict.nav.cart} />
+          <CartButton href={localePath(locale, "/cart")} label={dict.nav.cart} />
         </div>
       </div>
 
