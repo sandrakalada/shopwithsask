@@ -10,3 +10,7 @@ export const dirOf = (locale: Locale): "rtl" | "ltr" =>
 
 export const otherLocale = (locale: Locale): Locale =>
   locale === "ar" ? "en" : "ar";
+
+/** Fills `{name}` placeholders in a dictionary string. */
+export const fill = (template: string, vars: Record<string, string | number>) =>
+  template.replace(/\{(\w+)\}/g, (_, key: string) => String(vars[key] ?? ""));

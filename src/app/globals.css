@@ -1,25 +1,52 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafaf9;
-  --foreground: #1c1917;
+  --background: #ffffff;
+  --foreground: #0d141a;
 
-  /* Shop With Sask brand palette (placeholder until branding is final) */
-  --color-brand-primary: #1c1917;
-  --color-brand-accent: #c2410c;
-  --color-brand-accent-light: #fff7ed;
+  /* Shop With Sask palette, taken from the original shopwithsask.com and the SASK logo */
+  --color-cream: #fffdf6;
+  --color-sand: #f6f1ea;
+  --color-line: #e8e1d7;
+  --color-ink: #0d141a;
+  --color-espresso: #382e27;
+  --color-taupe: #7a6b5f;
+  --color-caramel: #9e7856;
+  --color-bronze: #7e663c;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-brand-primary: var(--color-brand-primary);
-  --color-brand-accent: var(--color-brand-accent);
-  --color-brand-accent-light: var(--color-brand-accent-light);
-  --font-sans: var(--font-cairo), Arial, Helvetica, sans-serif;
+  --color-cream: var(--color-cream);
+  --color-sand: var(--color-sand);
+  --color-line: var(--color-line);
+  --color-ink: var(--color-ink);
+  --color-espresso: var(--color-espresso);
+  --color-taupe: var(--color-taupe);
+  --color-caramel: var(--color-caramel);
+  --color-bronze: var(--color-bronze);
+  --font-sans: var(--font-raleway), var(--font-cairo), Arial, Helvetica, sans-serif;
+  --font-arabic: var(--font-cairo), var(--font-raleway), Arial, sans-serif;
 }
 
 body {
+  font-variant-numeric: lining-nums;
   background: var(--background);
   color: var(--foreground);
+}
+
+html[lang="ar"] body {
+  font-family: var(--font-arabic);
+}
+
+.prose-product p + p {
+  margin-top: 0.75rem;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
