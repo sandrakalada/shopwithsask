@@ -5,6 +5,7 @@ import "../globals.css";
 import { locales, isLocale, dirOf, defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/getDictionary";
 import { siteConfig } from "@/data/siteConfig";
+import { baseOpenGraph } from "@/lib/seo";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -38,10 +39,14 @@ export async function generateMetadata({
 
   return {
     metadataBase: new URL(siteConfig.url),
-    title: { default: `${dict.brand.name} — ${dict.brand.tagline}`, template: `%s | ${dict.brand.name}` },
+    title: { default: dict.meta.title, template: `%s | ${dict.brand.name}` },
     description: dict.meta.description,
-    alternates: { languages: { ar: "/ar", en: "/en" } },
-    openGraph: { siteName: dict.brand.name, images: ["/brand/sask-logo-cream.webp"] },
+    applicationName: dict.brand.name,
+    openGraph: {
+      ...baseOpenGraph(locale),
+      images: ["/brand/sask-logo-cream.webp"],
+    },
+    twitter: { card: "summary_large_image" },
   };
 }
 

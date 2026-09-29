@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { startCheckout } from "@/app/actions/checkout";
-import { MinusIcon, PlusIcon } from "@/components/Icons";
+import { MinusIcon, PlusIcon, WhatsAppIcon } from "@/components/Icons";
 import type { Locale } from "@/i18n/config";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "./CartProvider";
@@ -17,15 +17,26 @@ type Labels = {
   shippingNote: string;
   checkout: string;
   checkoutUnavailable: string;
+  orderOnWhatsApp: string;
+  whatsappGreeting: string;
   checkoutError: string;
   remove: string;
   decrease: string;
   increase: string;
 };
 
-export function CartView({ locale, labels }: { locale: Locale; labels: Labels }) {
+export function CartView({ locale, labels, whatsappUrl }: { locale: Locale; labels: Labels; whatsappUrl: string }) {
   const { lines, subtotal, ready, setQuantity, removeLine } = useCart();
   const [message, setMessage] = useState<string | null>(null);
+  const [offerWhatsApp, setOfferWhatsApp] = useState(false);
+
+  const whatsappOrder = () => {
+    const items = lines.map(
+      (l) => `• ${l.title}${l.variantTitle ? ` (${l.variantTitle})` : ""} × ${l.quantity} — ${formatPrice(Number(l.price) * l.quantity, locale)}`,
+    );
+    const text = [labels.whatsappGreeting, ...items, `${labels.subtotal}: ${formatPrice(subtotal, locale)}`].join("\n");
+    return `${whatsappUrl}?text=${encodeURIComponent(text)}`;
+  };
   const [pending, startTransition] = useTransition();
 
   const checkout = () => {
@@ -35,8 +46,9 @@ export function CartView({ locale, labels }: { locale: Locale; labels: Labels })
         lines.map((l) => ({ variantId: l.variantId, quantity: l.quantity })),
         locale,
       );
-      if ("url" in result) window.location.assign(result.url);
-      else setMessage(result.error === "unavailable" ? labels.checkoutUnavailable : labels.checkoutError);
+      if ("url" in result) return window.location.assign(result.url);
+      setMessage(result.error === "unavailable" ? labels.checkoutUnavailable : labels.checkoutError);
+      setOfferWhatsApp(true);
     });
   };
 
@@ -126,7 +138,18 @@ export function CartView({ locale, labels }: { locale: Locale; labels: Labels })
         <p className="mt-3 min-h-5 text-center text-sm font-semibold text-caramel" role="status">
           {message}
         </p>
-        <Link href={`/${locale}/collections/all`} className="mt-2 block text-center text-sm font-semibold underline underline-offset-4">
+        {offerWhatsApp && (
+          <a
+            href={whatsappOrder()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-[#1f8f4e] px-6 py-3.5 font-bold text-white transition-colors hover:bg-[#187540]"
+          >
+            <WhatsAppIcon />
+            {labels.orderOnWhatsApp}
+          </a>
+        )}
+        <Link href={`/${locale}/collections/all`} className="mt-4 block text-center text-sm font-semibold underline underline-offset-4">
           {labels.continue}
         </Link>
       </aside>

@@ -3,6 +3,8 @@ import Link from "next/link";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/getDictionary";
 import { collections } from "@/lib/catalog/collections";
+import { siteConfig } from "@/data/siteConfig";
+import { SocialLinks } from "./SocialLinks";
 
 export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   return (
@@ -11,6 +13,8 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         <div className="max-w-sm">
           <Image src="/brand/wordmark-white.png" alt={dict.brand.name} width={120} height={42} className="h-9 w-auto" />
           <p className="mt-4 leading-relaxed text-white/70">{dict.footer.about}</p>
+          <h2 className="mt-8 mb-3 text-sm font-bold uppercase tracking-widest text-white">{dict.footer.follow}</h2>
+          <SocialLinks />
         </div>
         <nav aria-label={dict.footer.shop}>
           <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-white">{dict.footer.shop}</h2>
@@ -32,6 +36,11 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
             </li>
             <li>
               <Link href={`/${locale}/cart`} className="hover:text-white">{dict.nav.cart}</Link>
+            </li>
+            <li>
+              <a href={siteConfig.whatsapp.url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                {dict.footer.whatsapp} <span dir="ltr">{siteConfig.whatsapp.number}</span>
+              </a>
             </li>
           </ul>
         </nav>

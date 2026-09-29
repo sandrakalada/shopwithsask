@@ -1,14 +1,31 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { isLocale } from "@/i18n/config";
+import { siteConfig } from "@/data/siteConfig";
+import { alternatesFor } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
 import { getDictionary } from "@/i18n/getDictionary";
 import { collections, getCollectionProducts, getProducts } from "@/lib/catalog";
 import { ProductGrid } from "@/components/product/ProductCard";
 
 export const revalidate = 300;
 
-export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+type Props = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const dict = await getDictionary(locale);
+  return {
+    title: { absolute: dict.meta.title },
+    description: dict.meta.description,
+    alternates: alternatesFor(locale),
+  };
+}
+
+export default async function HomePage({ params }: Props) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const dict = await getDictionary(locale);
@@ -21,8 +38,35 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     .map((c) => ({ ...c, cover: products.find((p) => p.collections.includes(c.handle))?.images[0] }))
     .filter((c) => c.cover);
 
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "OnlineStore",
+      name: dict.brand.name,
+      url: `${siteConfig.url}/${locale}`,
+      logo: `${siteConfig.url}/brand/wordmark-black.png`,
+      description: dict.meta.description,
+      currenciesAccepted: "EGP",
+      areaServed: "EG",
+      sameAs: siteConfig.social.map((s) => s.url),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: dict.brand.name,
+      url: `${siteConfig.url}/${locale}`,
+      inLanguage: locale,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${siteConfig.url}/${locale}/search?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <section className="bg-cream">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 md:py-20">
           <div className="text-center md:text-start">
@@ -95,6 +139,27 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <ProductGrid products={highlighted} locale={locale} />
         </section>
       )}
+
+      <section className="mx-auto mt-20 max-w-7xl px-4 sm:px-6">
+        <div className="grid gap-10 rounded-3xl bg-cream px-6 py-12 sm:px-10 lg:grid-cols-[1.4fr_1fr] lg:gap-16 lg:px-14">
+          <div>
+            <h2 className="text-2xl font-bold sm:text-3xl">{dict.home.aboutTitle}</h2>
+            {dict.home.aboutBody.map((paragraph) => (
+              <p key={paragraph.slice(0, 24)} className="mt-4 leading-relaxed text-espresso/85">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+          <ul className="flex flex-col justify-center gap-6">
+            {dict.home.highlights.map((h) => (
+              <li key={h.title} className="border-s-2 border-caramel ps-4">
+                <h3 className="font-bold">{h.title}</h3>
+                <p className="mt-1 text-taupe">{h.text}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
     </>
   );
 }

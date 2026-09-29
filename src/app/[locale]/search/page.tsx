@@ -5,6 +5,7 @@ import { getDictionary } from "@/i18n/getDictionary";
 import { searchProducts } from "@/lib/catalog";
 import { SearchIcon } from "@/components/Icons";
 import { ProductGrid } from "@/components/product/ProductCard";
+import { alternatesFor } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -14,7 +15,12 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  return { title: (await getDictionary(locale)).search.title };
+  // Result pages are thin/duplicate content, so keep them out of the index.
+  return {
+    title: (await getDictionary(locale)).search.title,
+    alternates: alternatesFor(locale, "/search"),
+    robots: { index: false, follow: true },
+  };
 }
 
 export default async function SearchPage({ params, searchParams }: Props) {

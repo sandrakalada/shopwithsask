@@ -1,8 +1,9 @@
 const en = {
   brand: { name: "Shop With Sask", tagline: "Bold, colorful pieces for every mood" },
   meta: {
+    title: "Shop With Sask – Colorful Women's Fashion & Accessories in Egypt",
     description:
-      "Shop With Sask — colorful dresses, tops, vests, bags and handmade accessories, delivered across Egypt.",
+      "Shop colorful women's fashion online in Egypt: printed dresses, boho vests, statement earrings, handmade bags and beach sets from Shop With Sask.",
   },
   nav: {
     home: "Home",
@@ -21,6 +22,16 @@ const en = {
     newTitle: "New collection",
     viewAll: "View all",
     bestTitle: "Best sellers & trending",
+    aboutTitle: "Colorful women's fashion, shopped online in Egypt",
+    aboutBody: [
+      "Shop With Sask is an online boutique for women who dress with personality. We pick statement pieces you won't find on every rail — printed maxi and mini dresses, embroidered boho vests, patchwork jackets, polka dot skirts and breezy beach sets for Sahel and the Red Sea.",
+      "Finish the look with our playful accessories: statement earrings shaped like seahorses, cassette tapes and ice cream cones, beaded necklaces, and handmade tote, crossbody and mini bags. New pieces land regularly in the New Collection, and most items come in limited quantities — so when you love it, grab it.",
+    ],
+    highlights: [
+      { title: "Statement pieces", text: "Bold prints and colors, picked one by one." },
+      { title: "Handmade accessories", text: "Earrings, necklaces and bags with character." },
+      { title: "Limited quantities", text: "Small batches, so your look stays unique." },
+    ],
   },
   collection: {
     all: "All products",
@@ -45,7 +56,9 @@ const en = {
     subtotal: "Subtotal",
     shippingNote: "Shipping is calculated at checkout.",
     checkout: "Checkout",
-    checkoutUnavailable: "Online checkout opens very soon — thank you for your patience!",
+    checkoutUnavailable: "Online checkout opens very soon — send us your order on WhatsApp in the meantime.",
+    orderOnWhatsApp: "Order on WhatsApp",
+    whatsappGreeting: "Hi Shop With Sask! I would like to order:",
     checkoutError: "We couldn't start checkout. Please try again.",
     remove: "Remove",
     decrease: "Decrease quantity",
@@ -60,7 +73,9 @@ const en = {
   switchLanguage: "العربية",
   footer: {
     rights: "All rights reserved.",
-    about: "Colorful fashion and handmade accessories, curated in Cairo.",
+    about: "Colorful women's fashion and handmade accessories, curated in Egypt.",
+    whatsapp: "WhatsApp:",
+    follow: "Follow us",
     shop: "Shop",
     help: "Help",
   },

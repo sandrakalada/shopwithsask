@@ -6,6 +6,9 @@ import { getDictionary } from "@/i18n/getDictionary";
 import { getCollectionInfo, getProduct, getProducts, getRelatedProducts, minPrice } from "@/lib/catalog";
 import { ProductGrid } from "@/components/product/ProductCard";
 import { ProductView } from "@/components/product/ProductView";
+import { JsonLd } from "@/components/JsonLd";
+import { siteConfig } from "@/data/siteConfig";
+import { alternatesFor, baseOpenGraph, excerpt } from "@/lib/seo";
 
 export const revalidate = 300;
 
@@ -17,13 +20,22 @@ export async function generateStaticParams() {
 type Props = { params: Promise<{ locale: string; handle: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { handle } = await params;
+  const { locale, handle } = await params;
+  if (!isLocale(locale)) return {};
   const product = await getProduct(handle);
   if (!product) return {};
+  const category = getCollectionInfo(product.collections.find((c) => c !== "new-collection") ?? "");
+  const title = category ? `${product.title} – ${category.title[locale]}` : product.title;
+  const lead =
+    locale === "ar"
+      ? `تسوّقي ${product.title} أونلاين في مصر من Shop With Sask${category ? ` – ${category.title.ar}` : ""}.`
+      : product.subtitle ?? "";
+  const description = excerpt([lead, excerpt(product.descriptionHtml, 400)].filter(Boolean).join(" "));
   return {
-    title: product.title,
-    description: product.subtitle ?? undefined,
-    openGraph: { images: product.images.slice(0, 1).map((i) => i.url) },
+    title,
+    description,
+    alternates: alternatesFor(locale, `/products/${handle}`),
+    openGraph: { ...baseOpenGraph(locale), title, description, images: product.images.slice(0, 4).map((i) => ({ url: i.url, alt: i.alt })) },
   };
 }
 
@@ -37,26 +49,46 @@ export default async function ProductPage({ params }: Props) {
   const related = await getRelatedProducts(product);
   const category = getCollectionInfo(product.collections.find((c) => c !== "new-collection") ?? "");
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.title,
-    image: product.images.map((i) => i.url),
-    description: product.subtitle ?? product.title,
-    brand: { "@type": "Brand", name: dict.brand.name },
-    offers: {
-      "@type": "AggregateOffer",
-      priceCurrency: "EGP",
-      lowPrice: minPrice(product),
-      availability: product.variants.some((v) => v.availableForSale)
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
+  const url = `${siteConfig.url}/${locale}/products/${product.handle}`;
+  const prices = product.variants.map((v) => Number(v.price));
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.title,
+      url,
+      image: product.images.map((i) => i.url),
+      description: excerpt(product.descriptionHtml, 500),
+      category: product.productType,
+      brand: { "@type": "Brand", name: dict.brand.name },
+      offers: {
+        "@type": "AggregateOffer",
+        url,
+        priceCurrency: "EGP",
+        lowPrice: minPrice(product),
+        highPrice: Math.max(...prices),
+        offerCount: product.variants.length,
+        availability: product.variants.some((v) => v.availableForSale)
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      },
     },
-  };
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: dict.nav.home, item: `${siteConfig.url}/${locale}` },
+        ...(category
+          ? [{ "@type": "ListItem", position: 2, name: category.title[locale], item: `${siteConfig.url}/${locale}/collections/${category.handle}` }]
+          : []),
+        { "@type": "ListItem", position: category ? 3 : 2, name: product.title },
+      ],
+    },
+  ];
 
   return (
     <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <JsonLd data={jsonLd} />
       <nav className="mb-6 text-sm text-taupe" aria-label="Breadcrumb">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
