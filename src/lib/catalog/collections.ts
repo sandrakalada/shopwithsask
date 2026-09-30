@@ -24,14 +24,14 @@ export const collections: CollectionInfo[] = [
       en: {
         title: "New Arrivals – Women's Fashion & Accessories",
         description:
-          "Discover the latest Shop With Sask arrivals: colorful dresses, boho vests, statement earrings and handmade bags. Shop new women's fashion online in Egypt.",
+          "Discover the latest Shop With Sask arrivals: colorful dresses, boho vests, statement earrings and playful bags. Shop new women's fashion online in Egypt.",
         intro:
           "Fresh drops from Shop With Sask — the newest dresses, tops, vests, bags and statement earrings, picked for women who love color and pieces with personality.",
       },
       ar: {
-        title: "وصل حديثاً – أزياء وإكسسوارات حريمي",
+        title: "وصل حديثاً – أزياء وإكسسوارات للسيدات",
         description:
-          "اكتشفي أحدث وصولات Shop With Sask: فساتين ملوّنة، فيستات بوهو، حلقان مميزة وشنط هاند ميد. تسوّقي أحدث الملابس الحريمي أونلاين في مصر.",
+          "اكتشفي أحدث وصولات Shop With Sask: فساتين ملوّنة، فيستات بوهو، حلقان مميزة وشنط مبهجة. تسوّقي أحدث أزياء السيدات أونلاين في مصر.",
         intro:
           "أحدث القطع من Shop With Sask — فساتين وبلوزات وفيستات وشنط وحلقان مميزة، مختارة لكل بنت بتحب الألوان والستايل المختلف.",
       },
@@ -49,9 +49,9 @@ export const collections: CollectionInfo[] = [
           "From flowing maxi dresses and breezy sundresses to printed minis and elegant evening gowns — dresses in bold prints and happy colors for every occasion.",
       },
       ar: {
-        title: "فساتين حريمي – فساتين ماكسي وقصيرة وصيفي",
+        title: "فساتين للسيدات – فساتين ماكسي وقصيرة وصيفي",
         description:
-          "تسوّقي فساتين حريمي أونلاين في مصر: فساتين ماكسي مشجّرة، فساتين قصيرة، فساتين صيفي وسواريه بألوان ونقشات مميزة من Shop With Sask.",
+          "تسوّقي فساتين للسيدات أونلاين في مصر: فساتين ماكسي مشجّرة، فساتين قصيرة، فساتين صيفي وسواريه بألوان ونقشات مميزة من Shop With Sask.",
         intro:
           "من الفساتين الماكسي الواسعة والفساتين الصيفي الخفيفة لحد الفساتين القصيرة المطبوعة والسواريه — نقشات جريئة وألوان مبهجة لكل مناسبة.",
       },
@@ -69,9 +69,9 @@ export const collections: CollectionInfo[] = [
           "Printed button-down shirts, boho blouses, corset tops and sleeveless styles — easy tops that bring color to jeans, skirts and everything in between.",
       },
       ar: {
-        title: "بلوزات وقمصان حريمي",
+        title: "بلوزات وقمصان للسيدات",
         description:
-          "تسوّقي بلوزات وقمصان حريمي أونلاين: قمصان مطبوعة، بلوزات بوهو، توبات كورسيه وتوبات بدون أكمام بنقشات ملوّنة تنفع لكل يوم.",
+          "تسوّقي بلوزات وقمصان للسيدات أونلاين: قمصان مطبوعة، بلوزات بوهو، توبات كورسيه وتوبات بدون أكمام بنقشات ملوّنة تنفع لكل يوم.",
         intro:
           "قمصان مطبوعة، بلوزات بوهو، توبات كورسيه وتوبات بدون أكمام — قطع سهلة تضيف لون لأي جينز أو جيبة.",
       },
@@ -89,9 +89,9 @@ export const collections: CollectionInfo[] = [
           "Polka dot maxi skirts, layered boho skirts, pleated minis and wide-leg trousers — bottoms that make any outfit feel special.",
       },
       ar: {
-        title: "جيبات وبناطيل حريمي – ماكسي وميدي وقصيرة",
+        title: "جيبات وبناطيل للسيدات – ماكسي وميدي وقصيرة",
         description:
-          "تسوّقي جيبات وبناطيل حريمي أونلاين في مصر: جيبات ماكسي منقّطة، جيبات بوهو، جيبات قصيرة بليسيه وبناطيل واسعة من Shop With Sask.",
+          "تسوّقي جيبات وبناطيل للسيدات أونلاين في مصر: جيبات ماكسي منقّطة، جيبات بوهو، جيبات قصيرة بليسيه وبناطيل واسعة من Shop With Sask.",
         intro:
           "جيبات ماكسي منقّطة، جيبات بوهو بطبقات، جيبات قصيرة بليسيه وبناطيل واسعة — قطع بتخلّي أي لوك مميز.",
       },
@@ -109,9 +109,9 @@ export const collections: CollectionInfo[] = [
           "Embroidered boho vests, crochet and knit vests, denim and puffer styles — the easiest layer to turn a simple outfit into a statement.",
       },
       ar: {
-        title: "فيستات حريمي – بوهو ومطرّزة وبافر",
+        title: "فيستات للسيدات – بوهو ومطرّزة وبافر",
         description:
-          "تسوّقي فيستات حريمي أونلاين: فيستات بوهو مطرّزة، فيستات كروشيه، فيستات جينز وفيستات بافر. أسهل طبقة تغيّر شكل أي لوك.",
+          "تسوّقي فيستات للسيدات أونلاين: فيستات بوهو مطرّزة، فيستات كروشيه، فيستات جينز وفيستات بافر. أسهل طبقة تغيّر شكل أي لوك.",
         intro:
           "فيستات بوهو مطرّزة، كروشيه وتريكو، جينز وبافر — أسهل قطعة تحوّل أي لوك بسيط لستايل ملفت.",
       },
@@ -129,9 +129,9 @@ export const collections: CollectionInfo[] = [
           "Patchwork and graphic jackets, embroidered suede, colorblock windbreakers, cardigans and blazers — outerwear with personality.",
       },
       ar: {
-        title: "جواكت وكارديجان وبليزر حريمي",
+        title: "جواكت وكارديجان وبليزر للسيدات",
         description:
-          "تسوّقي جواكت حريمي أونلاين في مصر: جواكت باتشورك، جواكت شمواه مطرّزة، ويند بريكر، كارديجان وبليزر بتصميمات جريئة وفنية.",
+          "تسوّقي جواكت للسيدات أونلاين في مصر: جواكت باتشورك، جواكت شمواه مطرّزة، ويند بريكر، كارديجان وبليزر بتصميمات جريئة وفنية.",
         intro:
           "جواكت باتشورك ومطبوعة، شمواه مطرّزة، ويند بريكر ملوّن، كارديجان وبليزر — قطع خارجية بشخصية.",
       },
@@ -148,9 +148,9 @@ export const collections: CollectionInfo[] = [
         intro: "Two pieces, zero effort — matching sets and co-ords that give you a complete look in seconds.",
       },
       ar: {
-        title: "أطقم حريمي – كو-أورد وأطقم قطعتين",
+        title: "أطقم للسيدات – كو-أورد وأطقم قطعتين",
         description:
-          "تسوّقي أطقم حريمي أونلاين من Shop With Sask — أطقم قطعتين متناسقة وجاهزة للبس من غير تفكير.",
+          "تسوّقي أطقم للسيدات أونلاين من Shop With Sask — أطقم قطعتين متناسقة وجاهزة للبس من غير تفكير.",
         intro: "قطعتين ومن غير مجهود — أطقم متناسقة بتديكي لوك كامل في ثواني.",
       },
     },
@@ -179,17 +179,17 @@ export const collections: CollectionInfo[] = [
     title: { en: "Bags", ar: "شنط" },
     seo: {
       en: {
-        title: "Women's Bags – Tote, Crossbody & Handmade Bags",
+        title: "Women's Bags – Tote, Crossbody & Mini Bags",
         description:
-          "Shop women's bags online in Egypt: embroidered denim totes, woven straw bags, crossbody bags and handmade mini handbags with charms.",
+          "Shop women's bags online in Egypt: embroidered denim totes, woven straw bags, crossbody bags and playful mini handbags with charms.",
         intro:
-          "Embroidered denim totes, woven straw shoulder bags, crossbody bags and playful mini handbags with charms — many of them handmade.",
+          "Embroidered denim totes, woven straw shoulder bags, crossbody bags and playful mini handbags with charms.",
       },
       ar: {
-        title: "شنط حريمي – توت وكروس وهاند ميد",
+        title: "شنط للسيدات – توت وكروس وشنط صغيرة",
         description:
-          "تسوّقي شنط حريمي أونلاين في مصر: شنط توت جينز مطرّزة، شنط قش، شنط كروس وشنط يد صغيرة هاند ميد بسلاسل ودلايات.",
-        intro: "شنط توت جينز مطرّزة، شنط قش كتف، شنط كروس وشنط يد صغيرة بدلايات — كتير منها هاند ميد.",
+          "تسوّقي شنط للسيدات أونلاين في مصر: شنط توت جينز مطرّزة، شنط قش، شنط كروس وشنط يد صغيرة مبهجة بسلاسل ودلايات.",
+        intro: "شنط توت جينز مطرّزة، شنط قش كتف، شنط كروس وشنط يد صغيرة بدلايات.",
       },
     },
   },
@@ -200,14 +200,14 @@ export const collections: CollectionInfo[] = [
       en: {
         title: "Statement Earrings, Necklaces & Accessories",
         description:
-          "Shop statement earrings, beaded necklaces, scarves and belts online in Egypt. Playful, handmade-style accessories from Shop With Sask.",
+          "Shop statement earrings, beaded necklaces, scarves and belts online in Egypt. Playful, colorful accessories from Shop With Sask.",
         intro:
           "Playful statement earrings — seahorses, cassette tapes, ice cream and more — plus beaded necklaces, scarves and belts to finish every look.",
       },
       ar: {
         title: "حلقان وسلاسل وإكسسوارات مميزة",
         description:
-          "تسوّقي حلقان مميزة، سلاسل خرز، إيشاربات وأحزمة أونلاين في مصر. إكسسوارات مبهجة بستايل هاند ميد من Shop With Sask.",
+          "تسوّقي حلقان مميزة، سلاسل خرز، إيشاربات وأحزمة أونلاين في مصر. إكسسوارات مبهجة وملوّنة من Shop With Sask.",
         intro:
           "حلقان مميزة ومبهجة — أحصنة بحر وشرايط كاسيت وآيس كريم وغيرهم — وسلاسل خرز وإيشاربات وأحزمة تكمّل أي لوك.",
       },
