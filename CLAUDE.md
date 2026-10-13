@@ -21,13 +21,14 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - Confirm before anything that cannot be undone (deleting orders, products, etc.).
 
 ## Adding a new product (owner sends photos + price + sizes + stock)
-1. Crop every photo to focus on the product: keep 3:4 portrait, trim excess sky/background, keep the full outfit with a little headroom, export JPEG about 900x1200. Lead with a clear front shot; put the back view last.
+1. Crop every photo to focus on the product: 3:4 portrait, tight on the product itself (for a vest/top/jacket frame the upper body; for skirts/dresses the full garment; for jewelry/bags the item, not the scene), little background, nothing cut off, export JPEG 900x1200. Where the shot is too wide to crop without cutting the product, fill the side bands with a matching background colour (plain backdrops) or a soft blur of the photo. Lead with a clear front shot; put the back view last. This applies to every main image in the store, not only new products.
 2. Match existing products: vendor "Shop With Sask"; productType one of Dresses, Tops, Bottoms, Vests, Jackets, Matching Set, Beach Set, Accessories, Bags; tags [Type, "New Collection"]; option "Size"; inventory tracked at location Cairo, policy DENY; taxable false.
 3. Description: 3 short sentences (what it is and colours; details; how to style it). US spelling.
 4. SEO title "{Title} for Women | Shop With Sask" (60 chars max; drop " for Women" if too long). SEO description = first sentence + " Shop online in Egypt at Shop With Sask." (155 max).
-5. Image alt: image 1 "{Title} – women's {noun} by Shop With Sask", others "{Title} – view {k}".
+5. Image alt: image 1 "{Title} – women's {noun} by Shop With Sask", others "{Title} – view {k}". Image file names must describe the product for SEO: "{handle}-{k}.jpg" (never camera/WhatsApp/random names). Applies to existing and future images.
 6. Arabic (translationsRegister, locale ar): title, body_html, product_type, meta_title "{Arabic name} للسيدات | Shop With Sask", meta_description = first sentence + " تسوّقي أونلاين في مصر من Shop With Sask.", image alts "{Arabic name} – من Shop With Sask" / "{Arabic name} – صورة {k}".
-7. Status ACTIVE; publish to Online Store and Google & YouTube; add to its type collection and New Collection; move it to the top of New Collection and Shop All (both MANUAL).
+7. Google Merchant (every product, existing and new): set the Shopify product category (Dresses aa-1-4, Skirts aa-1-15, Pants aa-1-12, Shirts aa-1-13-7, Corset tops aa-1-13-15, other tops aa-1-13, Vests aa-1-10-6, Jackets aa-1-10-2, Sets aa-1-11, Handbags aa-5-4, Earrings aa-6-6, Necklaces aa-6-8, Scarves aa-2-26, Belts aa-2-6) and metafields mm-google-shopping: gender "female", age_group "adult", condition "new" (single_line_text_field), custom_product true (boolean).
+8. Status ACTIVE; publish to Online Store and Google & YouTube; add to its type collection and New Collection; move it to the top of New Collection and Shop All (both MANUAL).
 
 ## Reporting
 - Real revenue = orders that are fulfilled AND paid. ShopifyQL filter: `WHERE order_fulfillment_status = 'fulfilled' AND order_payment_status = 'paid'`.
