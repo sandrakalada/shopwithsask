@@ -12,4 +12,8 @@ When exporting orders from the Shopify store (shopwithsask.com), always use each
 - Use `currentSubtotalPriceSet` / `currentTotalPriceSet` for order amounts, not `subtotalPriceSet` / `totalPriceSet`.
 - Check `refunds { refundLineItems }` and mention any removed or refunded items to the user.
 
-Agreed export layout (Excel, Arial, brand pink header): one row per order, with all items numbered and stacked in a single **Item** cell (SKU, Item Price, Qty and Item Fulfillment stacked to match). Columns: Order, Email, Name (billing), Phone (as text), Fulfillment Status, Date (`Oct 6, 2026, 1:55 PM`, Cairo time), Item, SKU, Item Price, Qty, Item Fulfillment, Currency, Subtotal, Shipping, Taxes, Total, Discount Code, Note, Tags, Discount Amount, Address 1, Address 2, City, Province, Zip, Country, Shipping Method, Payment Method, Payment Status. Add a totals row at the bottom.
+Agreed export layout (Excel, Arial, brand pink header): one row per order, with all items numbered and stacked in a single **Item** cell (SKU, Item Price, Qty and Item Fulfillment stacked to match). Columns: Order, Email, Name (billing), Phone (as text), Fulfillment Status, Date (`Oct 6, 2026, 1:55 PM`, Cairo time), Item, SKU, Item Price, Qty, Item Fulfillment, Currency, Subtotal, Shipping, Taxes, Total, Discount Code, Note, Tags, Discount Amount, Address 1, Address 2, City, Province, Zip, Country, Shipping Method, Payment Method, Payment Status. At the bottom, add three totals rows (Qty, Subtotal, Shipping, Taxes, Total):
+  1. **Fulfilled total**: orders whose Fulfillment Status is Fulfilled (completed sales).
+  2. **Unfulfilled total**: orders not yet fulfilled (still to ship and collect).
+  3. **All orders total**.
+Never give the user a single grand total without saying how much of it is unfulfilled.
