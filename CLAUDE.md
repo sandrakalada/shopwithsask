@@ -32,3 +32,11 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 
 ## Reporting
 - Real revenue = orders that are fulfilled AND paid. ShopifyQL filter: `WHERE order_fulfillment_status = 'fulfilled' AND order_payment_status = 'paid'`.
+
+## Editing reels (owner sends raw footage)
+- Owner uploads raw video to Shopify Files (chat cannot take video). Fetch originalSource; convert iPhone HDR (HLG) to SDR before editing.
+- Follow Pinterest best practices: few longer shots (2-2.5s), calm pacing, hard cuts between still poses, one soft dissolve into the end card. Soft warm film grade with light grain.
+- Use ONLY still, posed moments: model not talking (mouth closed or smiling), not walking toward or into the camera. Check face crops before choosing clips. Never use handheld close-ups where the model moves into the lens; for detail shots, punch in digitally on a still pose.
+- Text: small white Readex Pro, lowercase sentence style, soft shadow, no boxes, lower third. One hook line at the start, "colors | price" near the end. Nothing else on screen.
+- Logo only on the end card: cream #F6F1EA background, black SÄSK logo, spaced "STYLE WITHOUT LIMITS", shopwithsask.com. No logo watermark over footage.
+- No generated music. Deliver with silent audio; the owner adds a trending sound in Instagram. Ordering details (price, sizes, stock, COD/Instapay, free delivery) go in the caption, not on screen.
