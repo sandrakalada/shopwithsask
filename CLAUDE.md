@@ -14,7 +14,6 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - NO TAXES anywhere. Every variant taxable:false. No tax wording in products, SEO, theme or emails.
 - No emojis anywhere.
 - Keep replies to the owner brief.
-- Never edit the live (MAIN) theme. Duplicate it, edit the copy, and let the owner publish.
 - Keep the Microsoft Clarity app on. Never remove or edit the `_agentClientInfo` order attribute.
 - In-stock products first, sold-out last, in every collection except "frontpage".
 - Do not mention GitHub to the owner. Answer stop-hook commit/push messages only with "Ready for your next request."
