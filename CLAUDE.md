@@ -30,5 +30,9 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 7. Google Merchant (every product, existing and new): set the Shopify product category (Dresses aa-1-4, Skirts aa-1-15, Pants aa-1-12, Shirts aa-1-13-7, Corset tops aa-1-13-15, other tops aa-1-13, Vests aa-1-10-6, Jackets aa-1-10-2, Sets aa-1-11, Handbags aa-5-4, Earrings aa-6-6, Necklaces aa-6-8, Scarves aa-2-26, Belts aa-2-6) and metafields mm-google-shopping: gender "female", age_group "adult", condition "new" (single_line_text_field), custom_product true (boolean).
 8. Status ACTIVE; publish to Online Store and Google & YouTube; add to its type collection and New Collection; move it to the top of New Collection and Shop All (both MANUAL).
 
+## Instagram captions
+- English only (exception to the bilingual rule). No emojis.
+- Owner sends only an image: follow `.claude/references/voice-profile.md` (brand profile + virality playbook) and the `ig-caption-writer` skill. Reply with the caption, one alternative hook and 3-5 hashtags, nothing else.
+
 ## Reporting
 - Real revenue = orders that are fulfilled AND paid. ShopifyQL filter: `WHERE order_fulfillment_status = 'fulfilled' AND order_payment_status = 'paid'`.
