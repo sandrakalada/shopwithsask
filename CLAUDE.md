@@ -32,3 +32,6 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 
 ## Reporting
 - Real revenue = orders that are fulfilled AND paid. ShopifyQL filter: `WHERE order_fulfillment_status = 'fulfilled' AND order_payment_status = 'paid'`.
+
+## Instagram
+- Instagram study and competitor list: notes/instagram-competitors.md. Read it before any Instagram or marketing work.
