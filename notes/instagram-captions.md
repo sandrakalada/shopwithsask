@@ -1,6 +1,6 @@
 # Instagram caption playbook (@shopwithsask)
 
-Owner rule: Instagram captions are ENGLISH ONLY (overrides the bilingual rule for Instagram). No emojis (store rule). Brand spelling always "SASK" (never SÄSK/Säsk/Sask). Owner sends an image -> write the caption.
+Owner rules: captions SHORT (1-3 lines). NEVER mention price or sizes. Instagram captions are ENGLISH ONLY (overrides the bilingual rule for Instagram). No emojis (store rule). Brand spelling always "SASK" (never SÄSK/Säsk/Sask). Owner sends an image -> write the caption.
 
 ## What the account has posted (57 posts, Apr-Nov 2025, see instagram-posts-2025.txt)
 - Products: skirts (most), leopard, denim, floral/colour vests, blazers, sets (beach/print), bags (fringe, zebra, beach), quirky accessories (seahorse, fish), statement tees.
@@ -16,7 +16,7 @@ Owner rule: Instagram captions are ENGLISH ONLY (overrides the bilingual rule fo
 1. HOOK (first line, under ~100 chars, shows before "more"): a bold claim, question, joke or "POV:". Never start with the product name alone.
 2. 1-2 short lines: what it is (colour, fabric, detail) + how to style it. Include search words people type (e.g. "leopard midi skirt", "fringe crossbody bag", "summer set") - Instagram search reads captions.
 3. Engagement trigger (pick one): "Which look, 1, 2 or 3?" / "Save this for your next outing" / "Send this to the friend who needs it" / "Rate this fit out of 10".
-4. Sell line: "{Price} EGP | Sizes {S-L} | Shop: link in bio or DM us"
+4. CTA only (no price, no sizes): "Shop: link in bio" or "DM to order"
 5. "Delivery all over Egypt | Cash on delivery or Instapay"
 6. 3-5 hashtags: #ShopWithSask + 2-4 from the sets below. Never #sask alone.
 
@@ -41,7 +41,7 @@ New:
 This bag does all the talking so you don't have to.
 Black fringe crossbody with silver studs, the one piece that turns a basic tee and jeans into a whole look.
 Would you wear it day or night?
-{price} EGP | Shop: link in bio or DM us
+Shop: link in bio
 Delivery all over Egypt | Cash on delivery or Instapay
 #ShopWithSask #FringeBag #CairoFashion #StatementBag
 

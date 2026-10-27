@@ -35,4 +35,4 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 
 ## Instagram
 - Instagram study and competitor list: notes/instagram-competitors.md. Read it before any Instagram or marketing work.
-- Instagram captions: follow notes/instagram-captions.md (English only, no emojis). When the owner sends an image for Instagram, write the caption from it.
+- Instagram captions: follow notes/instagram-captions.md (English only, no emojis, short, never price or sizes). When the owner sends an image for Instagram, write the caption from it.
