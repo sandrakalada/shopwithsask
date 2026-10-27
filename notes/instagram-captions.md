@@ -47,3 +47,18 @@ Delivery all over Egypt | Cash on delivery or Instapay
 
 ## Unknown
 Likes/views per post not available yet (need Insights screenshots). Update this file with top performers when received.
+
+## Insights from owner screenshots (2026-10-27)
+Last 30 days: 189,163 views, 56,683 viewers, +247 followers, ~988 interactions. Views by type: Posts 31K, Stories 2.4K, Reels 1.1K (reels almost unused). Daily views fell from ~18K (late Sep / Oct 9) to ~1-2K since Oct 15.
+
+Top posts (2 years, views): Pyramids white lace skirt + corset belt (15 Nov 2025, boosted) 164K views, 532 likes, 43 comments, 305 shares.
+Organic 2026 top: Polka dot skirt 25/04 61K (105 likes, 40 shares) | One-shoulder moment 22/05 43K (139 likes, 17 comments, most liked) | Vintage vibes floral vest 02/07 28K (42 shares) | Statement vest 03/04 28K (47 shares, 12 comments) | Soft florals golden light 29/03 24K | Happy Easter 13/04 22K | Royal by nature 12/06 22K (33 shares) | Polka dots always 08/05 21K | Scarf or without 08/06 21K | Polka dots with a twist 23/05 17K | Vintage military vest 20/06 17K | Because ordinary jewelry 10/07 16K (87 likes) | One skirt so many outfits 01/05 10K (12 comments).
+Last 30 days best: "That colorful mood" 07/10 8.9K views, 26 follows. Others only 1.8-2.3K.
+
+Lessons:
+- Winners: polka dots (4 of top 10), floral/statement vests, one-shoulder tops, outdoor golden-light street shots, Egyptian landmarks (Pyramids, GEM), holidays (Easter).
+- Shares drive reach: top posts have 30-47 shares. Write captions people send to a friend.
+- Comments rise with "one piece, many outfits" and questions ("with the scarf or without?").
+- Recent caption formula "A little X, a little Y / a lot of Z" used 6+ times since Sep: reach dropped. Stop repeating it; vary hooks.
+- Reels nearly zero views because few are posted: add reels of the winning themes.
+- Re-boost the format of the Pyramids post (landmark + statement piece) and re-use winning themes.
