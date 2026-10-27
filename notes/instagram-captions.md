@@ -62,3 +62,30 @@ Lessons:
 - Recent caption formula "A little X, a little Y / a lot of Z" used 6+ times since Sep: reach dropped. Stop repeating it; vary hooks.
 - Reels nearly zero views because few are posted: add reels of the winning themes.
 - Re-boost the format of the Pyramids post (landmark + statement piece) and re-use winning themes.
+
+## Recent post captions with results (owner screenshots, 2026-10-27)
+| Date | Caption (start) | Views | Likes/Comments/Shares |
+|---|---|---|---|
+| 27 Dec 2025 | The SASK Tiger Print Skirt... confidently bold, irresistibly wild (hotel lobby, abroad) | 5.5K | 52/6/5 |
+| 30 Dec 2025 | Stepping out in statement pants... holiday-ready comfort | - | - |
+| 31 Dec 2025 | Winter-ready with a sleek fur jacket and matching fur bag. Snowy days, elevated. (Warsaw snow, 9 slides) | 7.6K | 61/8/3 |
+| 31 Dec 2025 | Green jacket with a festive touch, clean, easy, and fresh | 6.9K | 51/4/4 |
+| 31 Dec 2025 | One year... Thank you for being part of the Sask family (anniversary) | - | - |
+| 25 Sep | Not your basic black skirt (Sinai seaside, mesh poncho) | 6.3K | 34/1/6 |
+| 7 Oct | That colorful mood. Easy, playful & made to brighten your day (floral jacket, fringe boots) | 8.8K | 34/1/3 |
+| 9 Oct | Double the prints, double the personality. One top, two styles | - | 13/-/1 |
+| 11 Oct | Not your ordinary vest. A mix of bold prints... | 2.3K | 18/1/6 |
+| 12 Oct | A little color, a little retro, and a whole lot of personality | - | - |
+| 17 Oct | A little structure, a lot of style (military vest, labelled "AI content") | 2.1K | 27/1/8 |
+| 18 Oct | Light, but not too light. Perfect for this unpredictable weather | 2K | 20/1/3 |
+| ~20 Oct | Fringe, boots & a little wild west energy (boosted) | 1.7K | 23/1/3 |
+| ~21 Oct | Sometimes laughter and lots of color are the best medicine | - | 16/1/0 |
+| ~22 Oct | Colorful embroidery, bold details, and a little boho energy | 805 | 15/2/2 |
+| ~24 Oct | Cowgirl at heart, boho by nature | - | 8/1/5 |
+
+Extra lessons:
+- All feed posts are photo carousels with music; none are true reels.
+- Travel/destination settings (Pyramids, Sinai sea, Warsaw snow, grand hotel) beat the same green-hedge backdrop used for almost every October post. Vary locations.
+- Two October posts carry the "AI content" label; avoid AI edits that trigger it (lower trust/reach).
+- Since Oct the theme repeated (boho/cowgirl/fringe/vest) with near-identical short captions; reach fell under 1K. Rotate products and hooks.
+- Captions still have no price, CTA, sizes or delivery line.
