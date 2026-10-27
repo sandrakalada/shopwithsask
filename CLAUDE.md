@@ -40,3 +40,4 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - Text: small white Readex Pro, lowercase sentence style, soft shadow, no boxes, lower third. One hook line at the start, "colors | price" near the end. Nothing else on screen.
 - Logo only on the end card: cream #F6F1EA background, black SÄSK logo, spaced "STYLE WITHOUT LIMITS", shopwithsask.com. No logo watermark over footage.
 - No generated music. Deliver with silent audio; the owner adds a trending sound in Instagram. Ordering details (price, sizes, stock, COD/Instapay, free delivery) go in the caption, not on screen.
+- Reel skills installed: viral-instagram-reels and reels-scripting. Store rules above override their defaults (US English, no emojis, brand voice, no promised deliverables in CTAs beyond "Comment LINK").
