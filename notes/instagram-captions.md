@@ -89,3 +89,18 @@ Extra lessons:
 - Two October posts carry the "AI content" label; avoid AI edits that trigger it (lower trust/reach).
 - Since Oct the theme repeated (boho/cowgirl/fringe/vest) with near-identical short captions; reach fell under 1K. Rotate products and hooks.
 - Captions still have no price, CTA, sizes or delivery line.
+
+## Latest 12 posts (profile page, 2026-10-09 to 10-26)
+10-26 carousel 6: Wild prints, boho vibes & a little effortless energy
+10-24 carousel 5: Cowgirl at heart, boho by nature
+10-22 carousel 7: Colorful embroidery, bold details, and a little boho energy
+10-21 carousel 8: Sometimes laughter and lots of color are the best medicine
+10-20 carousel 5: Fringe, boots & a little wild west energy (boosted)
+10-18 carousel 9: Light, but not too light. Perfect for this unpredictable weather
+10-17 carousel 6: A little structure, a lot of style.
+10-16 REEL: Wear your mood, make a statement. The Pop Art Jacket. Bold prints, playful colors, and all the attitude.
+10-15 carousel 5: Fringe, studs & that effortless boho vibe
+10-12 carousel 8: A little color, a little retro, and a whole lot of personality.
+10-11 carousel 7: Not your ordinary vest. A mix of bold prints...
+10-09 carousel 3: Double the prints, double the personality. One top, two styles...
+Pattern: posting almost daily (12 in 18 days) - good cadence. But 11 of 12 are carousels, only 1 reel; "a little/boho/energy/vibe" repeated in 7 of 12; captions are one line with emojis, no product name (except Pop Art Jacket), no price/CTA/hashtags. Profile still 4,704 followers, bio unchanged, link shopwithsask.com, linked FB page "SÄSK".
