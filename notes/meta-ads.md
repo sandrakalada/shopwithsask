@@ -4,10 +4,12 @@ Ad account act_145068365612671 (EGP). Token app "Sask Claude", expires 2026-12-3
 Lifetime spend 123,471 EGP. No pixel on the ad account, no purchase events ever: Meta optimizes for clicks only.
 
 ## Current setup (changed 2026-11-01, owner's request)
-One ad set per post, 100 EGP/day each, 600 EGP/day total. Women 22-44, Instagram only, high-end areas only: Heliopolis (city 661654), Zamalek (city 669395), radius New Cairo + Rehab 30.030,31.470 7 km, Madinaty 30.087,31.640 3 km, Sheikh Zayed 30.044,30.980 4 km, Maadi 29.960,31.257 3 km. Audience estimate 1.8-2.1M.
+One ad set per post, 100 EGP/day each, 600 EGP/day total. Women 22-44, Instagram only, high-end areas only: cities Heliopolis 661654, Zamalek 669395, 6 October City 655657, Sheikh Zayed 2939206; subcity Garden City 661491; neighborhoods Sheraton El Matar 2895299, El Nozha 2895365; radius New Cairo + Rehab 30.030,31.470 7 km, Madinaty 30.087,31.640 3 km, El Shorouk 30.130,31.610 3 km, Maadi 29.960,31.257 3 km, Mokattam 30.020,31.300 3 km, Mohandessin + Dokki 30.050,31.200 2.5 km. Audience estimate 2.0-2.3M.
 Ad sets: 52559524165720 Wild prints vest, 52559527802320 Statement vest, 52559527826120 Star print jacket, 52559527876720 Colorful embroidery, 52559527953920 80s Lite jacket reel, 52559528017120 Crochet vest. Paused: Colorful jacket, old Statement vest copy.
-Old boosts (Wild prints, Cowgirl) end 2026-11-02; boosted posts can only be edited in the Instagram app.
-IG engagers custom audience could not be created by API (error 2654); make it in Ads Manager.
+Old boosts Wild prints (campaign 52558200957120) and Cowgirl (52558200921720) paused at campaign level (ad set edits are blocked for boosts).
+Custom audiences: IG engagers 365d 52559528686520 (create without subtype), 2% lookalike 52559528769920. Populating on 2026-11-01; add to ad sets when ready.
+Pixel "Sask's pixel" 1632032541930768 (business 938316295036444) fires Purchase/AddToCart, but is not connected to the ad account: the ad account is not in that business. Owner must connect it in Business settings. Website custom audiences need the custom audience terms accepted: https://www.facebook.com/customaudiences/app/tos/?act=145068365612671
+3-day check trigger: trig_01JVj1BwXNRpvxwC6AqQtpqQ (old trig_01Vv5w9LEznWXWdkNPwJ7UTb disabled).
 
 ## Original campaign (set up 2026-11-01)
 "SWS | Instagram | Best posts | Nov 2026" (52559524135720), OUTCOME_TRAFFIC, ad set 52559524165720 "Women 21-45 | Cairo+Giza | IG only", 400 EGP/day, landing page views, Advantage audience off, Instagram feed/story/reels.
