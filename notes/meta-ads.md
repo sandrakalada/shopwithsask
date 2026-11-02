@@ -51,3 +51,7 @@ Total ~389 EGP/day.
 
 ## Traffic quality (Shopify, last 90 days)
 facebook referrer (mostly ad in-app clicks): 12,699 sessions, 54 carts, 4 checkouts, 4 orders. instagram: 5,141 sessions, 72 carts, 14 checkouts. Google organic search: 112 sessions, 22 carts, 5 checkouts, 5 orders (best rate). Most orders (328) have no referrer (DM/manual).
+
+## Google (checked 2026-11-02)
+All 215 active products published to Google & YouTube channel, with category and gender/age/condition metafields. Merchant Center approval status not visible via API: owner checks in the Shopify Google & YouTube app.
+Google search visits (90d): 69 sessions; most land on Arabic product pages (/ar/products/...), e.g. floral-boho-mini-dress, flower-embroidered-sweater, embroidered-boho-jacket. Arabic SEO is what brings Google buyers.
