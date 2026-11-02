@@ -55,3 +55,6 @@ facebook referrer (mostly ad in-app clicks): 12,699 sessions, 54 carts, 4 checko
 ## Google (checked 2026-11-02)
 All 215 active products published to Google & YouTube channel, with category and gender/age/condition metafields. Merchant Center approval status not visible via API: owner checks in the Shopify Google & YouTube app.
 Google search visits (90d): 69 sessions; most land on Arabic product pages (/ar/products/...), e.g. floral-boho-mini-dress, flower-embroidered-sweater, embroidered-boho-jacket. Arabic SEO is what brings Google buyers.
+
+## 2026-11-02 test arm D added
+D IG engagers 52559650248120 (57 EGP, Statement vest DM, engagers 365d inside same women 22-44 high-end filter, ~43-51k people). Star jacket website ad set 52559527826120 paused to stay under 400. Total 391 EGP/day. Lookalike 52559528769920 still too small.
