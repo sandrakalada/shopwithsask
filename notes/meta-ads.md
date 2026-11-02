@@ -58,3 +58,11 @@ Google search visits (90d): 69 sessions; most land on Arabic product pages (/ar/
 
 ## 2026-11-02 test arm D added
 D IG engagers 52559650248120 (57 EGP, Statement vest DM, engagers 365d inside same women 22-44 high-end filter, ~43-51k people). Star jacket website ad set 52559527826120 paused to stay under 400. Total 391 EGP/day. Lookalike 52559528769920 still too small.
+
+## Ad research by real orders (Oct 1 - Nov 2, 2026)
+Website orders with journey data start Oct 1 (earlier orders are imports). ~32 web orders #1340-#1373; 5 cancelled (3 of them ad-driven, incl. 3,430 EGP).
+Meta spend Oct 1 - Nov 2: 19,706 EGP. Non-cancelled orders touched by an ad (first or last click): 14 orders, 20,505 EGP incl. delivery -> about break-even on revenue, a loss after product cost.
+Free channels same period: Google (organic + free Shopping listings, utm sag_organic) 6 orders 8,395 EGP; Instagram bio link 5 orders 7,194 EGP.
+Ads that brought orders: Serving vintage military chic (538 EGP spend, 3 orders), Not your ordinary vest (499, 3 orders first-click), That colorful mood (592, 2 orders 3,000), A statement vest (528, 2,760), The cherry on top (314, 3,190, summer), A little color (503, 2,520), Double the prints (725, 780), A little structure / A little texture (assist).
+Cheapest-visit ads brought 0 orders: Light not too light (754 EGP, 1,481 visits), Cowgirl (702, 1,361), Fringe boots (616, 1,097), Kind of vest changes (562, 1,467), Tiny florals (162, 563). Lesson: cost per visit does not predict sales; judge by orders (Shopify customerJourneySummary utm campaign ids).
+Vests sell best from ads.
