@@ -40,3 +40,6 @@ Website ad sets: 52559527802320 Statement vest, 52559527826120 Star jacket, 5255
 DM ad sets: 52559596425120 Statement vest, 52559596630120 Star jacket, 52559596676720 Colorful embroidery, 52559596704120 80s reel.
 Owner does not want to set up the pixel; judge ads by DMs/orders and Shopify carts.
 API rate limit: 1 write per 30 s on ad sets in bursts; space calls.
+
+## 2026-11-02 owner cap: max 400 EGP/day total (DMs + website)
+Website campaign resumed; 80s reel website ad set 52559527953920 paused (worst: 7.89 EGP/visit). Live: 4 DM ad sets x 55 + 3 website (Statement vest, Star jacket, Colorful embroidery) x 55 = 385 EGP/day.
