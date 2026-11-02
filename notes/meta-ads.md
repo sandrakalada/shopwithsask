@@ -5,7 +5,7 @@ Lifetime spend 123,471 EGP. No pixel on the ad account, no purchase events ever:
 
 ## Current setup (changed 2026-11-01, owner's request)
 One ad set per post, 100 EGP/day each (5 active = 500 EGP/day). Never advertise summer pieces from November; check the post with the owner if unsure. Every targeting edit sends ads back to review, so batch edits. Women 22-44, Instagram only, high-end areas only: cities Heliopolis 661654, Zamalek 669395, 6 October City 655657, Sheikh Zayed 2939206; subcity Garden City 661491; neighborhoods Sheraton El Matar 2895299, El Nozha 2895365; radius New Cairo + Rehab 30.030,31.470 7 km, Madinaty 30.087,31.640 3 km, El Shorouk 30.130,31.610 3 km, Maadi 29.960,31.257 3 km, Mokattam 30.020,31.300 3 km, Mohandessin + Dokki 30.050,31.200 2.5 km. Audience estimate 2.0-2.3M.
-Ad sets: 52559524165720 Wild prints vest (PAUSED 2026-11-02: owner says summer product), 52559527802320 Statement vest, 52559527826120 Star print jacket, 52559527876720 Colorful embroidery, 52559527953920 80s Lite jacket reel, 52559528017120 Crochet vest. Paused: Colorful jacket, old Statement vest copy.
+Ad sets: 52559524165720 Wild prints vest (PAUSED 2026-11-02, summer), crochet 52559528017120 (PAUSED 2026-11-02, summer), 52559527802320 Statement vest, 52559527826120 Star print jacket, 52559527876720 Colorful embroidery, 52559527953920 80s Lite jacket reel, 52559528017120 Crochet vest. Paused: Colorful jacket, old Statement vest copy.
 Old boosts Wild prints (campaign 52558200957120) and Cowgirl (52558200921720) paused at campaign level (ad set edits are blocked for boosts).
 Custom audiences: IG engagers 365d 52559528686520 (create without subtype), 2% lookalike 52559528769920. Populating on 2026-11-01; add to ad sets when ready.
 Pixel "Sask's pixel" 1632032541930768 (business 938316295036444) fires Purchase/AddToCart, but is not connected to the ad account: the ad account is not in that business. Owner must connect it in Business settings. Website custom audiences need the custom audience terms accepted: https://www.facebook.com/customaudiences/app/tos/?act=145068365612671
@@ -29,3 +29,6 @@ Weak: Colorful jacket retro 1.4-1.5, Sometimes laughter 1.5.
 Never advertised: Star print jacket (Oct 31), Colorful embroidery (Oct 22), 80's Lite Jacket reel (Sep 17), Flowy lace skirt (Apr 17, 50 likes).
 Most products have 1 in stock: link ads to collection pages, not single products.
 Most paid orders have no referrer (DM/manual orders), so ad sales are not traceable.
+
+## 2026-11-01 to 11-02 results
+Shopify: 715 sessions from Facebook/Instagram links, 7 add-to-carts, 2 checkouts. Ad traffic (link clicks / landing page views) is not buying. Plan: connect pixel, then run a Sales (purchase) campaign instead of traffic.
