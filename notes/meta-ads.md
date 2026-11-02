@@ -32,3 +32,11 @@ Most paid orders have no referrer (DM/manual orders), so ad sales are not tracea
 
 ## 2026-11-01 to 11-02 results
 Shopify: 715 sessions from Facebook/Instagram links, 7 add-to-carts, 2 checkouts. Ad traffic (link clicks / landing page views) is not buying. Plan: connect pixel, then run a Sales (purchase) campaign instead of traffic.
+
+## Setup from 2026-11-02 (owner: mix DMs and website)
+Each post runs twice: website ad set (traffic campaign 52559524135720) + DM ad set (campaign "SWS | Instagram DMs | Nov 2026" 52559596204120, OUTCOME_ENGAGEMENT, CONVERSATIONS, INSTAGRAM_DIRECT, CTA INSTAGRAM_MESSAGE link https://www.instagram.com/shopwithsask app_link instagram://direct?userid=72087065543).
+Meta minimum budget ~54 EGP/day per ad set, so 55 + 55 = 110 EGP/day per post, 440/day total.
+Website ad sets: 52559527802320 Statement vest, 52559527826120 Star jacket, 52559527876720 Colorful embroidery, 52559527953920 80s reel.
+DM ad sets: 52559596425120 Statement vest, 52559596630120 Star jacket, 52559596676720 Colorful embroidery, 52559596704120 80s reel.
+Owner does not want to set up the pixel; judge ads by DMs/orders and Shopify carts.
+API rate limit: 1 write per 30 s on ad sets in bursts; space calls.
