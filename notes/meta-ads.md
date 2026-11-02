@@ -43,3 +43,11 @@ API rate limit: 1 write per 30 s on ad sets in bursts; space calls.
 
 ## 2026-11-02 owner cap: max 400 EGP/day total (DMs + website)
 Website campaign resumed; 80s reel website ad set 52559527953920 paused (worst: 7.89 EGP/visit). Live: 4 DM ad sets x 55 + 3 website (Statement vest, Star jacket, Colorful embroidery) x 55 = 385 EGP/day.
+
+## Audience A/B test (started 2026-11-02, DM campaign, same Statement vest post)
+A Broad 52559596425120 (55 EGP), B Brands 52559642503520 (57: Zara, Mango, H&M, Bershka, Pull & Bear, Stradivarius), C Boho-Vintage 52559642562520 (57: Boho-chic, Bohemian style, Vintage clothing, Free People, Anthropologie, Street fashion). Same geo/age/gender. Judge after 5-7 days on cost per conversation and orders; winner audience goes to all ads.
+Paused to stay under 400: Colorful embroidery DM 52559596676720, 80s reel DM 52559596704120. Star jacket DM 52559596630120 stays broad. Meta minimum rose to ~56.35 EGP for new ad sets.
+Total ~389 EGP/day.
+
+## Traffic quality (Shopify, last 90 days)
+facebook referrer (mostly ad in-app clicks): 12,699 sessions, 54 carts, 4 checkouts, 4 orders. instagram: 5,141 sessions, 72 carts, 14 checkouts. Google organic search: 112 sessions, 22 carts, 5 checkouts, 5 orders (best rate). Most orders (328) have no referrer (DM/manual).
