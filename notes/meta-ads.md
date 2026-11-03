@@ -66,3 +66,6 @@ Free channels same period: Google (organic + free Shopping listings, utm sag_org
 Ads that brought orders: Serving vintage military chic (538 EGP spend, 3 orders), Not your ordinary vest (499, 3 orders first-click), That colorful mood (592, 2 orders 3,000), A statement vest (528, 2,760), The cherry on top (314, 3,190, summer), A little color (503, 2,520), Double the prints (725, 780), A little structure / A little texture (assist).
 Cheapest-visit ads brought 0 orders: Light not too light (754 EGP, 1,481 visits), Cowgirl (702, 1,361), Fringe boots (616, 1,097), Kind of vest changes (562, 1,467), Tiny florals (162, 563). Lesson: cost per visit does not predict sales; judge by orders (Shopify customerJourneySummary utm campaign ids).
 Vests sell best from ads.
+
+## 2026-11-03 check
+Since Nov 2: 552 EGP spent, 0 new orders. DM test: D followers 4 DMs (22/DM), B brands 2 (33), A broad 2 (36), C boho 0 and Star jacket DM 0 -> C 52559642562520 and Star jacket DM 52559596630120 PAUSED. Website ads -> /collections/vests 109 sessions, 2 carts, 0 orders.
