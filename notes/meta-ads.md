@@ -9,7 +9,7 @@ Ad sets: 52559524165720 Wild prints vest (PAUSED 2026-11-02, summer), crochet 52
 Old boosts Wild prints (campaign 52558200957120) and Cowgirl (52558200921720) paused at campaign level (ad set edits are blocked for boosts).
 Custom audiences: IG engagers 365d 52559528686520 (create without subtype), 2% lookalike 52559528769920. Populating on 2026-11-01; add to ad sets when ready.
 Pixel "Sask's pixel" 1632032541930768 (business 938316295036444) fires Purchase/AddToCart, but is not connected to the ad account: the ad account is not in that business. Owner must connect it in Business settings. Website custom audiences need the custom audience terms accepted: https://www.facebook.com/customaudiences/app/tos/?act=145068365612671
-Ads check trigger: trig_01JVj1BwXNRpvxwC6AqQtpqQ, twice daily 10:37 and 21:37 Cairo (old trig_01Vv5w9LEznWXWdkNPwJ7UTb disabled). Pause-losers rule in CLAUDE.md.
+Ads check: daily trig_01JzVtcjaqrbGKcxPrRtqGQA 12:47 Cairo (old twice-daily trig_01JVj1BwXNRpvxwC6AqQtpqQ disabled 2026-11-03) (old trig_01Vv5w9LEznWXWdkNPwJ7UTb disabled). Pause-losers rule in CLAUDE.md.
 
 ## Original campaign (set up 2026-11-01)
 "SWS | Instagram | Best posts | Nov 2026" (52559524135720), OUTCOME_TRAFFIC, ad set 52559524165720 "Women 21-45 | Cairo+Giza | IG only", 400 EGP/day, landing page views, Advantage audience off, Instagram feed/story/reels.
@@ -82,3 +82,4 @@ Paused: Statement vest website 52559527802320, Colorful embroidery website 52559
 Nov 2-3 spend 571 EGP. Orders since Nov 2: only #1373 (first click old boost 52555009088720, last click IG organic). DMs: D engagers 4, A broad 2, B brands 2. 4 product-page ad sets approved (ACTIVE) 13:18 UTC, no spend yet. Live budget 397 EGP/day. Nothing new to pause.
 2026-11-03: product-page ad stock checked: Floral Sleeveless Vest 3, Bohemian Desert Maxi Skirt 12, Floral Print Sleeveless Vest 4, Boho Jacket 2 (watch: pause if it drops to 1). DM A/B/D test runs to ~Nov 7-9 before choosing a winner.
 Daily Meta + Google check scheduled task trig_01JzVtcjaqrbGKcxPrRtqGQA, every day 12:47 Cairo (owner request 2026-11-03). Weekly Google check trig_01Q8U88QNyTzQUTM83pTCkAQ and twice-daily Meta check trig_01JVj1BwXNRpvxwC6AqQtpqQ still on.
+2026-11-03: twice-daily Meta check and weekly Google check turned OFF (owner wants one report). Only daily check trig_01JzVtcjaqrbGKcxPrRtqGQA (12:47 Cairo) runs; it now also covers the Meta token warning, lookalike, DM test winner (~Nov 7-9) and Google verdict (~Nov 17).
