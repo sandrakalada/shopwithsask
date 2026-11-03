@@ -19,7 +19,7 @@ Merchant Center: 628 items, 627 approved, 1 not approved.
 
 ## API status (2026-11-03)
 Reading works. Use API v25 (v22 blocked as deprecated). Call WITHOUT the login-customer-id header (with 7821083519 it returns 403 USER_PERMISSION_DENIED). No developer token needed. Account currency SAR, time zone Asia/Riyadh.
-IDs: Performance Max-2 = campaign 24362293653 (budget 65 SAR/day, Max conv. value, tROAS 310%). Modern Style Fashion Shop = 23697163172 (paused).
+IDs: Performance Max-2 = campaign 24362293653 (budget 25 SAR/day since 2026-11-03, was 65; Max conv. value, tROAS 310%). Modern Style Fashion Shop = 23697163172 (paused).
 
 ## API data, last 7 days to 2026-11-02 (Performance Max-2)
 75.4 SAR, 747 clicks, 83 "conversions" / 4,168 value.
@@ -33,3 +33,4 @@ Goals: GA4 actions Checkout, Shopping Cart, Purchase set to secondary. Account g
 Still primary inside PURCHASE: "Google Shopping App Purchase" (keep) and codeless "PURCHASE" 7550949594 (duplicate). Codeless (WEBPAGE_CODELESS) actions cannot be changed by API (MUTATE_NOT_ALLOWED); owner must set PURCHASE to secondary in the UI (Goals > Conversions > PURCHASE > Edit > Secondary).
 Channels: PMax network_settings readable in v25. target_youtube was already false and accepts false. target_content_network (Display) cannot be changed (OPERATION_NOT_PERMITTED_FOR_CONTEXT); target_search_network cannot be targeted (CANNOT_TARGET_SEARCH_NETWORK). Display spend is small (5 SAR/week) but brings ~460 junk clicks. No channel tiers via API for this account yet.
 Expect Google's conversion count to drop to real purchases; tROAS 310% may then limit delivery. Check in 2 weeks (around 2026-11-17) against Shopify paid utm orders.
+Budget: lowered from 65 to 25 SAR/day on 2026-11-03 (owner approved) while the campaign learns on purchases only. 65 SAR/day was about 850 EGP/day, over twice the Meta cap. Another chat had also set GA4 purchase tags secondary and tROAS 310%; same end state.
