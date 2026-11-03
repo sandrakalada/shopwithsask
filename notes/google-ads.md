@@ -19,7 +19,7 @@ Merchant Center: 628 items, 627 approved, 1 not approved.
 
 ## API status (2026-11-03)
 Reading works. Use API v25 (v22 blocked as deprecated). Call WITHOUT the login-customer-id header (with 7821083519 it returns 403 USER_PERMISSION_DENIED). No developer token needed. Account currency SAR, time zone Asia/Riyadh.
-IDs: Performance Max-2 = campaign 24362293653 (budget 25 SAR/day since 2026-11-03, was 65; Max conv. value, tROAS 310%). Modern Style Fashion Shop = 23697163172 (paused).
+IDs: Performance Max-2 = campaign 24362293653 (budget 10 SAR/day since 2026-11-03 (65 -> 25 -> 10, owner: Google too high); Max conv. value, tROAS 310%). Modern Style Fashion Shop = 23697163172 (paused).
 
 ## API data, last 7 days to 2026-11-02 (Performance Max-2)
 75.4 SAR, 747 clicks, 83 "conversions" / 4,168 value.
@@ -44,3 +44,4 @@ Weekly Google check scheduled task trig_01Q8U88QNyTzQUTM83pTCkAQ, Mondays 13:13 
 2026-11-03: duplicate codeless PURCHASE (7550949594) cannot be changed by API (MUTATE_NOT_ALLOWED on primary_for_goal, include_in_conversions_metric, status). Workaround done: custom conversion goal "Real purchases (Shopify)" 6459772980 = only Google Shopping App Purchase 7822081622, set on Performance Max-2 (conversionGoalCampaignConfig goal_config_level CAMPAIGN). Campaign now bids and reports only on that action; the codeless duplicate only shows in account-wide totals.
 Daily Meta + Google check scheduled task trig_01JzVtcjaqrbGKcxPrRtqGQA, every day 12:47 Cairo (owner request 2026-11-03). Weekly Google check trig_01Q8U88QNyTzQUTM83pTCkAQ and twice-daily Meta check trig_01JVj1BwXNRpvxwC6AqQtpqQ still on.
 2026-11-03: twice-daily Meta check and weekly Google check turned OFF (owner wants one report). Only daily check trig_01JzVtcjaqrbGKcxPrRtqGQA (12:47 Cairo) runs; it now also covers the Meta token warning, lookalike, DM test winner (~Nov 7-9) and Google verdict (~Nov 17).
+2026-11-03: budget lowered 25 -> 10 SAR/day (owner: Google too high). Never raise without asking.
