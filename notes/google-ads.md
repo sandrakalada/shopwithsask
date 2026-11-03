@@ -34,3 +34,8 @@ Still primary inside PURCHASE: "Google Shopping App Purchase" (keep) and codeles
 Channels: PMax network_settings readable in v25. target_youtube was already false and accepts false. target_content_network (Display) cannot be changed (OPERATION_NOT_PERMITTED_FOR_CONTEXT); target_search_network cannot be targeted (CANNOT_TARGET_SEARCH_NETWORK). Display spend is small (5 SAR/week) but brings ~460 junk clicks. No channel tiers via API for this account yet.
 Expect Google's conversion count to drop to real purchases; tROAS 310% may then limit delivery. Check in 2 weeks (around 2026-11-17) against Shopify paid utm orders.
 Budget: lowered from 65 to 25 SAR/day on 2026-11-03 (owner approved) while the campaign learns on purchases only. 65 SAR/day was about 850 EGP/day, over twice the Meta cap. Another chat had also set GA4 purchase tags secondary and tROAS 310%; same end state.
+
+## 2026-11-03 evening check
+Nov 3: 19.1 SAR, 99 clicks, 2 conv. Shopify since Nov 2: 0 orders from paid Google.
+Setup verified: PMax linked to Merchant Center 5869936766 (Shopify feed, Arabic titles show), one asset group, all products, auto-tagging on. Location = all Egypt (2818) with PRESENCE_OR_INTEREST. Search terms 30d: 3,336 terms, 127 clicks, 55 SAR; includes competitor brands (lc waikiki 7.2 SAR, adam store, bloom fashion, curves and co, rojada, محلات النصر).
+Proposed (not done, needs owner OK): presence-only location, limit to Cairo/Giza/Alexandria, negative keywords for competitor brand names.

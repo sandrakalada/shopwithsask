@@ -77,3 +77,6 @@ Website ads now link straight to product pages, product photos from the store, b
 - Floral Sleeveless Vest 52560135518320
 - Boho Jacket 52560135586920
 Paused: Statement vest website 52559527802320, Colorful embroidery website 52559527876720. DM A/B/D still on. Instagram CDN (cdninstagram.com) is blocked by the session network policy, so post photos cannot be viewed; store photos used instead.
+
+## 2026-11-03 evening check
+Nov 2-3 spend 571 EGP. Orders since Nov 2: only #1373 (first click old boost 52555009088720, last click IG organic). DMs: D engagers 4, A broad 2, B brands 2. 4 product-page ad sets approved (ACTIVE) 13:18 UTC, no spend yet. Live budget 397 EGP/day. Nothing new to pause.
