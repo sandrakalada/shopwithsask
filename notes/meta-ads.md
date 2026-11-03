@@ -83,3 +83,6 @@ Nov 2-3 spend 571 EGP. Orders since Nov 2: only #1373 (first click old boost 525
 2026-11-03: product-page ad stock checked: Floral Sleeveless Vest 3, Bohemian Desert Maxi Skirt 12, Floral Print Sleeveless Vest 4, Boho Jacket 2 (watch: pause if it drops to 1). DM A/B/D test runs to ~Nov 7-9 before choosing a winner.
 Daily Meta + Google check scheduled task trig_01JzVtcjaqrbGKcxPrRtqGQA, every day 12:47 Cairo (owner request 2026-11-03). Weekly Google check trig_01Q8U88QNyTzQUTM83pTCkAQ and twice-daily Meta check trig_01JVj1BwXNRpvxwC6AqQtpqQ still on.
 2026-11-03: twice-daily Meta check and weekly Google check turned OFF (owner wants one report). Only daily check trig_01JzVtcjaqrbGKcxPrRtqGQA (12:47 Cairo) runs; it now also covers the Meta token warning, lookalike, DM test winner (~Nov 7-9) and Google verdict (~Nov 17).
+
+## 2026-11-03 owner: decrease Meta spend
+Meta minimum ~56-57 EGP per ad set, so cut by pausing. Paused: TEST A Broad 52559596425120 (worst cost/DM), Boho Jacket 52560135586920 (2 left), Floral Sleeveless Vest 52560135518320. Live: D IG engagers 52559650248120, B Brands 52559642503520, Bohemian Desert Maxi Skirt 52560135401920 (12 in stock), Floral Print Sleeveless Vest 52560135455920. Total 228 EGP/day (was 397). Do not turn paused ones back on without asking.
