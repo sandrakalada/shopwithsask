@@ -80,3 +80,4 @@ Paused: Statement vest website 52559527802320, Colorful embroidery website 52559
 
 ## 2026-11-03 evening check
 Nov 2-3 spend 571 EGP. Orders since Nov 2: only #1373 (first click old boost 52555009088720, last click IG organic). DMs: D engagers 4, A broad 2, B brands 2. 4 product-page ad sets approved (ACTIVE) 13:18 UTC, no spend yet. Live budget 397 EGP/day. Nothing new to pause.
+2026-11-03: product-page ad stock checked: Floral Sleeveless Vest 3, Bohemian Desert Maxi Skirt 12, Floral Print Sleeveless Vest 4, Boho Jacket 2 (watch: pause if it drops to 1). DM A/B/D test runs to ~Nov 7-9 before choosing a winner.
