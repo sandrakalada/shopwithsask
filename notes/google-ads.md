@@ -6,8 +6,9 @@ Existing managers on 628-408-8654: Shopify Google Channel App, Hostinger Embedde
 ## API access
 Developer tokens were retired in Sep 2026; access level lives on the Google Cloud project. Project "Sask Claude" (id sask-claude, number 64554635373). Google Ads API enabled. Access level: Test, Explorer requested 2026-11-03 (check Cloud console > Google Ads API > Manage).
 OAuth: consent screen External, published, branding verified. Desktop OAuth client "Sask Claude".
-Environment (Default): GOOGLE_ADS_CLIENT_ID, GOOGLE_ADS_CLIENT_SECRET, GOOGLE_ADS_CUSTOMER_ID=6284088654, GOOGLE_ADS_LOGIN_CUSTOMER_ID=7821083519. Still needed: GOOGLE_ADS_REFRESH_TOKEN.
+Environment (Default): GOOGLE_ADS_CLIENT_ID, GOOGLE_ADS_CLIENT_SECRET, GOOGLE_ADS_CUSTOMER_ID=6284088654, GOOGLE_ADS_LOGIN_CUSTOMER_ID=7821083519. GOOGLE_ADS_REFRESH_TOKEN obtained 2026-11-03 (owner to save in Default).
 Getting the refresh token: build the auth URL (scope https://www.googleapis.com/auth/adwords, redirect_uri http://127.0.0.1, access_type=offline, prompt=consent). Owner opens it, approves (click Advanced > Go to Sask Claude on the unverified warning), the browser lands on a 127.0.0.1 page that fails to load; owner copies the "code" value from the address bar. Exchange at oauth2.googleapis.com/token, then owner saves the refresh token in Default (never paste tokens in chat if avoidable). The developer-token header is optional now.
+API versions: v23-v25 work (v22 and older blocked). Endpoint POST https://googleads.googleapis.com/v25/customers/6284088654/googleAds:search works without developer-token or login-customer-id headers. Connection verified 2026-11-03.
 If the login customer header errors, call without login-customer-id (the user has direct access to 628-408-8654).
 
 ## Findings (Oct 27 - Nov 2, from owner screenshots)
