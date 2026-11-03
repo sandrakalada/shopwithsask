@@ -69,3 +69,11 @@ Vests sell best from ads.
 
 ## 2026-11-03 check
 Since Nov 2: 552 EGP spent, 0 new orders. DM test: D followers 4 DMs (22/DM), B brands 2 (33), A broad 2 (36), C boho 0 and Star jacket DM 0 -> C 52559642562520 and Star jacket DM 52559596630120 PAUSED. Website ads -> /collections/vests 109 sessions, 2 carts, 0 orders.
+
+## 2026-11-03 product-page ads (owner chose option 2)
+Website ads now link straight to product pages, product photos from the store, bilingual copy, utm_source=ig utm_medium=paid utm_campaign={{campaign.id}} utm_content={{ad.id}}. 57 EGP each:
+- Bohemian Desert Maxi Skirt adset 52560135401920
+- Floral Print Sleeveless Vest 52560135455920
+- Floral Sleeveless Vest 52560135518320
+- Boho Jacket 52560135586920
+Paused: Statement vest website 52559527802320, Colorful embroidery website 52559527876720. DM A/B/D still on. Instagram CDN (cdninstagram.com) is blocked by the session network policy, so post photos cannot be viewed; store photos used instead.
