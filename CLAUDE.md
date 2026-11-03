@@ -33,6 +33,12 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 ## Reporting
 - Real revenue = orders that are fulfilled AND paid. ShopifyQL filter: `WHERE order_fulfillment_status = 'fulfilled' AND order_payment_status = 'paid'`.
 
+## Meta ads
+- Setup, IDs and history: notes/meta-ads.md. Read it before any ads work.
+- Hard cap: all live ad sets together max 400 EGP/day. Audience: women 22-44, Instagram only, high-end Cairo and Giza areas. Never advertise summer pieces in the cold season, sold-out items, or items with only 1 piece left.
+- Judge ads by orders (Shopify customerJourneySummary utm campaign/ad ids) and DMs, never by cheap visits.
+- Pause losers right away (owner's rule): whenever ads are checked, pause any ad set that has spent at least 85 EGP with 0 results (0 DMs for DM ads; 0 add-to-carts and 0 orders for website ads) while another ad in the same campaign is getting results, or whose cost per result is more than 2x the campaign average after 85 EGP spend. Do not move its budget without asking. Tell the owner what was paused and why.
+
 ## Instagram
 - Instagram study and competitor list: notes/instagram-competitors.md. Read it before any Instagram or marketing work.
 - Instagram captions: follow notes/instagram-captions.md (English only, short, 1-4 emojis, never price or sizes). When the owner sends an image for Instagram, write the caption from it.

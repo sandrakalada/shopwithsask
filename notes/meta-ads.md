@@ -9,7 +9,7 @@ Ad sets: 52559524165720 Wild prints vest (PAUSED 2026-11-02, summer), crochet 52
 Old boosts Wild prints (campaign 52558200957120) and Cowgirl (52558200921720) paused at campaign level (ad set edits are blocked for boosts).
 Custom audiences: IG engagers 365d 52559528686520 (create without subtype), 2% lookalike 52559528769920. Populating on 2026-11-01; add to ad sets when ready.
 Pixel "Sask's pixel" 1632032541930768 (business 938316295036444) fires Purchase/AddToCart, but is not connected to the ad account: the ad account is not in that business. Owner must connect it in Business settings. Website custom audiences need the custom audience terms accepted: https://www.facebook.com/customaudiences/app/tos/?act=145068365612671
-3-day check trigger: trig_01JVj1BwXNRpvxwC6AqQtpqQ (old trig_01Vv5w9LEznWXWdkNPwJ7UTb disabled).
+Ads check trigger: trig_01JVj1BwXNRpvxwC6AqQtpqQ, twice daily 10:37 and 21:37 Cairo (old trig_01Vv5w9LEznWXWdkNPwJ7UTb disabled). Pause-losers rule in CLAUDE.md.
 
 ## Original campaign (set up 2026-11-01)
 "SWS | Instagram | Best posts | Nov 2026" (52559524135720), OUTCOME_TRAFFIC, ad set 52559524165720 "Women 21-45 | Cairo+Giza | IG only", 400 EGP/day, landing page views, Advantage audience off, Instagram feed/story/reels.
