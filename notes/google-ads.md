@@ -28,7 +28,8 @@ By network: Search 63.9 SAR, 90 clicks, all 83 conv. Search partners 5.8 SAR, 17
 Primary conversion actions now: Checkout, Shopping Cart, ADD_TO_CART, Purchase, PURCHASE, CONTACT, BEGIN_CHECKOUT, Google Shopping App Purchase. Secondary: the other Google Shopping App actions.
 Shopify Oct 27 - Nov 2: 4 orders from Google, all utm google / product_sync / sag_organic (free listings, not paid). 0 orders with paid Google utm. Paid PMax produced no traceable orders.
 
-## Planned fixes (waiting for owner approval)
-a) Keep only "Google Shopping App Purchase" (7822081622, Shopify's own tag) primary; set the other two purchase actions, all cart/checkout, CONTACT to secondary (avoid triple counting).
-b) PMax channel controls: turn off Display/YouTube/Search partners if the account offers it; otherwise brand exclusions/placement exclusions are not possible on PMax via API.
-c) Re-judge after 2 weeks against Shopify paid utm orders.
+## Changes made 2026-11-03 (owner approved)
+Goals: GA4 actions Checkout, Shopping Cart, Purchase set to secondary. Account goals ADD_TO_CART, BEGIN_CHECKOUT, CONTACT, PAGE_VIEW, DEFAULT set to not biddable, so only the PURCHASE goal drives bidding (campaign goals confirm only PURCHASE biddable).
+Still primary inside PURCHASE: "Google Shopping App Purchase" (keep) and codeless "PURCHASE" 7550949594 (duplicate). Codeless (WEBPAGE_CODELESS) actions cannot be changed by API (MUTATE_NOT_ALLOWED); owner must set PURCHASE to secondary in the UI (Goals > Conversions > PURCHASE > Edit > Secondary).
+Channels: PMax network_settings readable in v25. target_youtube was already false and accepts false. target_content_network (Display) cannot be changed (OPERATION_NOT_PERMITTED_FOR_CONTEXT); target_search_network cannot be targeted (CANNOT_TARGET_SEARCH_NETWORK). Display spend is small (5 SAR/week) but brings ~460 junk clicks. No channel tiers via API for this account yet.
+Expect Google's conversion count to drop to real purchases; tROAS 310% may then limit delivery. Check in 2 weeks (around 2026-11-17) against Shopify paid utm orders.
