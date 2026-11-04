@@ -89,3 +89,5 @@ Meta minimum ~56-57 EGP per ad set, so cut by pausing. Paused: TEST A Broad 5255
 
 ## Facebook Page / AI replies (2026-11-04)
 Page phone +966 50 524 6570 is correct (owner confirmed); keep it. Page has no website listed. IG ice breakers (delivery, payment, shipping area, how to order, EN+AR) are set. Owner reports the Meta AI DM replies give wrong data; token cannot read IG DMs (needs advanced instagram_manage_messages) or edit Page (no pages_manage_metadata). Fix is in Business Suite: https://business.facebook.com/latest/inbox/automations?asset_id=519356447933571
+## 2026-11-04 DM ads switched to Floral Print Sleeveless Vest with welcome message
+Owner: Meta AI quoted 880 for the Boho Embroidered Vest (real 930, only Small left). Creative 2178355596396719 (product photo, CTA INSTAGRAM_MESSAGE, page_welcome_message 219 chars EN+AR with 940 EGP, S/M/L, link, ice breakers sizes/delivery/payment). New ads: A 52560489775920, B 52560490104720, D 52560490338320 in the same test ad sets; old Statement vest DM ads paused. Template script: notes/dm-ad-welcome-template.py (welcome text limit 300 chars). Rule in CLAUDE.md: every DM ad gets this.

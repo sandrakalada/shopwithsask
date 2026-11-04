@@ -37,6 +37,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - Setup, IDs and history: notes/meta-ads.md. Read it before any ads work.
 - Hard cap: all live ad sets together max 400 EGP/day. Audience: women 22-44, Instagram only, high-end Cairo and Giza areas. Never advertise summer pieces in the cold season, sold-out items, or items with only 1 piece left.
 - Judge ads by orders (Shopify customerJourneySummary utm campaign/ad ids) and DMs, never by cheap visits.
+- Every DM (Instagram message) ad, current and future, carries a fixed welcome message (page_welcome_message, max 300 characters) in English then Arabic with the live website price, the sizes in stock and the product link, plus 3 ice breakers (sizes, delivery fees, payment/try at the door). Take price and sizes from Shopify at the moment you create it; when a price or size changes or sells out, replace the ad with an updated one. Website ads link straight to the product page instead. Never let a DM ad depend on Meta AI for prices.
 - Pause losers right away (owner's rule): whenever ads are checked, pause any ad set that has spent at least 85 EGP with 0 results (0 DMs for DM ads; 0 add-to-carts and 0 orders for website ads) while another ad in the same campaign is getting results, or whose cost per result is more than 2x the campaign average after 85 EGP spend. Do not move its budget without asking. Tell the owner what was paused and why.
 
 ## Instagram
