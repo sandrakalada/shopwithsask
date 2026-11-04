@@ -108,3 +108,4 @@ Paused: traffic carousels 52560492747520 and 52560492804120. Total live still 22
 
 ## 2026-11-04 daily check
 Token valid, no expiry. Setup as in the sections above (Sales campaign + DM test with Floral Print Sleeveless Vest welcome-message ads). Live total 228 EGP/day (Sales WARM, Sales COLD, DM D, DM B). DM test to date: D 135 EGP 7 DMs (19/DM), B 117 EGP 3 DMs (39/DM), A paused 86 EGP 2 DMs. Lookalike 52559528769920 ready (538k): suggest for Sales COLD. Nothing paused.
+2026-11-04: owner approved; lookalike 52559528769920 (2% Egypt, IG engagers) added to Sales COLD 52560496984720 inside women 22-44 / Instagram / high-end areas. Audience ~210-247k. Budget unchanged (57).
