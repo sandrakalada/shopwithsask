@@ -105,3 +105,6 @@ New campaign "SWS | Sales | Website | Nov 2026" 52560496822120 (OUTCOME_SALES, o
 - Sales WARM - IG engagers 52560496848120 (ad 52560496880320), 57 EGP
 - Sales COLD - Women 22-44 high-end 52560496984720 (ad 52560497001120), 57 EGP
 Paused: traffic carousels 52560492747520 and 52560492804120. Total live still 228 EGP/day (DM B + DM D + 2 Sales). Purchase volume is low (~4/week), so learning is slow; judge after 7 days, not by visits. Future website ads: always OUTCOME_SALES with this pixel, never LANDING_PAGE_VIEWS.
+
+## 2026-11-04 daily check
+Token valid, no expiry. Setup as in the sections above (Sales campaign + DM test with Floral Print Sleeveless Vest welcome-message ads). Live total 228 EGP/day (Sales WARM, Sales COLD, DM D, DM B). DM test to date: D 135 EGP 7 DMs (19/DM), B 117 EGP 3 DMs (39/DM), A paused 86 EGP 2 DMs. Lookalike 52559528769920 ready (538k): suggest for Sales COLD. Nothing paused.
