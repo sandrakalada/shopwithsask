@@ -86,3 +86,6 @@ Daily Meta + Google check scheduled task trig_01JzVtcjaqrbGKcxPrRtqGQA, every da
 
 ## 2026-11-03 owner: decrease Meta spend
 Meta minimum ~56-57 EGP per ad set, so cut by pausing. Paused: TEST A Broad 52559596425120 (worst cost/DM), Boho Jacket 52560135586920 (2 left), Floral Sleeveless Vest 52560135518320. Live: D IG engagers 52559650248120, B Brands 52559642503520, Bohemian Desert Maxi Skirt 52560135401920 (12 in stock), Floral Print Sleeveless Vest 52560135455920. Total 228 EGP/day (was 397). Do not turn paused ones back on without asking.
+
+## Facebook Page / AI replies (2026-11-04)
+Page phone +966 50 524 6570 is correct (owner confirmed); keep it. Page has no website listed. IG ice breakers (delivery, payment, shipping area, how to order, EN+AR) are set. Owner reports the Meta AI DM replies give wrong data; token cannot read IG DMs (needs advanced instagram_manage_messages) or edit Page (no pages_manage_metadata). Fix is in Business Suite: https://business.facebook.com/latest/inbox/automations?asset_id=519356447933571
