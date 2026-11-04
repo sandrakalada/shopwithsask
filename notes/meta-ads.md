@@ -1,7 +1,7 @@
 # Meta ads (checked 2026-11-01)
 
 Ad account act_145068365612671 (EGP). Token app "Sask Claude", expires 2026-12-31. Scopes: ads_management, ads_read, business_management, catalog_management, instagram_basic, pages_show_list, pages_read_engagement (no instagram_manage_insights). Instagram business id 17841472046300883, Page 519356447933571.
-Lifetime spend 123,471 EGP. No pixel on the ad account, no purchase events ever: Meta optimizes for clicks only.
+Lifetime spend 123,471 EGP. Pixel "Sask's pixel" 1632032541930768 connected to the ad account on 2026-11-04 (ad account added to business Sask via request access; owner enabled 2FA). Purchase optimization is now possible.
 
 ## Current setup (changed 2026-11-01, owner's request)
 One ad set per post, 100 EGP/day each (5 active = 500 EGP/day). Never advertise summer pieces from November; check the post with the owner if unsure. Every targeting edit sends ads back to review, so batch edits. Women 22-44, Instagram only, high-end areas only: cities Heliopolis 661654, Zamalek 669395, 6 October City 655657, Sheikh Zayed 2939206; subcity Garden City 661491; neighborhoods Sheraton El Matar 2895299, El Nozha 2895365; radius New Cairo + Rehab 30.030,31.470 7 km, Madinaty 30.087,31.640 3 km, El Shorouk 30.130,31.610 3 km, Maadi 29.960,31.257 3 km, Mokattam 30.020,31.300 3 km, Mohandessin + Dokki 30.050,31.200 2.5 km. Audience estimate 2.0-2.3M.
@@ -98,3 +98,10 @@ New carousel creative 1845318719827579: 5 in-stock multi-size pieces (Bohemian D
 - Carousel WARM - IG engagers adset 52560492747520 (custom audience 52559528686520 inside women 22-44 high-end, ~44-52k), 57 EGP
 - Carousel COLD - Women 22-44 high-end adset 52560492804120, 57 EGP
 Paused: Bohemian Desert Maxi Skirt 52560135401920, Floral Print Sleeveless Vest 52560135455920 product-page ad sets. Total live stays 228 EGP/day (DM B + DM D + 2 carousels). If a carousel product drops to 1 piece or sells out, replace that card. Linking the pixel (Shopify > Facebook & Instagram > Settings > ad account 145068365612671) then switching to OUTCOME_SALES is still the main fix.
+
+## 2026-11-04 pixel connected, website ads moved to Sales
+Owner added the ad account to business Sask (request access, ownership stays personal). Pixel shared to the ad account via API (/pixel/shared_accounts). Shopify Facebook & Instagram channel already uses this pixel with Enhanced data sharing.
+New campaign "SWS | Sales | Website | Nov 2026" 52560496822120 (OUTCOME_SALES, optimize OFFSITE_CONVERSIONS PURCHASE, pixel 1632032541930768), same carousel creative 1845318719827579:
+- Sales WARM - IG engagers 52560496848120 (ad 52560496880320), 57 EGP
+- Sales COLD - Women 22-44 high-end 52560496984720 (ad 52560497001120), 57 EGP
+Paused: traffic carousels 52560492747520 and 52560492804120. Total live still 228 EGP/day (DM B + DM D + 2 Sales). Purchase volume is low (~4/week), so learning is slow; judge after 7 days, not by visits. Future website ads: always OUTCOME_SALES with this pixel, never LANDING_PAGE_VIEWS.
