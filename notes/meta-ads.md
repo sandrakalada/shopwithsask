@@ -137,3 +137,9 @@ Sales campaign 52560496822120, PURCHASE on pixel, lifetime budget 250 EGP each, 
 - Toucan Print Puffer Jacket (post DfVYd7oCAg7, 1 left Small, 1,450) adset 52560897440120 ad 52560897479920
 - Star Print Jacket (post DfK4aVQCFFz, 1 left Small, 1,850) adset 52560897520120 ad 52560897538120
 Old Toucan daily ad set 52560649951120 paused (spent 27.76 EGP). Pause either jacket ad as soon as it sells. Owner-approved; weekend daily-equivalent total is above the 400 cap until Sunday night.
+
+2026-11-05 (later): owner: "do not run ads for my followers, acquire new customers; split between DM and website". Jacket weekend ads rebuilt (Meta minimum is 160 EGP lifetime per ad set, so 125/125 per jacket was impossible):
+- WEBSITE: ad set 52560897440120 renamed "WEEKEND jackets - WEBSITE new customers | cap 250", ads Toucan 52560897479920 + Star 52560898073920, Sales PURCHASE
+- DM: ad set 52560898164920 "WEEKEND jackets - DM new customers | cap 250" in DM campaign 52559596204120, ads Toucan 52560898176120 (creative 1856931628838385) + Star 52560898184520 (creative 1782708486116119), IG post creatives with welcome message (price, last piece Small, link) and ice breakers
+- Targeting both: lookalike 52559528769920 INCLUDED, IG engagers 52559528686520 EXCLUDED, women 22-44, Instagram, high-end areas (~191-225k). Nov 5 21:00 to Nov 8 23:59. Star website ad set 52560897520120 paused.
+Open question to owner: Sales WARM 52560496848120 and DM D 52559650248120 still target followers (engagers).
