@@ -119,3 +119,8 @@ Traffic validation 2026-11-05: sessions fell from 520-1,000/day (Oct 28-Nov 1, o
 
 ## 2026-11-05 weekend DM boost (owner request)
 TEST D IG engagers DM ad set 52559650248120 raised 57 -> 127 EGP/day (+70) until Sunday 2026-11-08 23:55 Cairo; a scheduled reminder in the main ads session sets it back to 57. Live total is 441 EGP/day until then: this is an owner-approved temporary exception to the 400 cap. Daily check: do NOT pause anything to get under 400 before Nov 9; after Nov 9 the cap applies again.
+
+## 2026-11-05 daily check
+Stock OK: carousel bohemian-skirt 12, polka-dot-lace-maxi-skirt 4 (Large sold out), floral-print-sleeveless-vest 4, colorblock-floral-patchwork-shirt 3, embroidered-boho-jacket 2; DM ads floral vest 940 S/M/L still matches; Toucan 1 left (owner exception, pause when sold). Live 441 EGP/day (owner-approved weekend exception to Nov 9).
+FIRST SALES-AD ORDER: #1376, 1,515 EGP, 2026-11-05, Sales WARM carousel ad 52560496880320 (landed on floral-print-sleeveless-vest, bought Polka Dot Skirt + Polka Dot Lace Maxi Skirt).
+Since start: Sales WARM 141 EGP, 3 ATC, 1 order; Sales COLD 132 EGP, 0 ATC (meets pause rule, but kept: owner widened it to Cairo/Giza/Alex today and asked for no changes during learning; re-check by Nov 8). DM D 197 EGP 8 DMs (25/DM), B 168 EGP 3 DMs (56/DM, within 2x of 33 avg).
