@@ -131,3 +131,9 @@ Cause: creatives used store product photos (900x1200, upscaled from small/WhatsA
 2026-11-05 (later): owner reversed the pause: keep DM B, DM D (127 weekend boost), Sales WARM, Sales COLD running through the weekend with current creatives, then replace with high-res only. All 4 re-activated; live total 441 EGP/day until Nov 8 23:55 (D back to 57 then -> 371). From 2026-11-09: replace creatives 2178355596396719 (DM) and 1845318719827579 (carousel) with Instagram post/reel creatives or owner originals >=1080px, per the quality rule; owner to send post links (Instagram CDN is blocked here so posts cannot be viewed).
 
 2026-11-05: owner: on Monday Nov 9 do NOT pause the 4 ad sets; only swap their images to high-res (new ad in the same ad set, old ad paused only after the new one is live). Reminder trig_01D3rRnGe5iizp1zj6VUtK9e updated.
+
+## 2026-11-05 weekend jacket ads (owner: "best fit this weekend capping 250 per product")
+Sales campaign 52560496822120, PURCHASE on pixel, lifetime budget 250 EGP each, 2026-11-05 20:30 to 2026-11-08 23:59 Cairo, audience = IG engagers OR 2% lookalike inside women 22-44 / Instagram / high-end areas (~232-273k), Instagram post creatives (high quality):
+- Toucan Print Puffer Jacket (post DfVYd7oCAg7, 1 left Small, 1,450) adset 52560897440120 ad 52560897479920
+- Star Print Jacket (post DfK4aVQCFFz, 1 left Small, 1,850) adset 52560897520120 ad 52560897538120
+Old Toucan daily ad set 52560649951120 paused (spent 27.76 EGP). Pause either jacket ad as soon as it sells. Owner-approved; weekend daily-equivalent total is above the 400 cap until Sunday night.
