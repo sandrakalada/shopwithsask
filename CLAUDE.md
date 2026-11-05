@@ -33,6 +33,12 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 ## Reporting
 - Real revenue = orders that are fulfilled AND paid. ShopifyQL filter: `WHERE order_fulfillment_status = 'fulfilled' AND order_payment_status = 'paid'`.
 
+## Ad image and video quality (owner's rule, all platforms: Meta, Google, anywhere)
+- Never launch or approve a low-resolution, blurry, pixelated, upscaled or over-compressed image or video in any ad, on any platform. Customers complained about pixelated ads on 2026-11-05.
+- Store product photos (900x1200, often made from small WhatsApp photos) are NOT ad material. Do not use them in ads, and do not make ad images by enlarging, padding or blur-filling them.
+- Default ad creative: the owner's own Instagram post or reel (source_instagram_media_id), which keeps Instagram's original upload quality.
+- Any other image must be an original of at least 1080 px on the short side (1080x1350 for feed, 1080x1920 for stories/reels) with no upscaling; videos at least 1080 px tall and never upscaled from 720p. Before launching, look at the actual file at full size and check it is sharp; if you cannot view it, do not launch it and ask the owner for the original photo or the post link.
+
 ## Meta ads
 - Setup, IDs and history: notes/meta-ads.md. Read it before any ads work.
 - Hard cap: all live ad sets together max 400 EGP/day. Audience: women 22-44, Instagram only, high-end Cairo and Giza areas. Never advertise summer pieces in the cold season, sold-out items, or items with only 1 piece left.
