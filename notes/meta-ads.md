@@ -116,3 +116,6 @@ Post 18111683381266893 (DfVYd7oCAg7, "The art of standing out") = Toucan Print P
 Traffic validation 2026-11-05: sessions fell from 520-1,000/day (Oct 28-Nov 1, old cheap boosts) to 102 on Nov 4; orders only ~1.4/day -> ~1/day. Cause: boosts paused, high-end-areas targeting gives CPM ~318 EGP vs ~55 before, half budget on DM ads, Sales learning. Proposed to owner: widen Sales ads to all Cairo, Giza, Alexandria governorates (women 22-44, IG).
 
 2026-11-05: owner approved ("do what is best"): Sales COLD 52560496984720 widened from high-end areas to Cairo 1001 + Giza 998 + Alexandria 996 governorates (home/recent), still women 22-44, Instagram, lookalike 52559528769920 kept. Audience 210-247k -> 253-298k. Renamed "Sales COLD - Women 22-44 Cairo+Giza+Alex". Sales WARM, DM ads and Toucan ad stay on high-end areas. Watch CPM (was ~318 EGP) and sessions over the next 5-7 days; no other changes during learning.
+
+## 2026-11-05 weekend DM boost (owner request)
+TEST D IG engagers DM ad set 52559650248120 raised 57 -> 127 EGP/day (+70) until Sunday 2026-11-08 23:55 Cairo; a scheduled reminder in the main ads session sets it back to 57. Live total is 441 EGP/day until then: this is an owner-approved temporary exception to the 400 cap. Daily check: do NOT pause anything to get under 400 before Nov 9; after Nov 9 the cap applies again.
