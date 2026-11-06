@@ -64,3 +64,4 @@ Added to Performance Max-2 asset group: 80s Lite Jacket (tall xshojR2LQCk, squar
 
 ## 2026-11-05 QUALITY RULE (owner) - ACTION NEEDED
 Owner rule (CLAUDE.md "Ad image and video quality"): no low-res/upscaled/blur-filled assets anywhere. The PMax image assets made from store photos with blurred fill (1200x628, 1200x1200, 960x1200) and the videos upscaled from 720p reels to 1920x1080 / 1080x1080 break this rule. Remove them from asset group 6761615488 and replace only with sharp originals >=1080px (owner photos) or videos not upscaled. Keep logo assets.
+2026-11-06 daily check: ad strength EXCELLENT, all assets approved and in stock. Nov 5: 13.8 SAR, 12 clicks, 2 conv (Google-reported). #1378 (575 EGP, Nov 6) last visit Google, no utm. Negatives added: double a, havana store, lucy gang.
