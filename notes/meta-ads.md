@@ -165,3 +165,9 @@ Created: MAIN SALES ad set 52561224125720, 300 EGP/day, PURCHASE on pixel, women
 To pause (approved by owner, but the pause calls were blocked here pending explicit confirmation): 52561097335720, 52561068125120, 52560898164920, 52560897440120, 52560496984720, 52560496848120, 52559642503520. Keep DM NEW D 52559650248120.
 
 2026-11-07: owner confirmed ("keep DM NEW and MAIN SALES"). Paused 52561097335720, 52561068125120, 52560898164920, 52560897440120, 52560496984720, 52560496848120, 52559642503520. Live: MAIN SALES 52561224125720 (300/day) + DM NEW D 52559650248120 (127/day weekend boost, back to 57 on Nov 8 23:55 via reminder trig_01Jc1h3yuhEV2vXvQiAcAb2w). Total 427/day this weekend, 357 from Nov 9. Judge MAIN by orders after ~5 days; watch CPM vs the ~260-290 before.
+
+## 2026-11-07 daily check
+Live: MAIN SALES 52561224125720 (300/day; ads polka post -> /collections/polka-dot, Embroidered Suede Jacket post, Star Print Jacket post) + DM NEW D 52559650248120 (127 weekend). Total 427 (weekend exception, 357 from Nov 9).
+Stock: Star Print Jacket 1 (Small) and Embroidered Suede Jacket 1 (Small) = owner-approved last-piece ads, pause each when sold. Polka collection page items 0-4 (collection, sold-out last). DM floral vest 940 S/M/L matches.
+Yesterday (Nov 6) Meta spend 948 EGP across 10 ad sets before consolidation: 7 DMs (D 5, B 2), 8 ATC (weekend jackets website), 0 purchases. No new orders Nov 6-7 except #1378 (Google, 575).
+DM audience test winner: D (lookalike/engagers, ~24 EGP/DM over the test) vs B brands (~56/DM) vs A broad (43/DM, paused) vs C boho (0). D is already the only DM ad set left.
