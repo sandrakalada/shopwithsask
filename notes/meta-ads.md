@@ -190,3 +190,5 @@ Budgets: MAIN SALES 52561224125720 300 -> 100 (Suede post + polka), DM NEW D 525
 ## 2026-11-08 daily check
 Embroidered Suede Jacket SOLD (order #1379, 1,925, Nov 7, came from MAIN Suede ad 52561224158320). Paused MAIN Suede ad 52561224158320 and TRAFFIC "Art of standing out" ad 52561525046520 (post shows the sold jacket). Live ads: TRAFFIC retro jacket + polka (-> collections), MAIN polka, DM floral vest (940 S/M/L matches). Daily total 357.
 Early today: TRAFFIC CPM 62 (vs MAIN SALES 835), owner's pullover boost CPM 56. DM floral vest creative is a store photo: owner exception ends tonight; replace from Nov 9 with a high-res IG post creative.
+
+2026-11-08 23:56 Cairo: weekend boost end reminder fired. DM NEW 52559650248120 already at 57 EGP/day (set earlier). Boost Nov 5-8: 393 EGP, 12 DMs (~33/DM). Live daily total 357 EGP (TRAFFIC 200, MAIN SALES 100, DM NEW 57), under the 400 cap.
