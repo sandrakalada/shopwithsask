@@ -176,3 +176,12 @@ DM audience test winner: D (lookalike/engagers, ~24 EGP/DM over the test) vs B b
 Diagnosis: Sales/PURCHASE ads with narrow Instagram-only audiences buy at CPM 400-1,128 EGP (MAIN Star jacket 1,128 today: 64 impressions for 72 EGP), so ~100 sessions/day. The polka ad in MAIN gets almost no delivery (9 impressions in 3 days). The "Your everyday pullover" post boost (Instagram app boost, not ours) runs at CPM ~60 and brought 37 visits for 80 EGP yesterday, 0 carts.
 Done: paused MAIN Star Print Jacket ad 52561224174120 (worst CPM, 0 purchases, last piece). MAIN now effectively = Embroidered Suede Jacket ad (1 purchase, #1379 1,925 on Nov 7).
 Asked owner: allow a cheap website-visits ad (traffic objective, exception to the Sales-only rule) or keep Sales-only.
+
+## 2026-11-08 NEW CONSTRUCT (owner: "change the whole construct, focus heavily on website ads vs DMs, audience not working, no traffic, your ads vs mine; high resolution only")
+Owner's own boosts that drove traffic+orders: LINK_CLICKS to website, broad audience (Advantage+ audience or all Egypt), CPM 40-60 EGP. Our Sales/PURCHASE + narrow IG-only audiences: CPM 400-1,128.
+New: campaign "SWS | Website traffic | Nov 2026" 52561524910120 (OUTCOME_TRAFFIC), ad set 52561524960720 "TRAFFIC women 22-50 Cairo+Giza+Alex - IG posts", LANDING_PAGE_VIEWS, 200 EGP/day, Instagram feed/stories/reels (IG Explore placement deprecated in API), audience ~4.2-5.0M. Ads (IG post creatives, links to collections so last pieces are not a problem):
+- Colorful retro jacket post -> /collections/jackets, ad 52561524975120, creative 4637922803090424 (photos 2048 px, checked sharp)
+- Polka dot era post -> /collections/polka-dot, ad 52561524997920, creative 1138292438704552 (checked earlier 1086-2048 px)
+- Art of standing out (Embroidered Suede Jacket) post -> /collections/jackets, ad 52561525046520, creative 2228776221004875 (checked earlier)
+Rejected: "Not your ordinary vest" post (2 of 3 photos 902/761 px, below 1080 rule); "Crochet with character" (summer look, brown crochet vest sold out).
+Budgets: MAIN SALES 52561224125720 300 -> 100 (Suede post + polka), DM NEW D 52559650248120 127 -> 57. Daily total 357. NOTE: CLAUDE.md still says website ads = Sales only; owner's instruction today overrides it for this traffic campaign (rule file update needs owner OK). Judge by orders and sessions after 3-4 days.
