@@ -171,3 +171,8 @@ Live: MAIN SALES 52561224125720 (300/day; ads polka post -> /collections/polka-d
 Stock: Star Print Jacket 1 (Small) and Embroidered Suede Jacket 1 (Small) = owner-approved last-piece ads, pause each when sold. Polka collection page items 0-4 (collection, sold-out last). DM floral vest 940 S/M/L matches.
 Yesterday (Nov 6) Meta spend 948 EGP across 10 ad sets before consolidation: 7 DMs (D 5, B 2), 8 ATC (weekend jackets website), 0 purchases. No new orders Nov 6-7 except #1378 (Google, 575).
 DM audience test winner: D (lookalike/engagers, ~24 EGP/DM over the test) vs B brands (~56/DM) vs A broad (43/DM, paused) vs C boho (0). D is already the only DM ad set left.
+
+## 2026-11-08 owner: "no website visitors, fix now"
+Diagnosis: Sales/PURCHASE ads with narrow Instagram-only audiences buy at CPM 400-1,128 EGP (MAIN Star jacket 1,128 today: 64 impressions for 72 EGP), so ~100 sessions/day. The polka ad in MAIN gets almost no delivery (9 impressions in 3 days). The "Your everyday pullover" post boost (Instagram app boost, not ours) runs at CPM ~60 and brought 37 visits for 80 EGP yesterday, 0 carts.
+Done: paused MAIN Star Print Jacket ad 52561224174120 (worst CPM, 0 purchases, last piece). MAIN now effectively = Embroidered Suede Jacket ad (1 purchase, #1379 1,925 on Nov 7).
+Asked owner: allow a cheap website-visits ad (traffic objective, exception to the Sales-only rule) or keep Sales-only.
