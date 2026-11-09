@@ -192,3 +192,6 @@ Embroidered Suede Jacket SOLD (order #1379, 1,925, Nov 7, came from MAIN Suede a
 Early today: TRAFFIC CPM 62 (vs MAIN SALES 835), owner's pullover boost CPM 56. DM floral vest creative is a store photo: owner exception ends tonight; replace from Nov 9 with a high-res IG post creative.
 
 2026-11-08 23:56 Cairo: weekend boost end reminder fired. DM NEW 52559650248120 already at 57 EGP/day (set earlier). Boost Nov 5-8: 393 EGP, 12 DMs (~33/DM). Live daily total 357 EGP (TRAFFIC 200, MAIN SALES 100, DM NEW 57), under the 400 cap.
+
+## 2026-11-09 high-res swap (scheduled task from owner instruction)
+Only live ad still on a store photo was DM NEW 52559650248120 (Floral Print Sleeveless Vest, creative 2178355596396719). The vest IG post (DdkDgL6iHp1, Sep 21) is only 960 px on Facebook, below the 1080 rule, so no sharp version exists. Added new ad 52561679810720 in the same ad set: polka dot era post (photos 1086-2048 px, checked), creative 1141614061693255, welcome message: polka dot skirts from 720 EGP, mostly S/M/L, link /collections/polka-dot, ice breakers sizes/delivery/payment. Old ad 52560490338320 stays until the new one is approved; reminder in 3 h pauses it. B, WARM, COLD were already paused by the owner on Nov 7, so nothing to swap there.
