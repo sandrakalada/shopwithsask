@@ -195,3 +195,6 @@ Early today: TRAFFIC CPM 62 (vs MAIN SALES 835), owner's pullover boost CPM 56. 
 
 ## 2026-11-09 high-res swap (scheduled task from owner instruction)
 Only live ad still on a store photo was DM NEW 52559650248120 (Floral Print Sleeveless Vest, creative 2178355596396719). The vest IG post (DdkDgL6iHp1, Sep 21) is only 960 px on Facebook, below the 1080 rule, so no sharp version exists. Added new ad 52561679810720 in the same ad set: polka dot era post (photos 1086-2048 px, checked), creative 1141614061693255, welcome message: polka dot skirts from 720 EGP, mostly S/M/L, link /collections/polka-dot, ice breakers sizes/delivery/payment. Old ad 52560490338320 stays until the new one is approved; reminder in 3 h pauses it. B, WARM, COLD were already paused by the owner on Nov 7, so nothing to swap there.
+
+## 2026-11-09 more visits (owner approved: "yes and exclude alexandria")
+TRAFFIC 52561524960720: 200 -> 280 EGP/day, placements Instagram (feed/stories/reels) + Facebook (feed/stories/reels), Cairo 1001 + Giza 998 only (no Alexandria), engaged shoppers x fashion interests kept, women 22-44 (~2.0-2.4M). MAIN SALES 52561224125720: 100 -> 60 EGP/day. DM NEW 57. Total 397 EGP/day. Goal: 130-180 ad visits/day. Facebook placements are an owner exception to the Instagram-only audience rule (traffic ad set only).

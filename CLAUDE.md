@@ -42,7 +42,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 
 ## Meta ads
 - Setup, IDs and history: notes/meta-ads.md. Read it before any ads work.
-- Hard cap: all live ad sets together max 400 EGP/day. Audience: women 22-44, Instagram only, high-end Cairo and Giza areas. Never advertise summer pieces in the cold season, sold-out items, or items with only 1 piece left.
+- Hard cap: all live ad sets together max 400 EGP/day. Audience: women 22-44, Instagram only, high-end Cairo and Giza areas (owner exceptions: the TRAFFIC ad set runs on Instagram + Facebook across all of Cairo and Giza, since 2026-11-09). Never advertise summer pieces in the cold season, sold-out items, or items with only 1 piece left.
 - Website ads: always Sales objective (OUTCOME_SALES, optimize for PURCHASE on pixel 1632032541930768), never traffic/landing page views.
 - Judge ads by orders (Shopify customerJourneySummary utm campaign/ad ids) and DMs, never by cheap visits.
 - Every DM (Instagram message) ad, current and future, carries a fixed welcome message (page_welcome_message, max 300 characters) in English then Arabic with the live website price, the sizes in stock and the product link, plus 3 ice breakers (sizes, delivery fees, payment/try at the door). Take price and sizes from Shopify at the moment you create it; when a price or size changes or sells out, replace the ad with an updated one. Website ads link straight to the product page instead. Never let a DM ad depend on Meta AI for prices.
