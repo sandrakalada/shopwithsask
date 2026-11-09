@@ -198,3 +198,13 @@ Only live ad still on a store photo was DM NEW 52559650248120 (Floral Print Slee
 
 ## 2026-11-09 more visits (owner approved: "yes and exclude alexandria")
 TRAFFIC 52561524960720: 200 -> 280 EGP/day, placements Instagram (feed/stories/reels) + Facebook (feed/stories/reels), Cairo 1001 + Giza 998 only (no Alexandria), engaged shoppers x fashion interests kept, women 22-44 (~2.0-2.4M). MAIN SALES 52561224125720: 100 -> 60 EGP/day. DM NEW 57. Total 397 EGP/day. Goal: 130-180 ad visits/day. Facebook placements are an owner exception to the Instagram-only audience rule (traffic ad set only).
+
+## 2026-11-09 - Old posts added to TRAFFIC ad set (52561524960720)
+Owner asked for older in-stock posts in the traffic campaign (max 10 ads). Each post checked: right product, 2+ in stock, every photo at least 1,086 px. Each ad links to its product page with SHOP_NOW and the standard utm url_tags.
+- TRAFFIC - Color Block Collared Shirt post: ad 52561709007120 (IG 17907275031327307)
+- TRAFFIC - Polka Dot Long Sleeve Shirt post: ad 52561709129920 (IG 18593775148020446)
+- TRAFFIC - Embroidered Denim Vest post: ad 52561709188720 (IG 18016922909912117)
+- TRAFFIC - Bohemian Desert Maxi Skirt post: ad 52561709287920 (IG 17903344440562057)
+- TRAFFIC - Boho Embroidered Vest post: ad 52561709338320 (IG 18045697289728250; Small only, 2 left)
+- Skipped: the Colorblock Floral Patchwork Shirt post (IG 18084595766142388). Meta refused it because the carousel has too many slides. Also rejected: the retro zip jacket post (slides at 506/821 px) and the brown polka skirt post (960 px).
+The ad set now has 7 active ads (5 new ones in review), and its budget is unchanged at 280/day.
