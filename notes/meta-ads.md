@@ -217,3 +217,6 @@ The ad set now has 7 active ads (5 new ones in review), and its budget is unchan
 ## 2026-11-09 daily check
 New DM polka ad 52561679810720 approved ACTIVE -> old store-photo DM ad 52560490338320 paused (no low-res creatives live now). Live 397/day: TRAFFIC 280 (10 IG post ads), MAIN SALES 60 (polka), DM NEW 57 (polka).
 Yesterday 633 EGP total: TRAFFIC ads CPM 66-86, 85 LPV (retro jacket 59, polka 20); owner's pullover boost CPM 54, 68 LPV, 4 ATC; MAIN SALES CPM 512-1,112, 6 LPV, 0 ATC. Sessions: Nov 4-7 ~100/day -> Nov 8 196. No new orders since #1379 (Nov 7).
+
+## 2026-11-09 - Embroidered Suede Jacket restocked (1 piece, Small, 1,850)
+Owner asked for an extra 500 EGP on it for website purchases (owner exception to the 1-piece rule and the 400/day cap). New ad set 52561750550520 "SUEDE JACKET restock" in Sales campaign 52560496822120: lifetime 500 EGP, Nov 9 14:00 to Nov 13 23:59 Cairo (~125/day), PURCHASE on pixel, same audience as MAIN SALES. Ad 52561750562720 uses creative 1595386831860478 ("art of standing out" post, checked high-res, links to /products/embroidered-suede-jacket). PAUSE IT AS SOON AS THE JACKET SELLS.
