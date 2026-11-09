@@ -213,3 +213,7 @@ The ad set now has 7 active ads (5 new ones in review), and its budget is unchan
   - TRAFFIC - Sleeveless Velvet Buttoned Top post: ad 52561709911920 (IG 17940325842153129)
   - TRAFFIC - Burgundy Velvet Mini Skirt post: ad 52561709971120 (IG 18101317963805403)
   - Spares that also pass the checks: Embroidered Black Vest post (IG 18133205527515495) and Boho Vest post (IG 18104414068757533, 2048 px).
+
+## 2026-11-09 daily check
+New DM polka ad 52561679810720 approved ACTIVE -> old store-photo DM ad 52560490338320 paused (no low-res creatives live now). Live 397/day: TRAFFIC 280 (10 IG post ads), MAIN SALES 60 (polka), DM NEW 57 (polka).
+Yesterday 633 EGP total: TRAFFIC ads CPM 66-86, 85 LPV (retro jacket 59, polka 20); owner's pullover boost CPM 54, 68 LPV, 4 ATC; MAIN SALES CPM 512-1,112, 6 LPV, 0 ATC. Sessions: Nov 4-7 ~100/day -> Nov 8 196. No new orders since #1379 (Nov 7).
