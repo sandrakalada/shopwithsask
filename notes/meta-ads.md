@@ -208,3 +208,8 @@ Owner asked for older in-stock posts in the traffic campaign (max 10 ads). Each 
 - TRAFFIC - Boho Embroidered Vest post: ad 52561709338320 (IG 18045697289728250; Small only, 2 left)
 - Skipped: the Colorblock Floral Patchwork Shirt post (IG 18084595766142388). Meta refused it because the carousel has too many slides. Also rejected: the retro zip jacket post (slides at 506/821 px) and the brown polka skirt post (960 px).
 The ad set now has 7 active ads (5 new ones in review), and its budget is unchanged at 280/day.
+- Added 3 more ads to bring the TRAFFIC ad set to 10 active ads (owner request), all cold-season velvet posts. Every photo is 1440 px and was checked sharp at full size.
+  - TRAFFIC - Velvet Buttoned Vest post: ad 52561709877320 (IG 17999815091729144)
+  - TRAFFIC - Sleeveless Velvet Buttoned Top post: ad 52561709911920 (IG 17940325842153129)
+  - TRAFFIC - Burgundy Velvet Mini Skirt post: ad 52561709971120 (IG 18101317963805403)
+  - Spares that also pass the checks: Embroidered Black Vest post (IG 18133205527515495) and Boho Vest post (IG 18104414068757533, 2048 px).
