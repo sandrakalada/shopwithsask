@@ -220,3 +220,6 @@ Yesterday 633 EGP total: TRAFFIC ads CPM 66-86, 85 LPV (retro jacket 59, polka 2
 
 ## 2026-11-09 - Embroidered Suede Jacket restocked (1 piece, Small, 1,850)
 Owner asked for an extra 500 EGP on it for website purchases (owner exception to the 1-piece rule and the 400/day cap). New ad set 52561750550520 "SUEDE JACKET restock" in Sales campaign 52560496822120: lifetime 500 EGP, Nov 9 14:00 to Nov 13 23:59 Cairo (~125/day), PURCHASE on pixel, same audience as MAIN SALES. Ad 52561750562720 uses creative 1595386831860478 ("art of standing out" post, checked high-res, links to /products/embroidered-suede-jacket). PAUSE IT AS SOON AS THE JACKET SELLS.
+
+## 2026-11-09 - Latest IG post (pink florals, DfhKrhciKe8) website visits ad
+Owner request: website visits, 7 days, 100 EGP/day, link to /products/patterned-sleeveless-top (940, 1 left Small; owner exception to the 1-piece rule). Post photos 2048 px, checked sharp. Ad set 52561791054720 in traffic campaign 52561524910120 (LANDING_PAGE_VIEWS, same audience as TRAFFIC: women 22-44 Cairo+Giza, IG+FB), ends Nov 16 23:59 Cairo. Creative 1894866645009788, ad 52561791142920. PAUSE WHEN THE TOP SELLS. Daily total now ~622 (397 + suede ~125 until Nov 13 + this 100 until Nov 16), owner-approved.
