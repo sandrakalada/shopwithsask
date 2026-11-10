@@ -227,3 +227,10 @@ Owner request: website visits, 7 days, 100 EGP/day, link to /products/patterned-
 ## 2026-11-10 daily check
 Stock OK: all TRAFFIC product ads 2-12 pieces; Suede jacket (1, restock ad) and patterned-sleeveless-top (1, pink vest ad) = owner exceptions. Live daily 497 + suede lifetime (~125/day to Nov 13), owner-approved.
 Nov 9: Meta 736 EGP, 296 LPV (TRAFFIC CPM 42-80; MAIN polka CPM 406, 4 ATC; Suede CPM 423, 5 LPV). Sessions 359 (best since Nov 1). Orders: #1381 1,055 EGP from TRAFFIC retro jacket ad 52561524975120 (first sale from the traffic campaign); #1380 840 bio link. #1379 (suede, 1,925) CANCELLED Nov 9 (jacket restocked). Nothing paused.
+
+## 2026-11-10 - 11.11 sale (Buy 2 Get 3rd 50% Off, Shopify automatic discount, ends Nov 11 23:59 Cairo)
+Owner: 750 EGP on the 11.11 reel (IG 17882755710546141, DfkaS_doUtY) until end of Nov 11, split Instagram 80% / Facebook 20%, sent to the website Shop All. Reel has a 1080x1920 rendition, frames checked sharp; creative uses source_instagram_media_id. Creative 1620516959037409 -> /collections/all.
+Sales campaign 52560496822120 (PURCHASE on pixel), MAIN SALES audience (women 22-44 Cairo+Giza, IG engagers excluded):
+- 11.11 SALE reel - Instagram: ad set 52562115059720 (600 EGP lifetime, feed/stories/reels), ad 52562115077920
+- 11.11 SALE reel - Facebook: ad set 52562115096920 (150 EGP lifetime, feed/stories/reels), ad 52562115124520
+Both end 2026-11-11 23:59 Cairo. Reminder trig_01NoP43y7iQMGH5ke471tPGi (Nov 12 00:05 Riyadh) reports results.

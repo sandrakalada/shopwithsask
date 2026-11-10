@@ -69,3 +69,6 @@ Owner rule (CLAUDE.md "Ad image and video quality"): no low-res/upscaled/blur-fi
 2026-11-08: budget lowered 23 -> 10 SAR/day (owner: money not well spent; 27-31 SAR/day for 10-20 clicks, 0 tracked sales).
 2026-11-09 daily check: Nov 8 28.9 SAR (budget cut to 10 mid-day), 3 clicks, 0 conv. Ad strength EXCELLENT, all assets approved and in stock. No new search terms with clicks.
 2026-11-10 daily check: Nov 9 15.2 SAR, 5 clicks, 0 conv. 7d 150.9 SAR, no paid-Google orders. Ad strength EXCELLENT, all assets approved/in stock. No new search terms.
+
+## 2026-11-10 - 11.11 sale (owner: extra 250 EGP until end of Nov 11)
+Budget 10 -> 30 SAR/day (~+19 SAR = ~250 EGP over Nov 10 evening + Nov 11). Promotion asset 438078927131 "11.11 Sale", up to 50% off, Nov 10-11, -> /collections/all, linked to Performance Max-2 as PROMOTION. Note: v25 percent_off unit is 10,000 = 1% (500000 = 50%; 50,000,000 was rejected as too high). Reminder trig_01NoP43y7iQMGH5ke471tPGi resets the budget to 10 at Nov 12 00:05 Riyadh.
