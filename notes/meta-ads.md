@@ -223,3 +223,7 @@ Owner asked for an extra 500 EGP on it for website purchases (owner exception to
 
 ## 2026-11-09 - Latest IG post (pink florals, DfhKrhciKe8) website visits ad
 Owner request: website visits, 7 days, 100 EGP/day, link to /products/patterned-sleeveless-top (940, 1 left Small; owner exception to the 1-piece rule). Post photos 2048 px, checked sharp. Ad set 52561791054720 in traffic campaign 52561524910120 (LANDING_PAGE_VIEWS, same audience as TRAFFIC: women 22-44 Cairo+Giza, IG+FB), ends Nov 16 23:59 Cairo. Creative 1894866645009788, ad 52561791142920. PAUSE WHEN THE TOP SELLS. Daily total now ~622 (397 + suede ~125 until Nov 13 + this 100 until Nov 16), owner-approved.
+
+## 2026-11-10 daily check
+Stock OK: all TRAFFIC product ads 2-12 pieces; Suede jacket (1, restock ad) and patterned-sleeveless-top (1, pink vest ad) = owner exceptions. Live daily 497 + suede lifetime (~125/day to Nov 13), owner-approved.
+Nov 9: Meta 736 EGP, 296 LPV (TRAFFIC CPM 42-80; MAIN polka CPM 406, 4 ATC; Suede CPM 423, 5 LPV). Sessions 359 (best since Nov 1). Orders: #1381 1,055 EGP from TRAFFIC retro jacket ad 52561524975120 (first sale from the traffic campaign); #1380 840 bio link. #1379 (suede, 1,925) CANCELLED Nov 9 (jacket restocked). Nothing paused.

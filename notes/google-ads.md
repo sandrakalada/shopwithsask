@@ -68,3 +68,4 @@ Owner rule (CLAUDE.md "Ad image and video quality"): no low-res/upscaled/blur-fi
 2026-11-07 daily check: budget is 23 SAR/day (owner changed it from 10 in the Google Ads mobile app on 2026-11-06 11:58 Riyadh). Nov 6: 30.6 SAR, 20 clicks, 0 conv. Ad strength EXCELLENT, all assets approved, asset products in stock. Negatives added: emily bags, frillu, leocansa, soiree egypt, مستورة.
 2026-11-08: budget lowered 23 -> 10 SAR/day (owner: money not well spent; 27-31 SAR/day for 10-20 clicks, 0 tracked sales).
 2026-11-09 daily check: Nov 8 28.9 SAR (budget cut to 10 mid-day), 3 clicks, 0 conv. Ad strength EXCELLENT, all assets approved and in stock. No new search terms with clicks.
+2026-11-10 daily check: Nov 9 15.2 SAR, 5 clicks, 0 conv. 7d 150.9 SAR, no paid-Google orders. Ad strength EXCELLENT, all assets approved/in stock. No new search terms.
