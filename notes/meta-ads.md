@@ -243,3 +243,7 @@ Nov 10 Meta 1,290 EGP. Orders from ads: #1383 1,005 (11.11 SALE reel IG ad 52562
 Paused under the pause-losers rule (>=85 EGP, 0 ATC, 0 orders, while the 11.11 IG reel in the same Sales campaign had an order): SUEDE JACKET restock 52561750550520 (~97 EGP), 11.11 SALE story 52562118599520 (~236 EGP), MAIN SALES 52561224125720.
 Owner's own boosts still running: "Your everyday pullover" (155 EGP Nov 10, 109 LPV, 0 ATC) and a new boost of the 11.11 reel (started Nov 11) that duplicates our 11.11 reel ads.
 2026-11-11 daily check (12:48 Cairo, after the morning check above): stock OK for all our ads (2-11 pieces; pink top 1 = exception). Owner's own "Your everyday pullover" boost links to chunky-brown-knit-vest, which has 1 left: flagged to owner (owner's boost, not paused). Sessions: Nov 10 718 (best day), 13 carts. Live daily 437 + 11.11 lifetime sets ending tonight. Nothing new paused.
+
+## 2026-11-11 23:06 Cairo - 11.11 results (Nov 10-11)
+Meta total Nov 10-11: 2,393 EGP. 11.11 reel IG 581 EGP (21 LPV, 17 ATC, 1 purchase: #1383 1,005); 11.11 reel FB 141 EGP (9 LPV, 16 ATC, 1 pixel purchase, no utm order); 11.11 story 238 EGP, 0 ATC (paused). 11.11 ad sets end automatically at 23:59 Cairo.
+Orders Nov 10-11: #1382 2,945 (TRAFFIC velvet vest ad), #1383 1,005 (11.11 IG reel ad), #1384 1,730 (Google free listings), #1385 1,005 (direct), #1386 3,160 (owner's own 11.11 reel boost 52562260907920, which I had advised pausing - it worked; lesson: owner's in-app reel boosts can convert), #1387 795 (direct). Ad-tracked revenue 7,110 EGP on ~2,393 Meta spend.
