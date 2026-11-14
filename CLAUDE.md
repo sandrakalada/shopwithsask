@@ -30,6 +30,14 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 7. Google Merchant (every product, existing and new): set the Shopify product category (Dresses aa-1-4, Skirts aa-1-15, Pants aa-1-12, Shirts aa-1-13-7, Corset tops aa-1-13-15, other tops aa-1-13, Vests aa-1-10-6, Jackets aa-1-10-2, Sets aa-1-11, Handbags aa-5-4, Earrings aa-6-6, Necklaces aa-6-8, Scarves aa-2-26, Belts aa-2-6) and metafields mm-google-shopping: gender "female", age_group "adult", condition "new" (single_line_text_field), custom_product true (boolean).
 8. Status ACTIVE; publish to Online Store and Google & YouTube; add to its type collection and New Collection; move it to the top of New Collection and Shop All (both MANUAL).
 
+## Google free listings (owner's standing rule: rank every product as high as possible)
+- Applies now and to every new or edited product. History and IDs: notes/google-free-listings.md.
+- Product titles are the main ranking lever. Write them as searchable descriptions: {colour} {material/print/detail} {product type} [+ key feature], e.g. "Navy & White Chevron Striped Maxi Skirt". 70 chars max. No vague or invented names ("Boho Vest", "Vibrant Summer Skirt", "Women's Sleeveless Top"). Check the photo for colour before writing. Arabic title follows the same pattern in natural Egyptian Arabic.
+- Never change a product's handle (URL): old links, ads and Google keep working.
+- Whenever a product title changes, keep the old name searchable: add the old English title and the old Arabic title as product tags (tags are searched by the website search and the Shopify admin, and are not shown on the storefront). Then update the SEO title, Arabic title and meta_title, and the image alts (English) to the new title.
+- Keep every product complete for Google: category, gender/age/condition metafields (step 7 above), in-stock status correct, description with fabric, fit and occasion words people search.
+- Suggest sale prices (compare-at) and product reviews to the owner; never change prices without the owner.
+
 ## Reporting
 - Real revenue = orders that are fulfilled AND paid. ShopifyQL filter: `WHERE order_fulfillment_status = 'fulfilled' AND order_payment_status = 'paid'`.
 
