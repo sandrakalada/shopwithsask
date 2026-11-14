@@ -76,3 +76,4 @@ Budget 10 -> 30 SAR/day (~+19 SAR = ~250 EGP over Nov 10 evening + Nov 11). Prom
 2026-11-11 daily check: budget back at 10 SAR (set this morning). Nov 10 38.4 SAR, 33 clicks, 2 conv (Google-reported); #1384 1,730 came from free listings (sag_organic). Ad strength EXCELLENT, assets approved.
 2026-11-11 end of 11.11: Google spent 38.4 (Nov 10) + 42.1 (Nov 11) SAR, ~1,050 EGP; 0 orders with paid Google utm (one free-listing order #1384 1,730). Budget confirmed at 10 SAR/day.
 2026-11-12 daily check: Nov 11 42.1 SAR (30 SAR 11.11 budget until morning), 15 clicks, 0 conv; 7d 196.4 SAR, still no utm-tracked paid Google order. Assets approved.
+2026-11-14 daily check: Nov 13 16.8 SAR, 6 clicks, 0 conv; 7d 181 SAR, still no tracked paid order. Verdict due Nov 17.

@@ -269,3 +269,4 @@ Lesson: broad Advantage+ landing-page-view traffic delivers cheap visits that ra
 - TRAFFIC 52561524960720 at 167 EGP/day with only the two ads that brought orders: retro jacket 52561524975120 and velvet vest 52561709877320. Other 7 ads paused.
 - Reminder trig_01BBf8S3zXCNFRWyAeKPujWQ changed to a report only (no budget reset).
 - When the velvet top sizes change or sell out, replace the DM ad (welcome text has fixed sizes).
+2026-11-14 daily check (12:48 Cairo): live TRAFFIC 167 (retro jacket + velvet vest ads, Advantage+ audience still ON) + DM NEW 170 (velvet top; welcome sizes S green, S burgundy, M burgundy at 940 still match Shopify). Stock OK. Nov 13: 1,088 sessions, 0 carts; Nov 14 so far 179 sessions, 0 carts. Recommend owner: switch TRAFFIC Advantage+ audience OFF (carts fell to 0 after it widened beyond women 22-44). No orders since #1388.
