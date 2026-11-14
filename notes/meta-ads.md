@@ -273,3 +273,5 @@ Lesson: broad Advantage+ landing-page-view traffic delivers cheap visits that ra
 
 ## 2026-11-14 - ALL ADS STOPPED (owner: 'stop all ads, they are not getting me any sales')
 Meta campaigns PAUSED: TRAFFIC 52561524910120, DMs 52559596204120, Sales 52560496822120, Best posts 52559524135720, Star boost 52560955764720. Verified 0 ad sets able to deliver. Google Performance Max-2 24362293653 PAUSED (no enabled Google campaigns). Do not restart anything without the owner asking. Reminder trig_01BBf8S3zXCNFRWyAeKPujWQ (Sun 00:40) should only report.
+
+2026-11-14 (owner: run ad on polka dot only, website, 150/day): Sales campaign 52560496822120 re-activated; only new ad set 52563159389920 'POLKA DOT collection - website - 150/day' (PURCHASE, women 22-44 Cairo+Giza, IG engagers excluded, Instagram feed/stories/reels, Advantage+ off). Ad 52563159407320 with creative 1138292438704552 (Polka dot era post -> /collections/polka-dot; 17 pieces in stock, from 630). All other ads stay paused. Google stays paused.
