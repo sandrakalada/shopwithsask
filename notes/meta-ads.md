@@ -270,3 +270,6 @@ Lesson: broad Advantage+ landing-page-view traffic delivers cheap visits that ra
 - Reminder trig_01BBf8S3zXCNFRWyAeKPujWQ changed to a report only (no budget reset).
 - When the velvet top sizes change or sell out, replace the DM ad (welcome text has fixed sizes).
 2026-11-14 daily check (12:48 Cairo): live TRAFFIC 167 (retro jacket + velvet vest ads, Advantage+ audience still ON) + DM NEW 170 (velvet top; welcome sizes S green, S burgundy, M burgundy at 940 still match Shopify). Stock OK. Nov 13: 1,088 sessions, 0 carts; Nov 14 so far 179 sessions, 0 carts. Recommend owner: switch TRAFFIC Advantage+ audience OFF (carts fell to 0 after it widened beyond women 22-44). No orders since #1388.
+
+## 2026-11-14 - ALL ADS STOPPED (owner: 'stop all ads, they are not getting me any sales')
+Meta campaigns PAUSED: TRAFFIC 52561524910120, DMs 52559596204120, Sales 52560496822120, Best posts 52559524135720, Star boost 52560955764720. Verified 0 ad sets able to deliver. Google Performance Max-2 24362293653 PAUSED (no enabled Google campaigns). Do not restart anything without the owner asking. Reminder trig_01BBf8S3zXCNFRWyAeKPujWQ (Sun 00:40) should only report.
