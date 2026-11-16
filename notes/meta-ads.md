@@ -289,3 +289,6 @@ Meta campaigns PAUSED: TRAFFIC 52561524910120, DMs 52559596204120, Sales 5256049
 - Review reminder Nov 16 21:00 Cairo.
 2026-11-15 22:15 Cairo: owner deleted the Polka Dot Denim Jacket IG post (17965610784250074). Ad 52563309410520 PAUSED. VISITS ad set 52563309385520 continues with the retro jacket ad only; CATALOG ad set unchanged. Total still 300/day.
 2026-11-16 morning (owner OK): CATALOG ad set 52563309345320 PAUSED (45 EGP, 50 impressions, CPM ~900, 1 click; PURCHASE optimisation starves on a thin pixel, same as earlier Sales sets). Live: VISITS 52563309385520 150/day (retro jacket ad). Shopify Nov 15: 3 ATC sessions, 2 checkouts, 0 orders.
+
+## 2026-11-16 - FRESH START (owner: pause everything and start fresh)
+All Meta ads paused: VISITS 52563309385520 paused; campaigns TRAFFIC 52561524910120, Sales 52560496822120, Catalog 52563309334920 paused. 0 ad sets can deliver. Google PMax 24362293653 already paused since Nov 14. Review reminder deleted. Standing store rules in CLAUDE.md still apply. Wait for the owner's new direction before any new spend.
