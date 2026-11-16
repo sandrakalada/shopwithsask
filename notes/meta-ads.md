@@ -288,3 +288,4 @@ Meta campaigns PAUSED: TRAFFIC 52561524910120, DMs 52559596204120, Sales 5256049
 - Total 300 EGP/day. Google stays paused (0 paid-Google orders in 3 weeks). Buyer lookalike needs owner OK to upload the Shopify customer list (352 customers, hashed) to Meta.
 - Review reminder Nov 16 21:00 Cairo.
 2026-11-15 22:15 Cairo: owner deleted the Polka Dot Denim Jacket IG post (17965610784250074). Ad 52563309410520 PAUSED. VISITS ad set 52563309385520 continues with the retro jacket ad only; CATALOG ad set unchanged. Total still 300/day.
+2026-11-16 morning (owner OK): CATALOG ad set 52563309345320 PAUSED (45 EGP, 50 impressions, CPM ~900, 1 click; PURCHASE optimisation starves on a thin pixel, same as earlier Sales sets). Live: VISITS 52563309385520 150/day (retro jacket ad). Shopify Nov 15: 3 ATC sessions, 2 checkouts, 0 orders.
