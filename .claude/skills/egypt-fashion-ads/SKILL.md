@@ -32,7 +32,7 @@ Losses (do not repeat):
 2. Product choice: in-stock pieces with 2+ sizes, in season, priced in the store's sweet spot (700-1,100 EGP). Link a collection (not one product) when the hero item is a single piece.
 3. Creative: the owner's own high-res reel or post (source_instagram_media_id, CLAUDE.md quality rule). Prefer reels with movement/try-on. Ad text EN + AR: offer, cash on delivery, try at the door, delivery fee.
 4. Structure: one campaign per goal, max 2 ad sets, 2-4 ads each; no fragmenting.
-   - A. Website sales test: optimise for ADD_TO_CART (not Purchase, not landing page views) until the pixel has 20+ purchases/week, then switch to Purchase. Women 22-44 Cairo+Giza, Engaged Shoppers x fashion interests, followers excluded (owner's new-customer rule), IG+FB feed/stories/reels, Advantage+ audience OFF. ~150-200 EGP/day.
+   - A. Website sales (CLAUDE.md rule, owner approved): optimise for ADD_TO_CART (not Purchase, not landing page views) until the pixel has 20+ purchases/week, then switch to Purchase. Women 22-44 Cairo+Giza, Engaged Shoppers x fashion interests, followers excluded (owner's new-customer rule), IG+FB feed/stories/reels, Advantage+ audience OFF. ~150-200 EGP/day.
    - B. DM ad: same audience, fixed welcome message per CLAUDE.md. ~150 EGP/day. Needs fast human replies (Meta AI off).
 5. Run 5 days without touching (except the pause-losers rule). Judge by Shopify orders (utm campaign/ad ids) and DMs, never by cheap visits.
 6. Scale the winner by +20-30% every 2-3 days; cut the loser.
