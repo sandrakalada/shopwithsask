@@ -1,0 +1,295 @@
+# Meta ads (checked 2026-11-01)
+
+Ad account act_145068365612671 (EGP). Token app "Sask Claude", expires 2026-12-31. Scopes: ads_management, ads_read, business_management, catalog_management, instagram_basic, pages_show_list, pages_read_engagement (no instagram_manage_insights). Instagram business id 17841472046300883, Page 519356447933571.
+Lifetime spend 123,471 EGP. Pixel "Sask's pixel" 1632032541930768 connected to the ad account on 2026-11-04 (ad account added to business Sask via request access; owner enabled 2FA). Purchase optimization is now possible.
+
+## Current setup (changed 2026-11-01, owner's request)
+One ad set per post, 100 EGP/day each (5 active = 500 EGP/day). Never advertise summer pieces from November; check the post with the owner if unsure. Every targeting edit sends ads back to review, so batch edits. Women 22-44, Instagram only, high-end areas only: cities Heliopolis 661654, Zamalek 669395, 6 October City 655657, Sheikh Zayed 2939206; subcity Garden City 661491; neighborhoods Sheraton El Matar 2895299, El Nozha 2895365; radius New Cairo + Rehab 30.030,31.470 7 km, Madinaty 30.087,31.640 3 km, El Shorouk 30.130,31.610 3 km, Maadi 29.960,31.257 3 km, Mokattam 30.020,31.300 3 km, Mohandessin + Dokki 30.050,31.200 2.5 km. Audience estimate 2.0-2.3M.
+Ad sets: 52559524165720 Wild prints vest (PAUSED 2026-11-02, summer), crochet 52559528017120 (PAUSED 2026-11-02, summer), 52559527802320 Statement vest, 52559527826120 Star print jacket, 52559527876720 Colorful embroidery, 52559527953920 80s Lite jacket reel, 52559528017120 Crochet vest. Paused: Colorful jacket, old Statement vest copy.
+Old boosts Wild prints (campaign 52558200957120) and Cowgirl (52558200921720) paused at campaign level (ad set edits are blocked for boosts).
+Custom audiences: IG engagers 365d 52559528686520 (create without subtype), 2% lookalike 52559528769920. Populating on 2026-11-01; add to ad sets when ready.
+Pixel "Sask's pixel" 1632032541930768 (business 938316295036444) fires Purchase/AddToCart, but is not connected to the ad account: the ad account is not in that business. Owner must connect it in Business settings. Website custom audiences need the custom audience terms accepted: https://www.facebook.com/customaudiences/app/tos/?act=145068365612671
+Ads check: daily trig_01JzVtcjaqrbGKcxPrRtqGQA 12:47 Cairo (old twice-daily trig_01JVj1BwXNRpvxwC6AqQtpqQ disabled 2026-11-03) (old trig_01Vv5w9LEznWXWdkNPwJ7UTb disabled). Pause-losers rule in CLAUDE.md.
+
+## Original campaign (set up 2026-11-01)
+"SWS | Instagram | Best posts | Nov 2026" (52559524135720), OUTCOME_TRAFFIC, ad set 52559524165720 "Women 21-45 | Cairo+Giza | IG only", 400 EGP/day, landing page views, Advantage audience off, Instagram feed/story/reels.
+Ads: Wild prints - Vests, Colorful jacket - Jackets, Statement vest - Vests. Day 1: 170 EGP, 24 visits (7.1 EGP/visit, vs 0.5-1.0 for past boosts).
+3-day check scheduled Wed 2026-11-04 10:40 Cairo.
+Missing: Alexandria (region key 996). Cairo 1001, Giza 998.
+
+## Audience findings (May-Nov 2026, all ads)
+- 38% of spend went to men; men 55+ gave the cheapest "visits" but 0 messages and almost no saves (accidental/junk clicks). Old boosts were not gender-limited.
+- Women 25-44 = 42% of spend and nearly all real intent: 536 of 787 messages, 583 of 831 saves. Women 18-24 next (118 msgs, 161 saves). Women 45+ weak.
+- Cairo 81% of spend, Giza 6%, Alexandria 3%; rest of Egypt wasted (no delivery there).
+- Best audience: women 22-44, Cairo + Giza + Alexandria, Instagram. Next step: IG engagers 365d custom audience + 1-2% Egypt lookalike, run inside the same geo/gender filter.
+
+## Post performance (cost per landing page view, boosts)
+Cheapest: Tiny florals denim 0.24, Black vest tinge of flowers 0.29, Not your basic black skirt 0.36, Kind of vest changes the outfit 0.47, Cowgirl at heart 0.52, Light not too light 0.51, Fringe boots 0.56.
+Weak: Colorful jacket retro 1.4-1.5, Sometimes laughter 1.5.
+Never advertised: Star print jacket (Oct 31), Colorful embroidery (Oct 22), 80's Lite Jacket reel (Sep 17), Flowy lace skirt (Apr 17, 50 likes).
+Most products have 1 in stock: link ads to collection pages, not single products.
+Most paid orders have no referrer (DM/manual orders), so ad sales are not traceable.
+
+## 2026-11-01 to 11-02 results
+Shopify: 715 sessions from Facebook/Instagram links, 7 add-to-carts, 2 checkouts. Ad traffic (link clicks / landing page views) is not buying. Plan: connect pixel, then run a Sales (purchase) campaign instead of traffic.
+
+## Setup from 2026-11-02 (owner: mix DMs and website)
+Each post runs twice: website ad set (traffic campaign 52559524135720) + DM ad set (campaign "SWS | Instagram DMs | Nov 2026" 52559596204120, OUTCOME_ENGAGEMENT, CONVERSATIONS, INSTAGRAM_DIRECT, CTA INSTAGRAM_MESSAGE link https://www.instagram.com/shopwithsask app_link instagram://direct?userid=72087065543).
+Meta minimum budget ~54 EGP/day per ad set, so 55 + 55 = 110 EGP/day per post, 440/day total.
+Website ad sets: 52559527802320 Statement vest, 52559527826120 Star jacket, 52559527876720 Colorful embroidery, 52559527953920 80s reel.
+DM ad sets: 52559596425120 Statement vest, 52559596630120 Star jacket, 52559596676720 Colorful embroidery, 52559596704120 80s reel.
+Owner does not want to set up the pixel; judge ads by DMs/orders and Shopify carts.
+API rate limit: 1 write per 30 s on ad sets in bursts; space calls.
+
+## 2026-11-02 owner cap: max 400 EGP/day total (DMs + website)
+Website campaign resumed; 80s reel website ad set 52559527953920 paused (worst: 7.89 EGP/visit). Live: 4 DM ad sets x 55 + 3 website (Statement vest, Star jacket, Colorful embroidery) x 55 = 385 EGP/day.
+
+## Audience A/B test (started 2026-11-02, DM campaign, same Statement vest post)
+A Broad 52559596425120 (55 EGP), B Brands 52559642503520 (57: Zara, Mango, H&M, Bershka, Pull & Bear, Stradivarius), C Boho-Vintage 52559642562520 (57: Boho-chic, Bohemian style, Vintage clothing, Free People, Anthropologie, Street fashion). Same geo/age/gender. Judge after 5-7 days on cost per conversation and orders; winner audience goes to all ads.
+Paused to stay under 400: Colorful embroidery DM 52559596676720, 80s reel DM 52559596704120. Star jacket DM 52559596630120 stays broad. Meta minimum rose to ~56.35 EGP for new ad sets.
+Total ~389 EGP/day.
+
+## Traffic quality (Shopify, last 90 days)
+facebook referrer (mostly ad in-app clicks): 12,699 sessions, 54 carts, 4 checkouts, 4 orders. instagram: 5,141 sessions, 72 carts, 14 checkouts. Google organic search: 112 sessions, 22 carts, 5 checkouts, 5 orders (best rate). Most orders (328) have no referrer (DM/manual).
+
+## Google (checked 2026-11-02)
+All 215 active products published to Google & YouTube channel, with category and gender/age/condition metafields. Merchant Center approval status not visible via API: owner checks in the Shopify Google & YouTube app.
+Google search visits (90d): 69 sessions; most land on Arabic product pages (/ar/products/...), e.g. floral-boho-mini-dress, flower-embroidered-sweater, embroidered-boho-jacket. Arabic SEO is what brings Google buyers.
+
+## 2026-11-02 test arm D added
+D IG engagers 52559650248120 (57 EGP, Statement vest DM, engagers 365d inside same women 22-44 high-end filter, ~43-51k people). Star jacket website ad set 52559527826120 paused to stay under 400. Total 391 EGP/day. Lookalike 52559528769920 still too small.
+
+## Ad research by real orders (Oct 1 - Nov 2, 2026)
+Website orders with journey data start Oct 1 (earlier orders are imports). ~32 web orders #1340-#1373; 5 cancelled (3 of them ad-driven, incl. 3,430 EGP).
+Meta spend Oct 1 - Nov 2: 19,706 EGP. Non-cancelled orders touched by an ad (first or last click): 14 orders, 20,505 EGP incl. delivery -> about break-even on revenue, a loss after product cost.
+Free channels same period: Google (organic + free Shopping listings, utm sag_organic) 6 orders 8,395 EGP; Instagram bio link 5 orders 7,194 EGP.
+Ads that brought orders: Serving vintage military chic (538 EGP spend, 3 orders), Not your ordinary vest (499, 3 orders first-click), That colorful mood (592, 2 orders 3,000), A statement vest (528, 2,760), The cherry on top (314, 3,190, summer), A little color (503, 2,520), Double the prints (725, 780), A little structure / A little texture (assist).
+Cheapest-visit ads brought 0 orders: Light not too light (754 EGP, 1,481 visits), Cowgirl (702, 1,361), Fringe boots (616, 1,097), Kind of vest changes (562, 1,467), Tiny florals (162, 563). Lesson: cost per visit does not predict sales; judge by orders (Shopify customerJourneySummary utm campaign ids).
+Vests sell best from ads.
+
+## 2026-11-03 check
+Since Nov 2: 552 EGP spent, 0 new orders. DM test: D followers 4 DMs (22/DM), B brands 2 (33), A broad 2 (36), C boho 0 and Star jacket DM 0 -> C 52559642562520 and Star jacket DM 52559596630120 PAUSED. Website ads -> /collections/vests 109 sessions, 2 carts, 0 orders.
+
+## 2026-11-03 product-page ads (owner chose option 2)
+Website ads now link straight to product pages, product photos from the store, bilingual copy, utm_source=ig utm_medium=paid utm_campaign={{campaign.id}} utm_content={{ad.id}}. 57 EGP each:
+- Bohemian Desert Maxi Skirt adset 52560135401920
+- Floral Print Sleeveless Vest 52560135455920
+- Floral Sleeveless Vest 52560135518320
+- Boho Jacket 52560135586920
+Paused: Statement vest website 52559527802320, Colorful embroidery website 52559527876720. DM A/B/D still on. Instagram CDN (cdninstagram.com) is blocked by the session network policy, so post photos cannot be viewed; store photos used instead.
+
+## 2026-11-03 evening check
+Nov 2-3 spend 571 EGP. Orders since Nov 2: only #1373 (first click old boost 52555009088720, last click IG organic). DMs: D engagers 4, A broad 2, B brands 2. 4 product-page ad sets approved (ACTIVE) 13:18 UTC, no spend yet. Live budget 397 EGP/day. Nothing new to pause.
+2026-11-03: product-page ad stock checked: Floral Sleeveless Vest 3, Bohemian Desert Maxi Skirt 12, Floral Print Sleeveless Vest 4, Boho Jacket 2 (watch: pause if it drops to 1). DM A/B/D test runs to ~Nov 7-9 before choosing a winner.
+Daily Meta + Google check scheduled task trig_01JzVtcjaqrbGKcxPrRtqGQA, every day 12:47 Cairo (owner request 2026-11-03). Weekly Google check trig_01Q8U88QNyTzQUTM83pTCkAQ and twice-daily Meta check trig_01JVj1BwXNRpvxwC6AqQtpqQ still on.
+2026-11-03: twice-daily Meta check and weekly Google check turned OFF (owner wants one report). Only daily check trig_01JzVtcjaqrbGKcxPrRtqGQA (12:47 Cairo) runs; it now also covers the Meta token warning, lookalike, DM test winner (~Nov 7-9) and Google verdict (~Nov 17).
+
+## 2026-11-03 owner: decrease Meta spend
+Meta minimum ~56-57 EGP per ad set, so cut by pausing. Paused: TEST A Broad 52559596425120 (worst cost/DM), Boho Jacket 52560135586920 (2 left), Floral Sleeveless Vest 52560135518320. Live: D IG engagers 52559650248120, B Brands 52559642503520, Bohemian Desert Maxi Skirt 52560135401920 (12 in stock), Floral Print Sleeveless Vest 52560135455920. Total 228 EGP/day (was 397). Do not turn paused ones back on without asking.
+
+## Facebook Page / AI replies (2026-11-04)
+Page phone +966 50 524 6570 is correct (owner confirmed); keep it. Page has no website listed. IG ice breakers (delivery, payment, shipping area, how to order, EN+AR) are set. Owner reports the Meta AI DM replies give wrong data; token cannot read IG DMs (needs advanced instagram_manage_messages) or edit Page (no pages_manage_metadata). Fix is in Business Suite: https://business.facebook.com/latest/inbox/automations?asset_id=519356447933571
+## 2026-11-04 DM ads switched to Floral Print Sleeveless Vest with welcome message
+Owner: Meta AI quoted 880 for the Boho Embroidered Vest (real 930, only Small left). Creative 2178355596396719 (product photo, CTA INSTAGRAM_MESSAGE, page_welcome_message 219 chars EN+AR with 940 EGP, S/M/L, link, ice breakers sizes/delivery/payment). New ads: A 52560489775920, B 52560490104720, D 52560490338320 in the same test ad sets; old Statement vest DM ads paused. Template script: notes/dm-ad-welcome-template.py (welcome text limit 300 chars). Rule in CLAUDE.md: every DM ad gets this.
+
+## 2026-11-04 website ads rebuilt as carousels (owner: website ads not performing)
+Single-product ads (skirt, floral print vest) had 76 EGP, 28 visits, 0 carts; cause is LANDING_PAGE_VIEWS optimization without the pixel. Owner will not link the pixel yet.
+New carousel creative 1845318719827579: 5 in-stock multi-size pieces (Bohemian Desert Maxi Skirt, Floral Print Sleeveless Vest, Polka Dot Lace Maxi Skirt, Colorblock Floral Patchwork Shirt, Boho Jacket), each card to its product page, Meta reorders cards (multi_share_optimized), bilingual copy, utm tags.
+- Carousel WARM - IG engagers adset 52560492747520 (custom audience 52559528686520 inside women 22-44 high-end, ~44-52k), 57 EGP
+- Carousel COLD - Women 22-44 high-end adset 52560492804120, 57 EGP
+Paused: Bohemian Desert Maxi Skirt 52560135401920, Floral Print Sleeveless Vest 52560135455920 product-page ad sets. Total live stays 228 EGP/day (DM B + DM D + 2 carousels). If a carousel product drops to 1 piece or sells out, replace that card. Linking the pixel (Shopify > Facebook & Instagram > Settings > ad account 145068365612671) then switching to OUTCOME_SALES is still the main fix.
+
+## 2026-11-04 pixel connected, website ads moved to Sales
+Owner added the ad account to business Sask (request access, ownership stays personal). Pixel shared to the ad account via API (/pixel/shared_accounts). Shopify Facebook & Instagram channel already uses this pixel with Enhanced data sharing.
+New campaign "SWS | Sales | Website | Nov 2026" 52560496822120 (OUTCOME_SALES, optimize OFFSITE_CONVERSIONS PURCHASE, pixel 1632032541930768), same carousel creative 1845318719827579:
+- Sales WARM - IG engagers 52560496848120 (ad 52560496880320), 57 EGP
+- Sales COLD - Women 22-44 high-end 52560496984720 (ad 52560497001120), 57 EGP
+Paused: traffic carousels 52560492747520 and 52560492804120. Total live still 228 EGP/day (DM B + DM D + 2 Sales). Purchase volume is low (~4/week), so learning is slow; judge after 7 days, not by visits. Future website ads: always OUTCOME_SALES with this pixel, never LANDING_PAGE_VIEWS.
+
+## 2026-11-04 daily check
+Token valid, no expiry. Setup as in the sections above (Sales campaign + DM test with Floral Print Sleeveless Vest welcome-message ads). Live total 228 EGP/day (Sales WARM, Sales COLD, DM D, DM B). DM test to date: D 135 EGP 7 DMs (19/DM), B 117 EGP 3 DMs (39/DM), A paused 86 EGP 2 DMs. Lookalike 52559528769920 ready (538k): suggest for Sales COLD. Nothing paused.
+2026-11-04: owner approved; lookalike 52559528769920 (2% Egypt, IG engagers) added to Sales COLD 52560496984720 inside women 22-44 / Instagram / high-end areas. Audience ~210-247k. Budget unchanged (57).
+2026-11-04: owner approved Sales WARM 52560496848120 and Sales COLD 52560496984720 raised 57 -> 100 EGP/day. Live total 314 EGP/day. Stock check (owner: never advertise out-of-stock, check daily): carousel bohemian-skirt 12, polka-dot-lace-maxi-skirt 5, floral-print-sleeveless-vest 4, colorblock-floral-patchwork-shirt 3, embroidered-boho-jacket 2 (watch); DM ads floral-print-sleeveless-vest 4. All OK. Old boost ads still show ACTIVE but their campaigns/ad sets do not spend.
+
+## 2026-11-05 Toucan jacket post ad (owner approved despite last piece)
+Post 18111683381266893 (DfVYd7oCAg7, "The art of standing out") = Toucan Print Puffer Jacket, 1,450 EGP, 1 left (Small). Owner said promote it anyway. Ad set 52560649951120 in Sales campaign 52560496822120, PURCHASE on pixel, WARM engagers targeting, 57 EGP/day, ends 2026-11-10. Ad 52560649969320 (creative 1384905790158173, post to product page). PAUSE IT AS SOON AS THE JACKET SELLS. Live total 371 EGP/day.
+Traffic validation 2026-11-05: sessions fell from 520-1,000/day (Oct 28-Nov 1, old cheap boosts) to 102 on Nov 4; orders only ~1.4/day -> ~1/day. Cause: boosts paused, high-end-areas targeting gives CPM ~318 EGP vs ~55 before, half budget on DM ads, Sales learning. Proposed to owner: widen Sales ads to all Cairo, Giza, Alexandria governorates (women 22-44, IG).
+
+2026-11-05: owner approved ("do what is best"): Sales COLD 52560496984720 widened from high-end areas to Cairo 1001 + Giza 998 + Alexandria 996 governorates (home/recent), still women 22-44, Instagram, lookalike 52559528769920 kept. Audience 210-247k -> 253-298k. Renamed "Sales COLD - Women 22-44 Cairo+Giza+Alex". Sales WARM, DM ads and Toucan ad stay on high-end areas. Watch CPM (was ~318 EGP) and sessions over the next 5-7 days; no other changes during learning.
+
+## 2026-11-05 weekend DM boost (owner request)
+TEST D IG engagers DM ad set 52559650248120 raised 57 -> 127 EGP/day (+70) until Sunday 2026-11-08 23:55 Cairo; a scheduled reminder in the main ads session sets it back to 57. Live total is 441 EGP/day until then: this is an owner-approved temporary exception to the 400 cap. Daily check: do NOT pause anything to get under 400 before Nov 9; after Nov 9 the cap applies again.
+
+## 2026-11-05 daily check
+Stock OK: carousel bohemian-skirt 12, polka-dot-lace-maxi-skirt 4 (Large sold out), floral-print-sleeveless-vest 4, colorblock-floral-patchwork-shirt 3, embroidered-boho-jacket 2; DM ads floral vest 940 S/M/L still matches; Toucan 1 left (owner exception, pause when sold). Live 441 EGP/day (owner-approved weekend exception to Nov 9).
+FIRST SALES-AD ORDER: #1376, 1,515 EGP, 2026-11-05, Sales WARM carousel ad 52560496880320 (landed on floral-print-sleeveless-vest, bought Polka Dot Skirt + Polka Dot Lace Maxi Skirt).
+Since start: Sales WARM 141 EGP, 3 ATC, 1 order; Sales COLD 132 EGP, 0 ATC (meets pause rule, but kept: owner widened it to Cairo/Giza/Alex today and asked for no changes during learning; re-check by Nov 8). DM D 197 EGP 8 DMs (25/DM), B 168 EGP 3 DMs (56/DM, within 2x of 33 avg).
+
+## 2026-11-05 LOW-RES ADS PAUSED (owner: customers complained of pixelated ads)
+Cause: creatives used store product photos (900x1200, upscaled from small/WhatsApp originals). Paused ad sets: DM B 52559642503520, DM D 52559650248120 (weekend boost cancelled with it), Sales WARM 52560496848120, Sales COLD 52560496984720. Only live: Toucan jacket ad (Instagram post creative), 57 EGP/day. Do NOT re-enable these; rebuild them only with Instagram post/reel creatives (source_instagram_media_id) or owner-supplied originals >=1080px. Quality rule now in CLAUDE.md. The weekend reminder trig_01Jc1h3yuhEV2vXvQiAcAb2w will still set D budget to 57 on Nov 8 (harmless, it stays paused).
+
+2026-11-05 (later): owner reversed the pause: keep DM B, DM D (127 weekend boost), Sales WARM, Sales COLD running through the weekend with current creatives, then replace with high-res only. All 4 re-activated; live total 441 EGP/day until Nov 8 23:55 (D back to 57 then -> 371). From 2026-11-09: replace creatives 2178355596396719 (DM) and 1845318719827579 (carousel) with Instagram post/reel creatives or owner originals >=1080px, per the quality rule; owner to send post links (Instagram CDN is blocked here so posts cannot be viewed).
+
+2026-11-05: owner: on Monday Nov 9 do NOT pause the 4 ad sets; only swap their images to high-res (new ad in the same ad set, old ad paused only after the new one is live). Reminder trig_01D3rRnGe5iizp1zj6VUtK9e updated.
+
+## 2026-11-05 weekend jacket ads (owner: "best fit this weekend capping 250 per product")
+Sales campaign 52560496822120, PURCHASE on pixel, lifetime budget 250 EGP each, 2026-11-05 20:30 to 2026-11-08 23:59 Cairo, audience = IG engagers OR 2% lookalike inside women 22-44 / Instagram / high-end areas (~232-273k), Instagram post creatives (high quality):
+- Toucan Print Puffer Jacket (post DfVYd7oCAg7, 1 left Small, 1,450) adset 52560897440120 ad 52560897479920
+- Star Print Jacket (post DfK4aVQCFFz, 1 left Small, 1,850) adset 52560897520120 ad 52560897538120
+Old Toucan daily ad set 52560649951120 paused (spent 27.76 EGP). Pause either jacket ad as soon as it sells. Owner-approved; weekend daily-equivalent total is above the 400 cap until Sunday night.
+
+2026-11-05 (later): owner: "do not run ads for my followers, acquire new customers; split between DM and website". Jacket weekend ads rebuilt (Meta minimum is 160 EGP lifetime per ad set, so 125/125 per jacket was impossible):
+- WEBSITE: ad set 52560897440120 renamed "WEEKEND jackets - WEBSITE new customers | cap 250", ads Toucan 52560897479920 + Star 52560898073920, Sales PURCHASE
+- DM: ad set 52560898164920 "WEEKEND jackets - DM new customers | cap 250" in DM campaign 52559596204120, ads Toucan 52560898176120 (creative 1856931628838385) + Star 52560898184520 (creative 1782708486116119), IG post creatives with welcome message (price, last piece Small, link) and ice breakers
+- Targeting both: lookalike 52559528769920 INCLUDED, IG engagers 52559528686520 EXCLUDED, women 22-44, Instagram, high-end areas (~191-225k). Nov 5 21:00 to Nov 8 23:59. Star website ad set 52560897520120 paused.
+Open question to owner: Sales WARM 52560496848120 and DM D 52559650248120 still target followers (engagers).
+
+2026-11-06: owner approved: Sales WARM 52560496848120 renamed "Sales NEW - lookalike, followers excluded (high-end)" and DM D 52559650248120 renamed "DM NEW - lookalike, followers excluded (high-end)": both now target lookalike 52559528769920 with IG engagers 52559528686520 EXCLUDED (women 22-44, Instagram, high-end areas). No ad targets followers any more. Budgets unchanged (100 and 127 weekend).
+Meta AI (Business AI) in IG DMs now shows catalog product cards, but with wrong photos (e.g. Boho Patchwork Jacket / Tropical One-Shoulder Dress / Star Print Jacket cards showing the parrot vest ad photo). The Meta catalog items themselves have their own correct images (checked). Not fixable by API; advised owner to turn the AI agent off.
+
+## 2026-11-06 polka dot boost (owner: "boost website visits today and tomorrow, I want sales, high resolution")
+Sales campaign 52560496822120, ad set 52561068125120 "BOOST Nov 6-7 - polka dot post - SALES new women Cairo+Giza+Alex | 300 total", lifetime 300 EGP, Nov 6 11:30 - Nov 7 23:59 Cairo, PURCHASE on pixel, women 22-44 Cairo/Giza/Alex regions, IG engagers excluded, Instagram feed/stories/reels (~2.8-3.3M). Ad 52561068158320, creative 1138292438704552 = IG post "Our polka dot era" (Meta used its ad copy DfAtIC8gU97), link /collections/polka-dot (stock: most items 2-4).
+Quality check method that works here: Instagram CDN is blocked, but the same post on the Facebook Page is reachable: page token -> /{page_post_id}?fields=attachments{subattachments{target{id}}} -> /{photo_id}?fields=images (largest) -> download from fbcdn and view. Polka post photos: 1086-2048 px, viewed at 100%, sharp.
+
+## 2026-11-06 daily check
+Stock: Boho Jacket (embroidered-boho-jacket) down to 1 (Medium) -> removed from both Sales carousels: new 4-card creative 1797324717987094 (same images/copy/utm), new ads 52561093894320 (Sales NEW 52560496848120) and 52561094007720 (Sales COLD 52560496984720), approved ACTIVE, then old ads 52560496880320 / 52560497001120 paused. Other carousel items 3-12; DM floral vest 940 S/M/L matches. Jacket weekend ads (Toucan, Star) last piece = owner exception.
+Orders from Sales campaign: #1376 1,515 (Sales NEW/WARM ad) and #1377 1,170 (Sales COLD ad 52560497001120), both Nov 5. Yesterday: Sales NEW 144 EGP 3 ATC 1 purchase, Sales COLD 133 EGP 5 ATC 1 purchase (COLD now has results; no pause), DM NEW 110 EGP 4 DMs, DM B 29 EGP 0.
+Not in notes, flagged to owner: traffic campaign "Boost - Star Print Jacket (Fri-Sat)" 52560955764720, ad set "Egypt women 18-45" 52560955779320, 70 EGP/day, LANDING_PAGE_VIEWS, created 2026-11-06 01:47 UTC (another chat). Breaks the Sales-only/22-44 rules; left running pending owner.
+Live daily budgets 454 EGP + weekend lifetime ad sets (owner exceptions to Nov 8/9).
+2026-11-06: owner: "Fix it. Only for Cairo" (Star boost). Paused traffic ad set 52560955779320 (Egypt women 18-45, LPV). New ad set 52561097335720 "Star Print Jacket - SALES new women Cairo only (Fri-Sat)" in Sales campaign 52560496822120: PURCHASE on pixel, 70 EGP/day, ends 2026-11-07 23:59 Cairo, women 22-44, Cairo Governorate 1001 (home/recent), Instagram feed/stories/reels, IG engagers excluded (~1.5-1.8M). Ad 52561097418920 uses the Star IG post creative 1842630783832305 (high quality). Star jacket is a last piece (owner exception): pause when sold. Note: curl -d turns "+" in end_time into a space; use --data-urlencode for times.
+
+## 2026-11-06 evening: consolidation (owner approved "yes please")
+Diagnosis: CPM 257-292 EGP (vs ~55 Oct 29-Nov 1), ~30 visits/day for ~550 EGP: budget split over 10 small ad sets, narrow audiences, Sales objective with little purchase data.
+IMPORTANT FIX: post DfVYd7oCAg7 ("The art of standing out") is the EMBROIDERED SUEDE JACKET (orange suede, parrot embroidery, 1,850, 1 left Small), NOT the Toucan Print Puffer Jacket. Earlier Toucan ads/welcome text linked the wrong product. Verified by downloading the post photos (via Facebook Page) and comparing with store photos.
+Created: MAIN SALES ad set 52561224125720, 300 EGP/day, PURCHASE on pixel, women 22-44 Cairo+Giza+Alex regions, IG engagers excluded, IG feed/stories/reels. Ads: polka dot post -> /collections/polka-dot 52561224139720 (creative 1138292438704552); Embroidered Suede Jacket post -> /products/embroidered-suede-jacket 52561224158320 (creative 1595386831860478); Star Print Jacket post -> /products/star-print-jacket 52561224174120 (creative 1658046352490027). All post photos checked at full size (1086-2048 px, sharp).
+To pause (approved by owner, but the pause calls were blocked here pending explicit confirmation): 52561097335720, 52561068125120, 52560898164920, 52560897440120, 52560496984720, 52560496848120, 52559642503520. Keep DM NEW D 52559650248120.
+
+2026-11-07: owner confirmed ("keep DM NEW and MAIN SALES"). Paused 52561097335720, 52561068125120, 52560898164920, 52560897440120, 52560496984720, 52560496848120, 52559642503520. Live: MAIN SALES 52561224125720 (300/day) + DM NEW D 52559650248120 (127/day weekend boost, back to 57 on Nov 8 23:55 via reminder trig_01Jc1h3yuhEV2vXvQiAcAb2w). Total 427/day this weekend, 357 from Nov 9. Judge MAIN by orders after ~5 days; watch CPM vs the ~260-290 before.
+
+## 2026-11-07 daily check
+Live: MAIN SALES 52561224125720 (300/day; ads polka post -> /collections/polka-dot, Embroidered Suede Jacket post, Star Print Jacket post) + DM NEW D 52559650248120 (127 weekend). Total 427 (weekend exception, 357 from Nov 9).
+Stock: Star Print Jacket 1 (Small) and Embroidered Suede Jacket 1 (Small) = owner-approved last-piece ads, pause each when sold. Polka collection page items 0-4 (collection, sold-out last). DM floral vest 940 S/M/L matches.
+Yesterday (Nov 6) Meta spend 948 EGP across 10 ad sets before consolidation: 7 DMs (D 5, B 2), 8 ATC (weekend jackets website), 0 purchases. No new orders Nov 6-7 except #1378 (Google, 575).
+DM audience test winner: D (lookalike/engagers, ~24 EGP/DM over the test) vs B brands (~56/DM) vs A broad (43/DM, paused) vs C boho (0). D is already the only DM ad set left.
+
+## 2026-11-08 owner: "no website visitors, fix now"
+Diagnosis: Sales/PURCHASE ads with narrow Instagram-only audiences buy at CPM 400-1,128 EGP (MAIN Star jacket 1,128 today: 64 impressions for 72 EGP), so ~100 sessions/day. The polka ad in MAIN gets almost no delivery (9 impressions in 3 days). The "Your everyday pullover" post boost (Instagram app boost, not ours) runs at CPM ~60 and brought 37 visits for 80 EGP yesterday, 0 carts.
+Done: paused MAIN Star Print Jacket ad 52561224174120 (worst CPM, 0 purchases, last piece). MAIN now effectively = Embroidered Suede Jacket ad (1 purchase, #1379 1,925 on Nov 7).
+Asked owner: allow a cheap website-visits ad (traffic objective, exception to the Sales-only rule) or keep Sales-only.
+
+## 2026-11-08 NEW CONSTRUCT (owner: "change the whole construct, focus heavily on website ads vs DMs, audience not working, no traffic, your ads vs mine; high resolution only")
+Owner's own boosts that drove traffic+orders: LINK_CLICKS to website, broad audience (Advantage+ audience or all Egypt), CPM 40-60 EGP. Our Sales/PURCHASE + narrow IG-only audiences: CPM 400-1,128.
+New: campaign "SWS | Website traffic | Nov 2026" 52561524910120 (OUTCOME_TRAFFIC), ad set 52561524960720 "TRAFFIC women 22-50 Cairo+Giza+Alex - IG posts", LANDING_PAGE_VIEWS, 200 EGP/day, Instagram feed/stories/reels (IG Explore placement deprecated in API), audience ~4.2-5.0M. Ads (IG post creatives, links to collections so last pieces are not a problem):
+- Colorful retro jacket post -> /collections/jackets, ad 52561524975120, creative 4637922803090424 (photos 2048 px, checked sharp)
+- Polka dot era post -> /collections/polka-dot, ad 52561524997920, creative 1138292438704552 (checked earlier 1086-2048 px)
+- Art of standing out (Embroidered Suede Jacket) post -> /collections/jackets, ad 52561525046520, creative 2228776221004875 (checked earlier)
+Rejected: "Not your ordinary vest" post (2 of 3 photos 902/761 px, below 1080 rule); "Crochet with character" (summer look, brown crochet vest sold out).
+Budgets: MAIN SALES 52561224125720 300 -> 100 (Suede post + polka), DM NEW D 52559650248120 127 -> 57. Daily total 357. NOTE: CLAUDE.md still says website ads = Sales only; owner's instruction today overrides it for this traffic campaign (rule file update needs owner OK). Judge by orders and sessions after 3-4 days.
+2026-11-08 (owner: "do what is best; Cairo and Giza, female only, engaged shoppers, interested in fashion, skirts, tops, vests"): TRAFFIC 52561524960720 and MAIN SALES 52561224125720 now: women 22-44, Cairo 1001 + Giza 998 (Alexandria removed), Engaged Shoppers behavior 6071631541183 AND interests (Women's clothing 6011366104268, Skirt 6002866906422, Blouse 6002998047244, Boho-chic 6002868651110, Street fashion 6003446154680, Fashion accessories 6003348604581); no "vest/tops" interest exists in Meta (searched). Instagram feed/stories/reels. MAIN SALES also excludes IG engagers. Audiences ~1.3-1.6M each. DM NEW D unchanged (lookalike in high-end Cairo/Giza areas, women).
+
+## 2026-11-08 daily check
+Embroidered Suede Jacket SOLD (order #1379, 1,925, Nov 7, came from MAIN Suede ad 52561224158320). Paused MAIN Suede ad 52561224158320 and TRAFFIC "Art of standing out" ad 52561525046520 (post shows the sold jacket). Live ads: TRAFFIC retro jacket + polka (-> collections), MAIN polka, DM floral vest (940 S/M/L matches). Daily total 357.
+Early today: TRAFFIC CPM 62 (vs MAIN SALES 835), owner's pullover boost CPM 56. DM floral vest creative is a store photo: owner exception ends tonight; replace from Nov 9 with a high-res IG post creative.
+
+2026-11-08 23:56 Cairo: weekend boost end reminder fired. DM NEW 52559650248120 already at 57 EGP/day (set earlier). Boost Nov 5-8: 393 EGP, 12 DMs (~33/DM). Live daily total 357 EGP (TRAFFIC 200, MAIN SALES 100, DM NEW 57), under the 400 cap.
+
+## 2026-11-09 high-res swap (scheduled task from owner instruction)
+Only live ad still on a store photo was DM NEW 52559650248120 (Floral Print Sleeveless Vest, creative 2178355596396719). The vest IG post (DdkDgL6iHp1, Sep 21) is only 960 px on Facebook, below the 1080 rule, so no sharp version exists. Added new ad 52561679810720 in the same ad set: polka dot era post (photos 1086-2048 px, checked), creative 1141614061693255, welcome message: polka dot skirts from 720 EGP, mostly S/M/L, link /collections/polka-dot, ice breakers sizes/delivery/payment. Old ad 52560490338320 stays until the new one is approved; reminder in 3 h pauses it. B, WARM, COLD were already paused by the owner on Nov 7, so nothing to swap there.
+
+## 2026-11-09 more visits (owner approved: "yes and exclude alexandria")
+TRAFFIC 52561524960720: 200 -> 280 EGP/day, placements Instagram (feed/stories/reels) + Facebook (feed/stories/reels), Cairo 1001 + Giza 998 only (no Alexandria), engaged shoppers x fashion interests kept, women 22-44 (~2.0-2.4M). MAIN SALES 52561224125720: 100 -> 60 EGP/day. DM NEW 57. Total 397 EGP/day. Goal: 130-180 ad visits/day. Facebook placements are an owner exception to the Instagram-only audience rule (traffic ad set only).
+
+## 2026-11-09 - Old posts added to TRAFFIC ad set (52561524960720)
+Owner asked for older in-stock posts in the traffic campaign (max 10 ads). Each post checked: right product, 2+ in stock, every photo at least 1,086 px. Each ad links to its product page with SHOP_NOW and the standard utm url_tags.
+- TRAFFIC - Color Block Collared Shirt post: ad 52561709007120 (IG 17907275031327307)
+- TRAFFIC - Polka Dot Long Sleeve Shirt post: ad 52561709129920 (IG 18593775148020446)
+- TRAFFIC - Embroidered Denim Vest post: ad 52561709188720 (IG 18016922909912117)
+- TRAFFIC - Bohemian Desert Maxi Skirt post: ad 52561709287920 (IG 17903344440562057)
+- TRAFFIC - Boho Embroidered Vest post: ad 52561709338320 (IG 18045697289728250; Small only, 2 left)
+- Skipped: the Colorblock Floral Patchwork Shirt post (IG 18084595766142388). Meta refused it because the carousel has too many slides. Also rejected: the retro zip jacket post (slides at 506/821 px) and the brown polka skirt post (960 px).
+The ad set now has 7 active ads (5 new ones in review), and its budget is unchanged at 280/day.
+- Added 3 more ads to bring the TRAFFIC ad set to 10 active ads (owner request), all cold-season velvet posts. Every photo is 1440 px and was checked sharp at full size.
+  - TRAFFIC - Velvet Buttoned Vest post: ad 52561709877320 (IG 17999815091729144)
+  - TRAFFIC - Sleeveless Velvet Buttoned Top post: ad 52561709911920 (IG 17940325842153129)
+  - TRAFFIC - Burgundy Velvet Mini Skirt post: ad 52561709971120 (IG 18101317963805403)
+  - Spares that also pass the checks: Embroidered Black Vest post (IG 18133205527515495) and Boho Vest post (IG 18104414068757533, 2048 px).
+
+## 2026-11-09 daily check
+New DM polka ad 52561679810720 approved ACTIVE -> old store-photo DM ad 52560490338320 paused (no low-res creatives live now). Live 397/day: TRAFFIC 280 (10 IG post ads), MAIN SALES 60 (polka), DM NEW 57 (polka).
+Yesterday 633 EGP total: TRAFFIC ads CPM 66-86, 85 LPV (retro jacket 59, polka 20); owner's pullover boost CPM 54, 68 LPV, 4 ATC; MAIN SALES CPM 512-1,112, 6 LPV, 0 ATC. Sessions: Nov 4-7 ~100/day -> Nov 8 196. No new orders since #1379 (Nov 7).
+
+## 2026-11-09 - Embroidered Suede Jacket restocked (1 piece, Small, 1,850)
+Owner asked for an extra 500 EGP on it for website purchases (owner exception to the 1-piece rule and the 400/day cap). New ad set 52561750550520 "SUEDE JACKET restock" in Sales campaign 52560496822120: lifetime 500 EGP, Nov 9 14:00 to Nov 13 23:59 Cairo (~125/day), PURCHASE on pixel, same audience as MAIN SALES. Ad 52561750562720 uses creative 1595386831860478 ("art of standing out" post, checked high-res, links to /products/embroidered-suede-jacket). PAUSE IT AS SOON AS THE JACKET SELLS.
+
+## 2026-11-09 - Latest IG post (pink florals, DfhKrhciKe8) website visits ad
+Owner request: website visits, 7 days, 100 EGP/day, link to /products/patterned-sleeveless-top (940, 1 left Small; owner exception to the 1-piece rule). Post photos 2048 px, checked sharp. Ad set 52561791054720 in traffic campaign 52561524910120 (LANDING_PAGE_VIEWS, same audience as TRAFFIC: women 22-44 Cairo+Giza, IG+FB), ends Nov 16 23:59 Cairo. Creative 1894866645009788, ad 52561791142920. PAUSE WHEN THE TOP SELLS. Daily total now ~622 (397 + suede ~125 until Nov 13 + this 100 until Nov 16), owner-approved.
+
+## 2026-11-10 daily check
+Stock OK: all TRAFFIC product ads 2-12 pieces; Suede jacket (1, restock ad) and patterned-sleeveless-top (1, pink vest ad) = owner exceptions. Live daily 497 + suede lifetime (~125/day to Nov 13), owner-approved.
+Nov 9: Meta 736 EGP, 296 LPV (TRAFFIC CPM 42-80; MAIN polka CPM 406, 4 ATC; Suede CPM 423, 5 LPV). Sessions 359 (best since Nov 1). Orders: #1381 1,055 EGP from TRAFFIC retro jacket ad 52561524975120 (first sale from the traffic campaign); #1380 840 bio link. #1379 (suede, 1,925) CANCELLED Nov 9 (jacket restocked). Nothing paused.
+
+## 2026-11-10 - 11.11 sale (Buy 2 Get 3rd 50% Off, Shopify automatic discount, ends Nov 11 23:59 Cairo)
+Owner: 750 EGP on the 11.11 reel (IG 17882755710546141, DfkaS_doUtY) until end of Nov 11, split Instagram 80% / Facebook 20%, sent to the website Shop All. Reel has a 1080x1920 rendition, frames checked sharp; creative uses source_instagram_media_id. Creative 1620516959037409 -> /collections/all.
+Sales campaign 52560496822120 (PURCHASE on pixel), MAIN SALES audience (women 22-44 Cairo+Giza, IG engagers excluded):
+- 11.11 SALE reel - Instagram: ad set 52562115059720 (600 EGP lifetime, feed/stories/reels), ad 52562115077920
+- 11.11 SALE reel - Facebook: ad set 52562115096920 (150 EGP lifetime, feed/stories/reels), ad 52562115124520
+Both end 2026-11-11 23:59 Cairo. Reminder trig_01NoP43y7iQMGH5ke471tPGi (Nov 12 00:05 Riyadh) reports results.
+- 2026-11-10: owner's own story boost (campaign 52562113509120, ad set 52562113515720, story video 17993204151103376, LINK_CLICKS, homepage, ends Nov 12 19:04 Cairo): budget lowered from 1,304 to 400 EGP lifetime (owner approved). Its audience is still all Egypt, both genders, 18-65: the API refuses to edit boosted-post targeting ("only allowed in Instagram app"); owner must change it in the Instagram app. 11.11 ad sets: Advantage+ audience switched off, age fixed at 22-44. Note: Meta turns on advantage_audience for new ad sets by default; set it to 0 every time.
+- 2026-11-10: owner approved replacing the story boost. Boost campaign 52562113509120 PAUSED (0 spent). New: ad set 52562118599520 "11.11 SALE story" in Sales campaign 52560496822120, 400 EGP lifetime, ends Nov 11 23:59 Cairo, PURCHASE on pixel, women 22-44 Cairo+Giza, IG engagers excluded, Advantage+ audience off, IG stories/reels + FB stories/reels. Creative 3426494430861979 (story 17993204151103376 -> /collections/all), ad 52562118604920.
+
+## 2026-11-11 morning check
+Nov 10 Meta 1,290 EGP. Orders from ads: #1383 1,005 (11.11 SALE reel IG ad 52562115077920), #1382 2,945 (TRAFFIC velvet vest ad 52561709877320, Facebook), #1381 1,055 (TRAFFIC retro jacket ad 52561524975120). #1384 1,730 Google free listings.
+11.11 IG reel: 207 EGP, 10 ATC, 1 purchase. 11.11 FB: barely delivering (3 EGP, CPM ~600). TRAFFIC: 285 EGP, 261 LPV, CPM 66.
+Paused under the pause-losers rule (>=85 EGP, 0 ATC, 0 orders, while the 11.11 IG reel in the same Sales campaign had an order): SUEDE JACKET restock 52561750550520 (~97 EGP), 11.11 SALE story 52562118599520 (~236 EGP), MAIN SALES 52561224125720.
+Owner's own boosts still running: "Your everyday pullover" (155 EGP Nov 10, 109 LPV, 0 ATC) and a new boost of the 11.11 reel (started Nov 11) that duplicates our 11.11 reel ads.
+2026-11-11 daily check (12:48 Cairo, after the morning check above): stock OK for all our ads (2-11 pieces; pink top 1 = exception). Owner's own "Your everyday pullover" boost links to chunky-brown-knit-vest, which has 1 left: flagged to owner (owner's boost, not paused). Sessions: Nov 10 718 (best day), 13 carts. Live daily 437 + 11.11 lifetime sets ending tonight. Nothing new paused.
+
+## 2026-11-11 23:06 Cairo - 11.11 results (Nov 10-11)
+Meta total Nov 10-11: 2,393 EGP. 11.11 reel IG 581 EGP (21 LPV, 17 ATC, 1 purchase: #1383 1,005); 11.11 reel FB 141 EGP (9 LPV, 16 ATC, 1 pixel purchase, no utm order); 11.11 story 238 EGP, 0 ATC (paused). 11.11 ad sets end automatically at 23:59 Cairo.
+Orders Nov 10-11: #1382 2,945 (TRAFFIC velvet vest ad), #1383 1,005 (11.11 IG reel ad), #1384 1,730 (Google free listings), #1385 1,005 (direct), #1386 3,160 (owner's own 11.11 reel boost 52562260907920, which I had advised pausing - it worked; lesson: owner's in-app reel boosts can convert), #1387 795 (direct). Ad-tracked revenue 7,110 EGP on ~2,393 Meta spend.
+2026-11-12: paused PINK VEST ad set 52561791054720 under the pause-losers rule (294 EGP since Nov 9, 184 LPV, 0 ATC, 0 orders; TRAFFIC ads in the same campaign got orders #1381, #1382). Live: TRAFFIC 280 + DM NEW 57 = 337 EGP/day. DM NEW since Nov 9: 162 EGP, 2 DMs (~81/DM, weaker than the ~33 earlier). Pixel ATC shows 0 on traffic ads even though they produced orders, so judge them by Shopify utm orders. All 10 TRAFFIC products have 2+ in stock.
+2026-11-12 daily check (12:48 Cairo): confirms morning state. Live 337/day (TRAFFIC 280, DM NEW 57); 11.11 sets ended. Yesterday TRAFFIC CPM 49, 299 LPV. DM NEW Nov 11: 67 EGP, 0 DMs (~81/DM since Nov 9): suggest owner moves its 57 to TRAFFIC or pauses it (website focus). New order #1388 1,005 (bio link). Stock OK.
+2026-11-12 night (owner): DM NEW 52559650248120 PAUSED; its 57 moved to TRAFFIC 52561524960720: 280 -> 337 EGP/day. Live Meta total 337/day (TRAFFIC only). Embroidered Denim Puff Sleeve Jacket (Reel-chat reel) is sold out; catalog/collection ad waits for a new reel + budget from owner (catalog 1647854970337416, product set New Collection 28526331147069990).
+2026-11-13 (owner: "do whatever is necessary this weekend, I want orders"): tried a retargeting audience (pixel site visitors 14d, excluding Purchase 30d) for a 63 EGP/day weekend Sales ad set (reuses creatives 2313003616162479 retro jacket, 1398999948680970 velvet vest, 1450379136678107 velvet top, 1126751853666459 burgundy skirt). Blocked: Custom Audience terms not accepted (error 2663). Owner must accept at https://www.facebook.com/customaudiences/app/tos/?act=145068365612671, then run scratchpad retarget.py logic.
+2026-11-13: owner OK'd a slight weekend increase: TRAFFIC 337 -> 400 EGP/day until Nov 15 night; reminder trig_01BBf8S3zXCNFRWyAeKPujWQ (Nov 15 23:55 Cairo) sets it back to 337. Retargeting (63-100/day) launches once owner accepts Custom Audience terms.
+2026-11-13 (owner accepted Custom Audience terms; asked for a heavy weekend boost): audience 52562860497920 "SWS site visitors 14d, no purchase 30d" (still filling). RETARGET ad set 52562860501120 in Sales campaign, 100 EGP/day (owner confirmed), ends Nov 15 23:59 Cairo, PURCHASE, women 22-44 Cairo+Giza, IG+FB, Advantage+ audience off. Ads: 52562860517320 retro jacket, 52562860524920 velvet vest, 52562860540920 velvet top, 52562860551920 burgundy skirt. TRAFFIC 400 -> 550 EGP/day for the weekend. Weekend total ~650/day. Reminder trig_01BBf8S3zXCNFRWyAeKPujWQ (Nov 15 23:55) sets TRAFFIC back to 337.
+2026-11-13: owner: stop the weekend boost by Sun Nov 15 00:40 Cairo. RETARGET 52562860501120 end_time set to Nov 15 00:40 Cairo; reminder trig_01BBf8S3zXCNFRWyAeKPujWQ moved to Nov 15 00:40 Cairo (TRAFFIC 550 -> 337).
+2026-11-13: owner's new reel (IG 18020732951843437, Rust Ruffle Bell Sleeve Maxi Dress, 1,550, 1 left S, owner exception; 1080 rendition, frames checked). Ad set 52562873333720 'RUST DRESS reel' in Sales campaign, 150 EGP/day (owner chose), ends Nov 15 00:40 Cairo, PURCHASE, women 22-44 Cairo+Giza, IG engagers excluded, IG+FB, Advantage+ off. Creative 1661363042150654 -> /products/rust-ruffle-bell-sleeve-maxi-dress, ad 52562873365920. PAUSE IF THE DRESS SELLS. Weekend total ~800/day.
+2026-11-13: TRAFFIC 52561524960720 has Advantage+ audience ON (age 22-44 only a suggestion). Owner decided: keep it ON this weekend (it produced the orders); review after the weekend by order ages. Retarget audience only ~20 people so far (filling).
+2026-11-13 daily check (12:48 Cairo): stock OK for all TRAFFIC/RETARGET products (2-11); rust dress 1 = owner exception. Nov 12: TRAFFIC 324 EGP CPM 41, 342 LPV. Sessions 600 (Nov 12), 394 so far today, but carts dropped (13/12 on Nov 10-11 -> 2 on Nov 12, 0 today); no orders since #1388 (Nov 12, bio link). Watch traffic quality with Advantage+ audience ON.
+2026-11-13 evening (owner: fix now, want orders): RETARGET 52562860501120 PAUSED (audience stuck at ~20 people, 75 EGP to the same few). Its 100 moved to TRAFFIC: 550 -> 650 EGP/day until Sun 00:40 (reminder trig_01BBf8S3zXCNFRWyAeKPujWQ resets to 337). Weekend live: TRAFFIC 650 + RUST DRESS reel 150 = 800/day. Pixel website audience not filling: check Shopify pixel/CAPI data sharing level after the weekend.
+2026-11-13 night (owner restocked; move budget to 'That colorful mood' post IG 17937305877122506 = Floral Print Open Front Jacket, 940, 1 left S; photos 1086 px): ad set 52562961366720 'FLORAL JACKET post' in Sales campaign, 150 EGP/day, ends Nov 15 00:40 Cairo, same audience as RUST DRESS. Creative 1686706616528444 -> /products/floral-print-open-front-jacket, ad 52562961402920. TRAFFIC 650 -> 500. Weekend total stays 800 (TRAFFIC 500, RUST 150, FLORAL 150). PAUSE IF THE JACKET SELLS.
+
+## 2026-11-14 00:10 Cairo - owner: "ads are not performing, you are wasting budget"
+Nov 13: Meta 701 EGP, 0 orders. Shopify Nov 13: 1,088 sessions (614 social, 464 direct), 0 cart additions (Nov 9-11 had 6-9/day). No orders since #1388 (Nov 12, bio link). Site checked: add to cart works (mobile test, item added); White Friday popup (sale ends Sun 00:40) shows once per session (sessionStorage). So the problem is traffic quality / offer, not a broken site.
+Cut: RUST DRESS 52562873333720 and FLORAL JACKET 52562961366720 PAUSED (Sales sets, CPM 266-707, 2 LPV, 0 ATC). TRAFFIC ad "Bohemian Desert Maxi Skirt post" 52561709287920 PAUSED (most spend since Nov 9, ~430 EGP, never an order). TRAFFIC 500 -> 337 EGP/day (back to normal). Live Meta: TRAFFIC 337 only (9 ads; orders came from retro jacket and velvet vest ads). Reminder trig_01BBf8S3zXCNFRWyAeKPujWQ (Sun 00:40) will just confirm 337.
+Lesson: broad Advantage+ landing-page-view traffic delivers cheap visits that rarely add to cart; extra weekend budget there did not produce orders.
+2026-11-14 00:30 Cairo (owner OK'd the new split of 337/day):
+- DM NEW 52559650248120 restarted at 170 EGP/day: age 22-44, Advantage+ audience off (age_range field must be removed when advantage is off), lookalike in high-end areas, followers excluded. New ad 52563014659520, creative 1682707403263988 (Sleeveless Velvet Buttoned Top IG post 17940325842153129, welcome 275 chars EN+AR: 940 EGP, S green/burgundy, M burgundy, product link; ice breakers sizes/delivery/payment). Old DM ads (polka 52561679810720, floral vest, statement vest) stay PAUSED.
+- TRAFFIC 52561524960720 at 167 EGP/day with only the two ads that brought orders: retro jacket 52561524975120 and velvet vest 52561709877320. Other 7 ads paused.
+- Reminder trig_01BBf8S3zXCNFRWyAeKPujWQ changed to a report only (no budget reset).
+- When the velvet top sizes change or sell out, replace the DM ad (welcome text has fixed sizes).
+2026-11-14 daily check (12:48 Cairo): live TRAFFIC 167 (retro jacket + velvet vest ads, Advantage+ audience still ON) + DM NEW 170 (velvet top; welcome sizes S green, S burgundy, M burgundy at 940 still match Shopify). Stock OK. Nov 13: 1,088 sessions, 0 carts; Nov 14 so far 179 sessions, 0 carts. Recommend owner: switch TRAFFIC Advantage+ audience OFF (carts fell to 0 after it widened beyond women 22-44). No orders since #1388.
+
+## 2026-11-14 - ALL ADS STOPPED (owner: 'stop all ads, they are not getting me any sales')
+Meta campaigns PAUSED: TRAFFIC 52561524910120, DMs 52559596204120, Sales 52560496822120, Best posts 52559524135720, Star boost 52560955764720. Verified 0 ad sets able to deliver. Google Performance Max-2 24362293653 PAUSED (no enabled Google campaigns). Do not restart anything without the owner asking. Reminder trig_01BBf8S3zXCNFRWyAeKPujWQ (Sun 00:40) should only report.
+
+2026-11-14 (owner: run ad on polka dot only, website, 150/day): Sales campaign 52560496822120 re-activated; only new ad set 52563159389920 'POLKA DOT collection - website - 150/day' (PURCHASE, women 22-44 Cairo+Giza, IG engagers excluded, Instagram feed/stories/reels, Advantage+ off). Ad 52563159407320 with creative 1138292438704552 (Polka dot era post -> /collections/polka-dot; 17 pieces in stock, from 630). All other ads stay paused. Google stays paused.
+2026-11-14 21:20 Cairo (owner: no website traffic, fix audience): audience was fine (3.3-3.8M); problem was PURCHASE optimisation on a thin pixel (CPM 371, 90 impressions, 0 clicks, 33 EGP). Polka Sales ad set 52563159389920 PAUSED. New ad set 52563181984520 'POLKA DOT - website visits - 150/day' in TRAFFIC campaign 52561524910120 (re-activated; old TRAFFIC ad set 52561524960720 PAUSED first): LANDING_PAGE_VIEWS, women 22-44 Cairo+Giza, followers excluded, Engaged Shoppers AND fashion interests, IG+FB feed/stories/reels, Advantage+ off (~2.0-2.4M). Ad 52563181993120, creative 1138292438704552. Owner's request overrides the Sales-only rule for this ad (same exception as the TRAFFIC ad set).
+2026-11-14 23:30 Cairo check of polka visits ad set 52563181984520: first 2h 7.3 EGP, 121 impressions, CPM 60 (Sales set was 371), 5 clicks, 3 LPV. 100% female, ages 25-44 (8 impressions 18-24 within age_min 22), Cairo 94 / Giza 27; Facebook 92 / Instagram 29. Audience correct; delivery just starting late at night.
+2026-11-15 00:40 Cairo weekend report (reminder trig_01BBf8S3zXCNFRWyAeKPujWQ; its budget split was outdated, no budgets changed): Meta Nov 13 731.5 EGP, Nov 14 286.4 EGP; 0 orders Nov 13-14 (last order #1388 Nov 12, bio link). RETARGET, RUST DRESS, FLORAL JACKET ad sets paused. Only live: POLKA visits 52563181984520 at 150/day.
+2026-11-15 daily check (12:48 Cairo): only live Meta ad set POLKA visits 52563181984520 (150/day, Advantage+ off). Yesterday it spent 50 EGP, CPM 58, 26 LPV, 0 ATC. Polka collection stock OK. Sessions Nov 14 238 (1 cart), Nov 15 so far 67. No orders since #1388 (Nov 12). Google paused by owner.
+2026-11-15 (owner: stop polka ads): POLKA visits ad set 52563181984520 PAUSED (~112+ EGP, 65 LPV, 0 ATC, 0 orders). No Meta ad sets live; Google paused. Decision reminder deleted.
+
+## 2026-11-15 night - catalog sale + visits push (owner: pick a post, catalog sale, website visitors, audience like my audience/buyers, push what works)
+- Product set 1646945297477460 "SWS in stock (catalog ads)" in catalog 1647854970337416 (filter availability = in stock, 251 items).
+- CATALOG: campaign 52563309334920 "SWS | Catalog sale | in stock" (OUTCOME_SALES, promoted catalog), ad set 52563309345320 150 EGP/day, PURCHASE on pixel for the product set, women 22-44 Cairo+Giza, followers excluded, IG+FB, Advantage+ off. Creative 1131414119867682 (catalog carousel, EN+AR text: cash on delivery, try at the door; end link /collections/all), ad 52563309376120.
+- VISITS: ad set 52563309385520 in TRAFFIC campaign 52561524910120, 150 EGP/day, LANDING_PAGE_VIEWS, lookalike 52559528769920 (people like SASK IG engagers) within women 22-44 Cairo+Giza, followers excluded (~190-220k). Ads: 52563309410520 new Polka Dot Denim Jacket post (IG 17965610784250074, photos 1086-2048 px checked; 1,850, 1 left S, owner exception) -> product page, creative 1666...; 52563309420120 retro jacket post (creative 2313003616162479 -> /collections/jackets, brought order #1381).
+- Total 300 EGP/day. Google stays paused (0 paid-Google orders in 3 weeks). Buyer lookalike needs owner OK to upload the Shopify customer list (352 customers, hashed) to Meta.
+- Review reminder Nov 16 21:00 Cairo.
+2026-11-15 22:15 Cairo: owner deleted the Polka Dot Denim Jacket IG post (17965610784250074). Ad 52563309410520 PAUSED. VISITS ad set 52563309385520 continues with the retro jacket ad only; CATALOG ad set unchanged. Total still 300/day.
+2026-11-16 morning (owner OK): CATALOG ad set 52563309345320 PAUSED (45 EGP, 50 impressions, CPM ~900, 1 click; PURCHASE optimisation starves on a thin pixel, same as earlier Sales sets). Live: VISITS 52563309385520 150/day (retro jacket ad). Shopify Nov 15: 3 ATC sessions, 2 checkouts, 0 orders.
+
+## 2026-11-16 - FRESH START (owner: pause everything and start fresh)
+All Meta ads paused: VISITS 52563309385520 paused; campaigns TRAFFIC 52561524910120, Sales 52560496822120, Catalog 52563309334920 paused. 0 ad sets can deliver. Google PMax 24362293653 already paused since Nov 14. Review reminder deleted. Standing store rules in CLAUDE.md still apply. Wait for the owner's new direction before any new spend.
+2026-11-16 daily report (12:48 Cairo, new routine trig_01VdqKkcqEg6uLfVgfGTwkrH in the Google-vs-Shopify session; old trig_01JzVtcjaqrbGKcxPrRtqGQA disabled): 0 Meta ad sets can deliver (132 old boosts show ACTIVE but all have past end times; TRAFFIC, Sales, Catalog campaigns PAUSED). Spend Nov 15 158 EGP (TRAFFIC, 73 LPV, 0 ATC); Nov 16 125 EGP before the pause. Last 7 days 4,904 EGP: Meta counted 4 purchases (5,965), Shopify 2 real Meta-paid orders (6,105: #1382 traffic, #1386 11.11 post) + 2 cancelled; Shopify ROAS 1.24. Since Nov 1, 6 of 9 Meta-ad orders cancelled. Earlier 2026-11-16: "SWS | Sales | Website | Nov 2026" paused at owner's OK.

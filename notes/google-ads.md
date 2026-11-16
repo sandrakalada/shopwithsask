@@ -1,0 +1,81 @@
+# Google Ads (set up 2026-11-03)
+
+Accounts (login minaboss8@gmail.com): Shop With Sask ads account 628-408-8654 (billed in SAR), manager "Sask Manager" 782-108-3519 (link request sent, not needed for API). Other accounts on the login: Baba Saleh, Athletic Horse (not ours to touch).
+Existing managers on 628-408-8654: Shopify Google Channel App, Hostinger Embedded Ads.
+
+## API access
+Developer tokens were retired in Sep 2026; access level lives on the Google Cloud project. Project "Sask Claude" (id sask-claude, number 64554635373). Google Ads API enabled. Access level: Test, Explorer requested 2026-11-03 (check Cloud console > Google Ads API > Manage).
+OAuth: consent screen External, published, branding verified. Desktop OAuth client "Sask Claude".
+Environment (Default): GOOGLE_ADS_CLIENT_ID, GOOGLE_ADS_CLIENT_SECRET, GOOGLE_ADS_CUSTOMER_ID=6284088654, GOOGLE_ADS_LOGIN_CUSTOMER_ID=7821083519. GOOGLE_ADS_REFRESH_TOKEN saved (works as of 2026-11-03).
+Getting the refresh token: build the auth URL (scope https://www.googleapis.com/auth/adwords, redirect_uri http://127.0.0.1, access_type=offline, prompt=consent). Owner opens it, approves (click Advanced > Go to Sask Claude on the unverified warning), the browser lands on a 127.0.0.1 page that fails to load; owner copies the "code" value from the address bar. Exchange at oauth2.googleapis.com/token, then owner saves the refresh token in Default (never paste tokens in chat if avoidable). The developer-token header is optional now.
+If the login customer header errors, call without login-customer-id (the user has direct access to 628-408-8654).
+
+## Findings (Oct 27 - Nov 2, from owner screenshots)
+Campaign "Performance Max-2": budget 65 SAR/day, Target ROAS, spent 75 SAR in 7 days, 747 clicks at 0.10 SAR, Google reports 83 conversions / 4,167 conv. value. "Modern Style Fashion Shop" PMax paused.
+Shopify same week: Google 104 sessions 16 carts; YouTube 94 sessions 0 carts; ~550 clicks never became sessions. Real orders from Google came via free listings (utm sag_organic).
+Conversion goals: Add to cart (85) and Begin checkout (33) are primary, so Google optimizes for carts; Purchases only 12. Fix: set Add to cart and Begin checkout to secondary, keep Purchase primary.
+Cut YouTube/Display: Google offers "Prioritize channels" (channel tiers) for PMax.
+Merchant Center: 628 items, 627 approved, 1 not approved.
+
+## API status (2026-11-03)
+Reading works. Use API v25 (v22 blocked as deprecated). Call WITHOUT the login-customer-id header (with 7821083519 it returns 403 USER_PERMISSION_DENIED). No developer token needed. Account currency SAR, time zone Asia/Riyadh.
+IDs: Performance Max-2 = campaign 24362293653 (budget 10 SAR/day since 2026-11-03 (65 -> 25 -> 10, owner: Google too high); Max conv. value, tROAS 310%). Modern Style Fashion Shop = 23697163172 (paused).
+
+## API data, last 7 days to 2026-11-02 (Performance Max-2)
+75.4 SAR, 747 clicks, 83 "conversions" / 4,168 value.
+83 conversions break down: ADD_TO_CART 25 + Shopping Cart 25 (same event counted twice), BEGIN_CHECKOUT 11 + Checkout 13, purchases 3 each in three actions (Purchase GA4, PURCHASE codeless, Google Shopping App Purchase) = the same ~3 purchases counted 3 times.
+By network: Search 63.9 SAR, 90 clicks, all 83 conv. Search partners 5.8 SAR, 179 clicks, 0. Display (CONTENT) 5.0 SAR, 463 clicks, 0. YouTube 0.8 SAR, 15 clicks, 0. Junk clicks are Display + partners; spend is mostly Search.
+Primary conversion actions now: Checkout, Shopping Cart, ADD_TO_CART, Purchase, PURCHASE, CONTACT, BEGIN_CHECKOUT, Google Shopping App Purchase. Secondary: the other Google Shopping App actions.
+Shopify Oct 27 - Nov 2: 4 orders from Google, all utm google / product_sync / sag_organic (free listings, not paid). 0 orders with paid Google utm. Paid PMax produced no traceable orders.
+
+## Changes made 2026-11-03 (owner approved)
+Goals: GA4 actions Checkout, Shopping Cart, Purchase set to secondary. Account goals ADD_TO_CART, BEGIN_CHECKOUT, CONTACT, PAGE_VIEW, DEFAULT set to not biddable, so only the PURCHASE goal drives bidding (campaign goals confirm only PURCHASE biddable).
+Still primary inside PURCHASE: "Google Shopping App Purchase" (keep) and codeless "PURCHASE" 7550949594 (duplicate). Codeless (WEBPAGE_CODELESS) actions cannot be changed by API (MUTATE_NOT_ALLOWED); owner must set PURCHASE to secondary in the UI (Goals > Conversions > PURCHASE > Edit > Secondary).
+Channels: PMax network_settings readable in v25. target_youtube was already false and accepts false. target_content_network (Display) cannot be changed (OPERATION_NOT_PERMITTED_FOR_CONTEXT); target_search_network cannot be targeted (CANNOT_TARGET_SEARCH_NETWORK). Display spend is small (5 SAR/week) but brings ~460 junk clicks. No channel tiers via API for this account yet.
+Expect Google's conversion count to drop to real purchases; tROAS 310% may then limit delivery. Check in 2 weeks (around 2026-11-17) against Shopify paid utm orders.
+Budget: lowered from 65 to 25 SAR/day on 2026-11-03 (owner approved) while the campaign learns on purchases only. 65 SAR/day was about 850 EGP/day, over twice the Meta cap. Another chat had also set GA4 purchase tags secondary and tROAS 310%; same end state.
+
+## 2026-11-03 evening check
+Nov 3: 19.1 SAR, 99 clicks, 2 conv. Shopify since Nov 2: 0 orders from paid Google.
+Setup verified: PMax linked to Merchant Center 5869936766 (Shopify feed, Arabic titles show), one asset group, all products, auto-tagging on. Location = all Egypt (2818) with PRESENCE_OR_INTEREST. Search terms 30d: 3,336 terms, 127 clicks, 55 SAR; includes competitor brands (lc waikiki 7.2 SAR, adam store, bloom fashion, curves and co, rojada, محلات النصر).
+Done 2026-11-03 (owner approved): location type PRESENCE only; locations Cairo Gov 21468, Giza Gov 21465, Alexandria Gov 21463 (all Egypt 2818 removed); 35 campaign negative keywords (phrase) for competitor brands: lc waikiki, dress code, boutique unique, max egypt/fashion, بريق جولد, go native, rojada/rogada, mishkah, curves and co, my turtle, adam store, محلات النصر, bloom fashion, zelie, غيمه, كريسبيلا, lily bags, in your shoe, makani, hippie dippie, h&m, r&b, pink shop, شي ان/shein, ميكا/mika, سبلاش/splash, zara/زارا, defacto/ديفاكتو. PMax accepts campaign negative keywords via API (v25). Review search terms weekly and add new brand names.
+2026-11-03: owner gave full media-buying authority ("do everything you see fit"). Added 19 more negatives (phrase): طريقة عمل, how to, ما هو, gym, tiktok, diy, هدايا, مستعمل, used, jobs, وظائف, رخيص, cheap, wholesale, جملة, men, رجالي, kids, اطفال. Total 54 negatives.
+Weekly Google check scheduled task trig_01Q8U88QNyTzQUTM83pTCkAQ, Mondays 13:13 Cairo, fires into this session. Hard limits in it: no budget rise, no tROAS change without owner. Leave campaign alone otherwise until ~2026-11-17 (learning).
+2026-11-03: duplicate codeless PURCHASE (7550949594) cannot be changed by API (MUTATE_NOT_ALLOWED on primary_for_goal, include_in_conversions_metric, status). Workaround done: custom conversion goal "Real purchases (Shopify)" 6459772980 = only Google Shopping App Purchase 7822081622, set on Performance Max-2 (conversionGoalCampaignConfig goal_config_level CAMPAIGN). Campaign now bids and reports only on that action; the codeless duplicate only shows in account-wide totals.
+Daily Meta + Google check scheduled task trig_01JzVtcjaqrbGKcxPrRtqGQA, every day 12:47 Cairo (owner request 2026-11-03). Weekly Google check trig_01Q8U88QNyTzQUTM83pTCkAQ and twice-daily Meta check trig_01JVj1BwXNRpvxwC6AqQtpqQ still on.
+2026-11-03: twice-daily Meta check and weekly Google check turned OFF (owner wants one report). Only daily check trig_01JzVtcjaqrbGKcxPrRtqGQA (12:47 Cairo) runs; it now also covers the Meta token warning, lookalike, DM test winner (~Nov 7-9) and Google verdict (~Nov 17).
+2026-11-03: budget lowered 25 -> 10 SAR/day (owner: Google too high). Never raise without asking.
+
+## 2026-11-04 assets (ad strength was POOR: feed only, no assets)
+Asset group 6761615488 final URL set to https://shopwithsask.com. Added: 15 headlines, 3 long headlines, 4 descriptions (English + Egyptian Arabic, no prices/emojis), business name "Shop With Sask", logo square + wide (sask-logo-black.png), images from store photos with blurred-fill: landscape 1200x628 + square 1200x1200 for 8 in-season, in-stock products (boho-embroidered-vest, boho-crochet-floral-crop-vest, floral-print-sleeveless-vest, colorblock-windbreaker-jacket, retro-colorblock-zip-jacket, colorblock-floral-patchwork-shirt, bohemian-skirt, brown-polka-dot-and-lace-midi-skirt) + 4 portrait 960x1200. Image limit is 20 marketing images total. Status after upload: under review, ad strength PENDING.
+Videos: Google needs YouTube links; Instagram CDN is blocked here and there is no YouTube access. Best reels to use (by likes/comments, in season): "Wear the parrot" DZVYRLWouYT (Boho Embroidered Vest), "For the love of vests" DYU_w7Ro5eA, "80's Lite Jacket" DdZHF_WoT4K, "No such thing as a boring outfit" DXXXmFtDA11. Owner to upload them to YouTube (unlisted) and send links.
+Daily check now also watches ad strength and asset labels and fixes them.
+2026-11-04 videos: reel files can be downloaded via Meta ad-video source (page token, fbcdn reachable; Instagram CDN is not). Saved 4 in-season reels (wear-the-parrot 1021040707049158, for-the-love-of-vests 1089842423458157, 80s-lite-jacket 2078636090191574, new-bag-collection 1636581147906809) to ads-videos/ (not committed) and sent to owner. Pop Art jacket reel skipped (sold out). Upload to YouTube needs the youtube.upload scope, which the current Google token does not have; owner uploads them as Unlisted and sends links, then add as YOUTUBE_VIDEO assets.
+
+## 2026-11-04 daily check
+Nov 3: 22.6 SAR (budget cut mid-day), Search 20.2 / partners 2.0 (45 clicks) / Display 0.4 (32 clicks); 2 conv on custom goal. 7d 84.4 SAR. All 48 new assets APPROVED; ad strength still POOR (no videos yet; waiting on owner YouTube links or youtube.upload consent). Note: asset_group_asset.performance_label no longer exists in v25. Added 10 brand negatives: nh designs, original only, desigual, mavericks, self the brand, devaro, mitcha, chello, khatwa, remiseg (64 total).
+
+## 2026-11-04 videos added (no YouTube access needed)
+Google Ads API YouTubeVideoUploadService uploads to a Google-managed channel (not the owner's YouTube): resumable POST https://googleads.googleapis.com/resumable/upload/v25/customers/6284088654/youTubeVideoUploads:create (headers X-Goog-Upload-Protocol: resumable, Command: start, JSON {customerId, youTubeVideoUpload{videoTitle, videoDescription, videoPrivacy: UNLISTED}}), then PUT/POST bytes to x-goog-upload-url with "upload, finalize". Poll you_tube_video_upload.state until PROCESSED, then create youtubeVideoAsset and link as YOUTUBE_VIDEO.
+Source: Meta ad-video "source" (page token). Made tall 720x1280, square 1080x1080, wide 1920x1080 (blurred fill; clips under 10s looped to 11s) with ffmpeg.
+Added to Performance Max-2 asset group: 80s Lite Jacket (tall xshojR2LQCk, square gj26TURfrHY, wide l0Vg53Or5CM), For the love of vests (tall 1tkR6kL3G2E, square YTt4urJqJ28, wide 7DSHAeVejlg), New bag collection (tall aGkUn3iNrFQ, square mWNBasOwmo4, wide aFWWgSLGW5c). "Wear the parrot" reel skipped: it shows a summer dress. Max 15 videos per asset group; 6 slots left. Ad strength PENDING after upload.
+2026-11-04: removed the 3 "New bag collection" videos (bags in stock are mostly 1 piece). 6 videos remain (80s jacket = colorblock jackets 2 each; vests). Daily check now does a stock check of every Google image/video product first.
+2026-11-05 daily check: ad strength EXCELLENT, all assets approved, all asset products in stock (>=2). Yesterday 12.4 SAR, 13 clicks, 0 conv. Added negatives alamki, obi boutique, محل 99 (67 total).
+
+## 2026-11-05 QUALITY RULE (owner) - ACTION NEEDED
+Owner rule (CLAUDE.md "Ad image and video quality"): no low-res/upscaled/blur-filled assets anywhere. The PMax image assets made from store photos with blurred fill (1200x628, 1200x1200, 960x1200) and the videos upscaled from 720p reels to 1920x1080 / 1080x1080 break this rule. Remove them from asset group 6761615488 and replace only with sharp originals >=1080px (owner photos) or videos not upscaled. Keep logo assets.
+2026-11-06 daily check: ad strength EXCELLENT, all assets approved and in stock. Nov 5: 13.8 SAR, 12 clicks, 2 conv (Google-reported). #1378 (575 EGP, Nov 6) last visit Google, no utm. Negatives added: double a, havana store, lucy gang.
+2026-11-07 daily check: budget is 23 SAR/day (owner changed it from 10 in the Google Ads mobile app on 2026-11-06 11:58 Riyadh). Nov 6: 30.6 SAR, 20 clicks, 0 conv. Ad strength EXCELLENT, all assets approved, asset products in stock. Negatives added: emily bags, frillu, leocansa, soiree egypt, مستورة.
+2026-11-08: budget lowered 23 -> 10 SAR/day (owner: money not well spent; 27-31 SAR/day for 10-20 clicks, 0 tracked sales).
+2026-11-09 daily check: Nov 8 28.9 SAR (budget cut to 10 mid-day), 3 clicks, 0 conv. Ad strength EXCELLENT, all assets approved and in stock. No new search terms with clicks.
+2026-11-10 daily check: Nov 9 15.2 SAR, 5 clicks, 0 conv. 7d 150.9 SAR, no paid-Google orders. Ad strength EXCELLENT, all assets approved/in stock. No new search terms.
+
+## 2026-11-10 - 11.11 sale (owner: extra 250 EGP until end of Nov 11)
+Budget 10 -> 30 SAR/day (~+19 SAR = ~250 EGP over Nov 10 evening + Nov 11). Promotion asset 438078927131 "11.11 Sale", up to 50% off, Nov 10-11, -> /collections/all, linked to Performance Max-2 as PROMOTION. Note: v25 percent_off unit is 10,000 = 1% (500000 = 50%; 50,000,000 was rejected as too high). Reminder trig_01NoP43y7iQMGH5ke471tPGi resets the budget to 10 at Nov 12 00:05 Riyadh.
+2026-11-11 08:00 UTC: Google spent 38.4 SAR Nov 10 and 42.1 SAR by 11:00 Riyadh Nov 11 (Google can spend 2x the daily budget), already well past the owner's extra 250 EGP (~19 SAR). Budget set back 30 -> 10 SAR/day now. 11.11 promotion asset stays until it ends.
+2026-11-11 daily check: budget back at 10 SAR (set this morning). Nov 10 38.4 SAR, 33 clicks, 2 conv (Google-reported); #1384 1,730 came from free listings (sag_organic). Ad strength EXCELLENT, assets approved.
+2026-11-11 end of 11.11: Google spent 38.4 (Nov 10) + 42.1 (Nov 11) SAR, ~1,050 EGP; 0 orders with paid Google utm (one free-listing order #1384 1,730). Budget confirmed at 10 SAR/day.
+2026-11-12 daily check: Nov 11 42.1 SAR (30 SAR 11.11 budget until morning), 15 clicks, 0 conv; 7d 196.4 SAR, still no utm-tracked paid Google order. Assets approved.
+2026-11-14 daily check: Nov 13 16.8 SAR, 6 clicks, 0 conv; 7d 181 SAR, still no tracked paid order. Verdict due Nov 17.
+2026-11-14: owner stopped all ads. Performance Max-2 24362293653 PAUSED. Do not re-enable without the owner.
+2026-11-16: both campaigns PAUSED (PMax-2 since Nov 14), 0 spend Nov 15. Bid-related auto-apply recommendation subscriptions (9 types) PAUSED via API at owner's OK. Conversion action PURCHASE 7550949594 (WEBPAGE_CODELESS) is still primary alongside Google Shopping App Purchase 7822081622 and double-counts; API refuses the change (MUTATE_NOT_ALLOWED), owner to set it to Secondary in the UI. Last 7 days: 137 SAR spend, 1 Ads purchase = Shopify #1384 (1,730 EGP, utm sag_organic, likely free listing).
