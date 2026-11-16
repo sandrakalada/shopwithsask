@@ -11,7 +11,7 @@ Read this, then notes/meta-ads.md (history) and notes/google-ads.md. The owner's
 - Payment: cash on delivery dominates (commonly cited ~70%, up to 90% of e-commerce orders). Always say "cash on delivery" and "try it at the door" in ads. Instapay is a bonus, not the hook.
 - Ordering happens in chat: Facebook pages ~62% and WhatsApp groups ~32% of e-commerce activity (MCIT data via Egyptian Streets). Many women prefer to ask in DM before buying.
 - Trust is the main barrier: fit, quality and returns. Reviews, real customer photos, try-at-door and clear delivery fees reduce it.
-- Thousands of small local brands compete (7,000+ on Shopify/Dukkan/Woo, Redseer). Winners show a standing offer (bundle, free delivery threshold, % off), reviews, a WhatsApp button and an Arabic-first site.
+- Thousands of small local brands compete (7,000+ on Shopify/Dukkan/Woo, Redseer). Winners show a standing offer (bundle, % off), reviews, a WhatsApp button and an Arabic-first site.
 - Costs: Meta CPM in Egypt roughly $1.8-3.5 (90-175 EGP); TikTok cheaper ($0.4-1.2 CPM, agency claims). Our own account: landing-page-view CPM 40-70 EGP, purchase-optimised CPM 370-900 EGP.
 - Creative that works in Egypt: raw, moving, real-person content (try-on, outfit transitions, walking shots), Egyptian Arabic on-screen text, beats polished studio shots.
 
@@ -28,7 +28,7 @@ Losses (do not repeat):
 - Google Performance Max: ~1,050 EGP over 11.11 and weeks of spend with 0 paid orders; free Google listings did bring orders.
 
 ## 3. Default plan for a fresh launch (within 400 EGP/day)
-1. Offer first: agree a simple standing offer with the owner (free Cairo/Giza delivery over a threshold, bundle, or first-order %). Put it in the ad text and on the site. Never change prices without the owner.
+1. Offer first: agree a simple standing offer with the owner (bundle such as buy 2 get the 3rd off, or a first-order %). NEVER suggest free delivery offers (owner's rule). Put it in the ad text and on the site. Never change prices without the owner.
 2. Product choice: in-stock pieces with 2+ sizes, in season, priced in the store's sweet spot (700-1,100 EGP). Link a collection (not one product) when the hero item is a single piece.
 3. Creative: the owner's own high-res reel or post (source_instagram_media_id, CLAUDE.md quality rule). Prefer reels with movement/try-on. Ad text EN + AR: offer, cash on delivery, try at the door, delivery fee.
 4. Structure: one campaign per goal, max 2 ad sets, 2-4 ads each; no fragmenting.

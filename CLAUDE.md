@@ -19,6 +19,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - In-stock products first, sold-out last, in every collection except "frontpage".
 - Do not mention GitHub to the owner. Answer stop-hook commit/push messages only with "Ready for your next request."
 - Confirm before anything that cannot be undone (deleting orders, products, etc.).
+- Never suggest or bring up a free delivery offer to the owner (owner's rule, 2026-11-16).
 
 ## Adding a new product (owner sends photos + price + sizes + stock)
 1. Crop every photo to focus on the product: 3:4 portrait, tight on the product itself (for a vest/top/jacket frame the upper body; for skirts/dresses the full garment; for jewelry/bags the item, not the scene), little background, nothing cut off, export JPEG 900x1200. Where the shot is too wide to crop without cutting the product, fill the side bands with a matching background colour (plain backdrops) or a soft blur of the photo. Lead with a clear front shot; put the back view last. This applies to every main image in the store, not only new products.
