@@ -318,3 +318,11 @@ Uploaded Meta videos: 1390156162971773, 915192158245527, 1565110688713713. Music
 2026-11-17 05:35 Cairo 3h check: night, little delivery (FB ~54, IG ~17, followers ~10, top items ~11 EGP total). 0 ATC, 0 orders. Stock unchanged. Nothing paused.
 2026-11-17 08:35 Cairo 3h check: FB visits ~57 EGP total (31 LPV), IG visits ~32 (windbreaker 15 clicks/10 LPV), followers ~10 (under-delivering: watch), top items ~27 (tote 10 clicks/8 LPV). 0 ATC, 0 orders. Stock unchanged. Nothing paused.
 2026-11-17 09:10 Cairo (owner: sessions declined, fix it): sessions follow Meta spend/LPV exactly (Nov 10-13 spend 430-1,300/day -> 600-1,080 sessions; Nov 14-16 after the owner's stop-all and fresh start, spend 160-340 -> 150-240 sessions). New ad sets under-deliver: FOLLOWERS spent ~10 EGP in 15 h at 150/day. Action: FOLLOWERS 52563607677720 PAUSED; its budget moved to FB website visits 52563578814720: 100 -> 250/day (cheapest visits, CPM ~25, ~1.6 EGP/LPV). Live: FB visits 250 + IG visits 150 + Top items 60 = 460/day. To return to ~1,000 sessions/day needs ~1,000+ EGP/day of traffic spend (owner decision).
+
+## 2026-11-17 - A/B audience test for website orders (owner: "I want orders on website, fix audience, A/B test, new campaign, PUSH")
+Campaign 52563728051920 "SWS | A/B audience test | website orders" (OUTCOME_SALES), 4 ad sets x 75 EGP/day, ADD_TO_CART on pixel, women Cairo+Giza, IG+FB feed/stories/reels, same 4 ads each (velvet top post 1450379136678107, windbreaker post 2313003616162479 -> jackets, leopard tote photo 1863618647978530, boho maxi skirt post 1547432947381376):
+- A 52563728221720 BROAD, Advantage+ audience ON (age 22-44 as suggestion; Meta requires max age 65 when on) - mirrors the owner's own boosts that converted.
+- B 52563728056120 17 fashion interests, followers excluded.
+- C 52563728100920 lookalike of IG engagers, followers excluded.
+- D 52563728138720 WARM: IG engagers 365d + site visitors 14d (exception to new-customers-only, owner said "whatever it takes").
+Funded by: IG visits 52563630108120 PAUSED (CPM ~55), FB visits 250 -> 100. Live total 460: AB 300, FB visits 100, Top items 60. Judge after 3 days by add-to-carts and orders; then move all budget to the winning audience.
