@@ -394,3 +394,4 @@ Skipped: pop art bomber (photo blurry); toucan puffer, retro colorblock zip, cor
 ## 2026-11-17 night - 11.11 audience round 2 (owner approved 150/day)
 Campaign 52563885256720 (OUTCOME_SALES), ad set 52563885268320 150/day, ADD_TO_CART, 11.11 audience (Engaged Shoppers + skirt/boho/blouse/accessories/street fashion/women's clothing, women 21-44 Cairo+Giza, IG engagers excluded, Advantage+ off), IG feed/stories/reels + FB feed/stories/reels, value rule on.
 Ads: heart patch bomber 52563885287920, colorblock windbreaker 52563885301720, leopard tote 980 52563885321320, embroidered boho jacket 52563885334520. Live total ~715/day.
+- 2026-11-17 22:40 Cairo: owner asked to stop her Polka boost. Ad set edit refused (boost, IG app only); campaign 52563733453520 paused via API, ad set now CAMPAIGN_PAUSED.
