@@ -367,3 +367,9 @@ Skipped: pop art bomber (photo blurry); toucan puffer, retro colorblock zip, cor
 - Spend today 276 EGP. Shopify: 149 sessions, 2 add-to-cart, 2 reached checkout, 0 orders.
 - AB D WARM: 2 add-to-carts for 62.8 EGP (only results). A 49.5, B 37.0, C 25.5, FB visits 29.7, Top items 46.0: 0 ATC, none at 85 EGP yet.
 - Jackets campaign (11 ad sets) and Stories ad set: ACTIVE, approved, no issues, but 0 impressions since 10:40 Cairo. Likely auction overlap: 11 jacket ad sets share cell B's audience. Watch next check; if still 0, propose merging jackets into 1-2 ad sets to the owner.
+
+## 2026-11-17 14:50 Cairo fixes (owner: "fix what needs fixing")
+- Jackets: 11 per-jacket ad sets had 0 impressions all day (auction overlap). Paused all 11; new single ad set 52563789776920 "JACKETS - all in-stock jackets - WARM" 150/day, ADD_TO_CART, cell D warm audience (IG engagers 365d + site visitors), age 21-44, value rule on. 12 ads re-created with the same creatives (52563789823920 ... 52563790155120).
+- Summer pieces paused (cold-season rule): Stories tropical mini dress 52563733385520, Stories Bermuda shorts 52563733364720, Top items Bermuda shorts 52563624071920.
+- Stories 52563733350320 (0 impressions): switched to broad Advantage+ (age_min 21, suggestion 21-44, Cairo+Giza women, stories only, followers excluded) to stop overlapping Top items. Ads left: rust maxi dress video, polka denim jacket video, black knit vest photo.
+- Live budget now ~665 EGP/day: A/B 4x75, Jackets 150, FB visits 100, Top items 60, Stories 55.
