@@ -329,3 +329,16 @@ Funded by: IG visits 52563630108120 PAUSED (CPM ~55), FB visits 250 -> 100. Live
 2026-11-17 (owner: if no winner in 1 day, change strategy): decision reminder trig_01FSSQvVWA4obs8HvE8jPtVx Nov 18 10:00 Cairo. Winner -> all test budget to it. No winner -> pause A/B + FB visits; DM sales ad set 250/day (broad Advantage+, fixed welcome messages, 4 best in-stock posts) + broad Advantage+ ATC website ad set 150/day + Top items 60.
 2026-11-17: STORIES ad set 52563733350320 in Top items campaign, 55/day (owner asked 40; Meta minimum 53.72), IG+FB stories only, ADD_TO_CART, latest 5 products: striped shorts 52563733364720, polka jacket 52563733367720, rust dress 52563733368920, black knit vest 52563733370920, tropical balloon sleeve mini dress 52563733385520 (new video 1182397824315666, music track, original audio removed; summer piece = owner request). Total live 515/day. Rule added to CLAUDE.md: owner videos always muted + music.
 2026-11-17: owner discounted Leopard Print Tote Bag to 980 (compare-at 1040, Shopify variant 54210935095480). All live tote ads replaced with new creatives saying 980 (photo 29776169118635917, styled 2668967680221875): A/B cells A-D (new ads 52563733819320, 52563733841520, 52563733854520, 52563733882720) and Top items (2 new ads); old 1040 ads paused.
+
+## 2026-11-17 - Jackets: one ad set per jacket (owner: ad for each in-stock jacket from its posts, direct product link, 50 per post)
+Campaign 52563734479920 "SWS | Jackets | one ad set per jacket" (OUTCOME_SALES), 8 ad sets x 55 EGP/day (Meta minimum ~53.7/day; owner asked 50), ADD_TO_CART, fashion-interest audience (copy of A/B cell B: women 22-44 Cairo+Giza, 17 interests, followers excluded), IG+FB. Ad sets (jacket: ad set / IG post):
+- Polka Dot Denim Jacket 52563734485520 / 18138475069677763
+- Star Print Jacket 52563734505320 / 18127969814493295 (2048 px)
+- Colorblock Windbreaker 52563734522520 / 17897898654413308
+- Cropped Mauve Blazer 52563734543920 / 18575256268063232 (1440)
+- Faux Fur Winter Jacket 52563734622720 / 18116659411519742 (1440) + reel 18047600624499247 (1080)
+- Embroidered Boho Jacket 52563734713520 / 18136951168628778 (2048)
+- Floral Print Open Front Jacket 52563734824120 / 17937305877122506 (1086)
+- Embroidered Suede Jacket 52563734856720 / 18111683381266893
+No usable post (skipped): colour block corduroy crop jacket (post slides 506-1086 px), retro colorblock zip jacket (same low-res post), boho floral cardigan (Christmas post 960 px), toucan puffer, pink/chevron windbreakers, purple track, navy boho padded, heart patch bomber, pop art bomber, colorful patchwork, boho patchwork jacket (no matching sharp post found).
+All jackets are 1-2 pieces (owner request). Live total now ~955 EGP/day (owner-set budgets).
