@@ -326,3 +326,4 @@ Campaign 52563728051920 "SWS | A/B audience test | website orders" (OUTCOME_SALE
 - C 52563728100920 lookalike of IG engagers, followers excluded.
 - D 52563728138720 WARM: IG engagers 365d + site visitors 14d (exception to new-customers-only, owner said "whatever it takes").
 Funded by: IG visits 52563630108120 PAUSED (CPM ~55), FB visits 250 -> 100. Live total 460: AB 300, FB visits 100, Top items 60. Judge after 3 days by add-to-carts and orders; then move all budget to the winning audience.
+2026-11-17 (owner: if no winner in 1 day, change strategy): decision reminder trig_01FSSQvVWA4obs8HvE8jPtVx Nov 18 10:00 Cairo. Winner -> all test budget to it. No winner -> pause A/B + FB visits; DM sales ad set 250/day (broad Advantage+, fixed welcome messages, 4 best in-stock posts) + broad Advantage+ ATC website ad set 150/day + Top items 60.
