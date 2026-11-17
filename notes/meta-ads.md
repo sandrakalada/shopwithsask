@@ -378,3 +378,9 @@ Skipped: pop art bomber (photo blurry); toucan puffer, retro colorblock zip, cor
 - Spend today ~400 EGP. Shopify: 253 sessions, 6 cart sessions, 2 checkouts, 0 orders.
 - Merged JACKETS warm ad set: 5 add-to-carts for 73.7 EGP (~15 EGP each) in ~3h, clear leader. AB D warm: 2 ATC / 73. A, B, C, Top items, FB visits: 0 ATC, all under 85 EGP.
 - Stories 52563733350320: still 0 impressions all day after switching to broad. Proposed to owner: pause it and add its 55/day to jackets.
+
+## 2026-11-17 evening: why visitors drop (owner asked to fix)
+- Shopify landing pages, last 7d: velvet top 1,108 visits ~9-10s, boho skirt 883 ~12-16s, jackets collection 373, all 0 carts; homepage 129 visits 2.5 min, 12 carts.
+- Meta ad level, last 7d: those visits came from traffic/landing-page-view ads (old TRAFFIC ad set: boho skirt 1,062 clicks / 582 EGP, velvet top 1,122 clicks / 520 EGP, 0 ATC). Offer ads (11.11 reel IG 17 ATC, FB 16, owner boost 10) are what produced carts.
+- Paused the last traffic ad set: FB WEBSITE VISITS 52563578814720 (LANDING_PAGE_VIEWS, 0 ATC). Live budget now ~565/day.
+- Asked website chat for a mobile sticky add-to-cart bar, shorter main image and faster first image on a duplicate theme (owner previews and publishes).
