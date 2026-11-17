@@ -384,3 +384,4 @@ Skipped: pop art bomber (photo blurry); toucan puffer, retro colorblock zip, cor
 - Meta ad level, last 7d: those visits came from traffic/landing-page-view ads (old TRAFFIC ad set: boho skirt 1,062 clicks / 582 EGP, velvet top 1,122 clicks / 520 EGP, 0 ATC). Offer ads (11.11 reel IG 17 ATC, FB 16, owner boost 10) are what produced carts.
 - Paused the last traffic ad set: FB WEBSITE VISITS 52563578814720 (LANDING_PAGE_VIEWS, 0 ATC). Live budget now ~565/day.
 - Asked website chat for a mobile sticky add-to-cart bar, shorter main image and faster first image on a duplicate theme (owner previews and publishes).
+- Owner approved: jackets warm ad set 52563789776920 raised 150 -> 250/day (FB visits budget moved). Live ~565/day.
