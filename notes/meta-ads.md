@@ -373,3 +373,8 @@ Skipped: pop art bomber (photo blurry); toucan puffer, retro colorblock zip, cor
 - Summer pieces paused (cold-season rule): Stories tropical mini dress 52563733385520, Stories Bermuda shorts 52563733364720, Top items Bermuda shorts 52563624071920.
 - Stories 52563733350320 (0 impressions): switched to broad Advantage+ (age_min 21, suggestion 21-44, Cairo+Giza women, stories only, followers excluded) to stop overlapping Top items. Ads left: rust maxi dress video, polka denim jacket video, black knit vest photo.
 - Live budget now ~665 EGP/day: A/B 4x75, Jackets 150, FB visits 100, Top items 60, Stories 55.
+
+## 2026-11-17 17:35 Cairo 3h check
+- Spend today ~400 EGP. Shopify: 253 sessions, 6 cart sessions, 2 checkouts, 0 orders.
+- Merged JACKETS warm ad set: 5 add-to-carts for 73.7 EGP (~15 EGP each) in ~3h, clear leader. AB D warm: 2 ATC / 73. A, B, C, Top items, FB visits: 0 ATC, all under 85 EGP.
+- Stories 52563733350320: still 0 impressions all day after switching to broad. Proposed to owner: pause it and add its 55/day to jackets.
