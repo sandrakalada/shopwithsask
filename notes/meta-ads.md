@@ -390,3 +390,7 @@ Skipped: pop art bomber (photo blurry); toucan puffer, retro colorblock zip, cor
 - Spend today 524 EGP. Shopify: 328 sessions, 8 cart sessions, 2 checkouts, 0 orders.
 - Jackets warm 6 ATC / 90 EGP (heart patch bomber 6 of them). AB D 2 / 84, AB A 1 / 64. B, C, Top items 0 ATC, all under 85. Stories 12.7, delivering slowly. Nothing paused.
 - Pending owner: 11.11-audience round 2 (150/day proposed), budget not yet confirmed.
+
+## 2026-11-17 night - 11.11 audience round 2 (owner approved 150/day)
+Campaign 52563885256720 (OUTCOME_SALES), ad set 52563885268320 150/day, ADD_TO_CART, 11.11 audience (Engaged Shoppers + skirt/boho/blouse/accessories/street fashion/women's clothing, women 21-44 Cairo+Giza, IG engagers excluded, Advantage+ off), IG feed/stories/reels + FB feed/stories/reels, value rule on.
+Ads: heart patch bomber 52563885287920, colorblock windbreaker 52563885301720, leopard tote 980 52563885321320, embroidered boho jacket 52563885334520. Live total ~715/day.
