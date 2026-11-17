@@ -351,3 +351,7 @@ Campaign 52563734479920, ADD_TO_CART, 55/day each, audience copied from A/B cell
 - Boho Patchwork: 52563736152720, ad 52563736193520 (1090, 1 piece)
 - Colorful Patchwork: 52563736203920, ad 52563736256920 (800, 1 piece)
 Skipped: pop art bomber (photo blurry); toucan puffer, retro colorblock zip, corduroy crop shirt jacket, chevron windbreaker, pink windbreaker, bohemian floral cardigan (store photos under 1080 px, quality rule).
+
+## 2026-11-17 11:36 Cairo 3h check
+- Paused jacket ad sets Purple Track 52563736051320 and Navy Boho Padded 52563736092920: both products are DRAFT in Shopify (page not live). Re-enable if the owner publishes them.
+- Spend today 94 EGP so far, 0 add-to-carts. New jacket ad sets not delivering yet. Nothing at 85 EGP. All other advertised items in stock.
