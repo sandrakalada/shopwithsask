@@ -362,3 +362,8 @@ Skipped: pop art bomber (photo blurry); toucan puffer, retro colorblock zip, cor
 - Audit: 54 live ads. All images >=1080 px (store/owner hashes 1080-1932 short side; IG posts checked at creation). All 29 linked products ACTIVE and in stock.
 - Fixed: 5 Colorblock Windbreaker ads linked to /collections/jackets. New creative 1479333544328970 -> product page; new ads AB A 52563754937920, B 52563754974920, C 52563754991920, D 52563755003320, BEST WEB 52563755068320; old ads paused.
 - Note: many advertised items are down to 1 piece (owner asked for every jacket); tropical mini dress and Bermuda shorts are summer pieces in the Stories ad set.
+
+## 2026-11-17 14:36 Cairo 3h check
+- Spend today 276 EGP. Shopify: 149 sessions, 2 add-to-cart, 2 reached checkout, 0 orders.
+- AB D WARM: 2 add-to-carts for 62.8 EGP (only results). A 49.5, B 37.0, C 25.5, FB visits 29.7, Top items 46.0: 0 ATC, none at 85 EGP yet.
+- Jackets campaign (11 ad sets) and Stories ad set: ACTIVE, approved, no issues, but 0 impressions since 10:40 Cairo. Likely auction overlap: 11 jacket ad sets share cell B's audience. Watch next check; if still 0, propose merging jackets into 1-2 ad sets to the owner.
