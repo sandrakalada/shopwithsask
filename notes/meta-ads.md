@@ -355,3 +355,10 @@ Skipped: pop art bomber (photo blurry); toucan puffer, retro colorblock zip, cor
 ## 2026-11-17 11:36 Cairo 3h check
 - Paused jacket ad sets Purple Track 52563736051320 and Navy Boho Padded 52563736092920: both products are DRAFT in Shopify (page not live). Re-enable if the owner publishes them.
 - Spend today 94 EGP so far, 0 add-to-carts. New jacket ad sets not delivering yet. Nothing at 85 EGP. All other advertised items in stock.
+
+## 2026-11-17 Value rules, age 21+, full ad audit (owner videos: Advertising settings > Value rules)
+- Value rule set 1773847437033269 "Audience - new customers +100%": AUDIENCE_LABEL contains NEW_USERS (Meta's "New audiences"), bid +100%. Attached (value_rules_applied) to all 18 live managed ad sets.
+- Age minimum 21 on all 18 (Advantage+ cell A: age_min 21, age_range suggestion 21-44).
+- Audit: 54 live ads. All images >=1080 px (store/owner hashes 1080-1932 short side; IG posts checked at creation). All 29 linked products ACTIVE and in stock.
+- Fixed: 5 Colorblock Windbreaker ads linked to /collections/jackets. New creative 1479333544328970 -> product page; new ads AB A 52563754937920, B 52563754974920, C 52563754991920, D 52563755003320, BEST WEB 52563755068320; old ads paused.
+- Note: many advertised items are down to 1 piece (owner asked for every jacket); tropical mini dress and Bermuda shorts are summer pieces in the Stories ad set.
