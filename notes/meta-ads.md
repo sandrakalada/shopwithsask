@@ -342,3 +342,12 @@ Campaign 52563734479920 "SWS | Jackets | one ad set per jacket" (OUTCOME_SALES),
 - Embroidered Suede Jacket 52563734856720 / 18111683381266893
 No usable post (skipped): colour block corduroy crop jacket (post slides 506-1086 px), retro colorblock zip jacket (same low-res post), boho floral cardigan (Christmas post 960 px), toucan puffer, pink/chevron windbreakers, purple track, navy boho padded, heart patch bomber, pop art bomber, colorful patchwork, boho patchwork jacket (no matching sharp post found).
 All jackets are 1-2 pieces (owner request). Live total now ~955 EGP/day (owner-set budgets).
+
+## 2026-11-17 Jackets from website photos (owner: "use the images from the website for the missing ones")
+Campaign 52563734479920, ADD_TO_CART, 55/day each, audience copied from A/B cell B. Only store photos >=1080 px, checked at full size.
+- Heart Patch Bomber: ad set 52563736004520, ad 52563736043520 (1040)
+- Purple Colorblock Track: 52563736051320, ad 52563736086720 (930)
+- Navy Boho Padded: 52563736092920, ad 52563736125920 (1040)
+- Boho Patchwork: 52563736152720, ad 52563736193520 (1090, 1 piece)
+- Colorful Patchwork: 52563736203920, ad 52563736256920 (800, 1 piece)
+Skipped: pop art bomber (photo blurry); toucan puffer, retro colorblock zip, corduroy crop shirt jacket, chevron windbreaker, pink windbreaker, bohemian floral cardigan (store photos under 1080 px, quality rule).
