@@ -91,3 +91,11 @@ Judge Google orders by gclid / Google Ads shopping_performance_view conversions 
 - Advisor: 113 Shirts & Tops missing details (attributes such as material, pattern, colour); 22 sale price suggestions; image min 500x500 from 2027-01-31 (ours are 900x1200).
 - Local inventory error (Business Profile link): not relevant, online-only store; ignore.
 - Fix for owner: Merchant Center > Settings > Shipping and returns > Returns > add Egypt policy matching the Shopify refund policy (returns only at the door while courier is present; after that final sale), link https://shopwithsask.com/policies/refund-policy.
+
+## 2026-11-18 Product attributes for Google (store quality)
+- Enabled Shopify category metafields shopify.color-pattern and shopify.fabric; created 101 color-pattern metaobjects (colours + pattern checked against each main photo) and fabric metaobjects.
+- All 155 active clothing products now have colour/pattern and fabric. Fabric = Viscose, Elastane, Polyester, Cotton for every item (owner's instruction: "just write contains viscose elastane polyester cotton"; do not elaborate).
+- Two products had no category or Google metafields: Tropical Print Balloon Sleeve Mini Dress (set Dresses) and Embroidered Denim Puff Sleeve Jacket (set Coats & Jackets) plus gender/age/condition/custom_product. Renamed the dress image files from Instagram numbers to {handle}-{k}.jpg.
+- Return policy: "Standard for Egypt" exists and is verified (owner). Return cost = 75 EGP (pickup fee, Cairo/Giza/Alexandria) per owner; owner enters it in Merchant Center (our token has no Merchant scope: Merchant API and Content API both 403 ACCESS_TOKEN_SCOPE_INSUFFICIENT).
+- Unused duplicate theme "Updated (Google return policy)" (194269348024) holds an unused snippet sask-org-schema; not needed.
+- Merchant feed titles come from the SEO title ("... for Women | Shop With Sask"), per Google Ads shopping_product.
