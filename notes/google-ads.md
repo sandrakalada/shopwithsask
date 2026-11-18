@@ -99,3 +99,4 @@ Judge Google orders by gclid / Google Ads shopping_performance_view conversions 
 - Return policy: "Standard for Egypt" exists and is verified (owner). Return cost = 75 EGP (pickup fee, Cairo/Giza/Alexandria) per owner; owner enters it in Merchant Center (our token has no Merchant scope: Merchant API and Content API both 403 ACCESS_TOKEN_SCOPE_INSUFFICIENT).
 - Unused duplicate theme "Updated (Google return policy)" (194269348024) holds an unused snippet sask-org-schema; not needed.
 - Merchant feed titles come from the SEO title ("... for Women | Shop With Sask"), per Google Ads shopping_product.
+- Owner (2026-11-18): return cost is 75 EGP Cairo/Giza, 120 EGP Alexandria (website refund policy already says this; keep it). Merchant Center allows one fixed return fee per country, so MC stays 75.
