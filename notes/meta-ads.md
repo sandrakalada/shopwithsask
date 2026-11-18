@@ -430,3 +430,4 @@ All audio replaced with ads-assets/sask_track.wav, 1080x1920, checked. Each ad i
 - Polka A 4.1s 987609237269045: 52564052771920 / 52564052784720
 - Polka B 4.3s 4804846089748500: 52564052806120 / 52564052840120
 - Navy set cuts uploaded (videos navy_a 1187042144009609, navy_b 1447200097621376, navy_c 2355557591515346; full 1077472185393690), waiting for product link.
+- Navy Pinstripe Shirt & Bubble Skirt Set (navy-pinstripe-shirt-bubble-skirt-set, 1,850, Medium x1) connected: full + 3 cuts, creatives 1048177694994682, 3086885631653335, 1491688739499377, 2124026921809358; ads JACKETS 52564056698320/706520/719320/757320, R2 52564056702720/710520/733320/777920.
