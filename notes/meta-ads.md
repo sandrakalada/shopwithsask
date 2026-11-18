@@ -435,3 +435,4 @@ All audio replaced with ads-assets/sask_track.wav, 1080x1920, checked. Each ad i
 ## 2026-11-18 afternoon - Meta music (owner: "use multiple tracks", then "dont make anything just use meta's")
 - All 13 owner videos re-uploaded silent and given Meta's licensed music (creative degrees_of_freedom_spec.creative_features_spec.audio OPT_IN; asset_feed_spec audios is ignored by the API). New ads in JACKETS and R2 (log: scratchpad mute/ads_log.json); the 26 store-track ads paused. Rule updated in CLAUDE.md. sask_track.wav no longer used for new ads.
 - 2026-11-18 14:35 Cairo check: 238 EGP today. R2 2 ATC / 55; AB D 0 / 49; Jackets 0 / 46 (new Meta-music video ads in learning); AB A 0 / 13. Orders today #1389 (R2 ad), #1390 (bio). Stock unchanged, all ACTIVE. Nothing at 85, nothing paused.
+- 2026-11-18 17:35 Cairo check: 314 EGP today. R2 2 ATC / 85; Jackets 2 / 77; AB D 0 / 58; AB A 0 / 17. Orders today #1389, #1390. Stock unchanged. Nothing paused.
