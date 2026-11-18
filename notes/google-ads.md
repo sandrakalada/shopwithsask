@@ -100,3 +100,4 @@ Judge Google orders by gclid / Google Ads shopping_performance_view conversions 
 - Unused duplicate theme "Updated (Google return policy)" (194269348024) holds an unused snippet sask-org-schema; not needed.
 - Merchant feed titles come from the SEO title ("... for Women | Shop With Sask"), per Google Ads shopping_product.
 - Owner (2026-11-18): return cost is 75 EGP Cairo/Giza, 120 EGP Alexandria (website refund policy already says this; keep it). Merchant Center allows one fixed return fee per country, so MC stays 75.
+- 2026-11-18 full run: all active products complete; 6 draft clothing products given color-pattern + fabric (new metaobjects navy-floral, beige-brown-animal, purple-pink-yellow-geometric). No badly named product image files found (2 UUID-named files have no alt, not product images). Daily task trig_01SM1sPtWQeALybVh6Ko9vGA (22:13 Cairo) keeps this up.
