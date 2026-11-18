@@ -408,3 +408,9 @@ Ads: heart patch bomber 52563885287920, colorblock windbreaker 52563885301720, l
 - Account day Nov 17 final: 807 EGP. Jackets 9 ATC / 174; Round 2 3 ATC, 1 purchase / 39; AB D 2 / 96; AB A 1 / 83; B 72, C 78, Top items 77, Stories 61: 0 ATC (B, C under 85). Nothing paused.
 - Heart patch bomber now 1 left (Large only; Small sold out). Ads keep running (owner asked for every jacket), flag to owner.
 - 2026-11-18 08:35 Cairo check: early day, 91 EGP spent; round 2 1 ATC. No new orders since #1389. Stock unchanged (heart patch 1 left). Nothing paused.
+
+## 2026-11-18 morning - owner videos (audio removed, store track ads-assets/sask_track.wav, 1080x1920, frames checked sharp)
+- Embroidered Suede Jacket (3 clips, 31.5s): video 2625006197999716, creative 1152637153815282; ads JACKETS 52564010595520, R2 52564010598120.
+- Polka Dot Denim Jacket (2 clips, 8.5s): video 1136789828957952, creative 1671902991303715; ads JACKETS 52564010689120, R2 52564010692720.
+- Floral Print Open Front Jacket (4.2s): video 2456604225168819, creative 1909358450099130; ads JACKETS 52564010872520, R2 52564010894520.
+- All 1 piece left (owner wants every jacket advertised). Budget move (pause B, C, Top items, Stories; jackets 250->380, R2 150->285) waiting for owner to confirm amounts.
