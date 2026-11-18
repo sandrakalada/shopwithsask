@@ -399,3 +399,6 @@ Ads: heart patch bomber 52563885287920, colorblock windbreaker 52563885301720, l
 ## 2026-11-17 23:35 Cairo 3h check
 - Spend today 653. Jackets 7 ATC / 137 (best, ~20/ATC). AB D 2 / 94, AB A 1 / 76. AB B 59, C 68, Top items 69, Stories 23: 0 ATC, none at 85. No orders today. Stock OK.
 - Round 2 52563885268320: ads ACTIVE, 0 impressions ~2h after launch (new; recheck next run). Polka boost campaign paused.
+
+## 2026-11-18 02:35 Cairo 3h check (account timezone is Etc/GMT+2 = UTC-2, so Meta "today" still = Nov 17)
+- Nov 17 (account day) so far 794 EGP. Jackets 8 ATC / 173 (~22/ATC). Round 2 started: 2 ATC / 31.6 (~16/ATC). AB D 2 / 95.5, AB A 1 / 82. B 71, C 78, Top items 76, Stories 59: 0 ATC, none at 85. No orders. Nothing paused.
