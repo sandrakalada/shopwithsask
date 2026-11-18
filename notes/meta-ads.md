@@ -420,3 +420,13 @@ Ads: heart patch bomber 52563885287920, colorblock windbreaker 52563885301720, l
 ## 2026-11-18 11:35 Cairo 3h check
 - New order #1390 1,290 EGP (Instagram link in bio, organic). Orders today: #1389 (round 2 ad) + #1390.
 - Today so far 175 EGP: R2 2 ATC / 29; AB D 0 / 36; Jackets 0 / 25 (just raised); AB A 0 / 10. Nothing at 85. Stock unchanged, all ACTIVE.
+
+## 2026-11-18 midday - short cuts (owner: "chop the videos to smaller videos to boost more ads inside the ad set")
+All audio replaced with ads-assets/sask_track.wav, 1080x1920, checked. Each ad in JACKETS 52563789776920 and R2 52563885268320.
+- Suede reel v2 (owner edit, 13.7s) creative 1121746050844306: ads 52564052467120 / 52564052619120
+- Suede back 6.5s 1164127599385866: 52564052692920 / 52564052698720
+- Suede walk 8s 1686663363009859: 52564052712120 / 52564052717120
+- Suede walk 2 8.3s 2126627184625438: 52564052732520 / 52564052740920
+- Polka A 4.1s 987609237269045: 52564052771920 / 52564052784720
+- Polka B 4.3s 4804846089748500: 52564052806120 / 52564052840120
+- Navy set cuts uploaded (videos navy_a 1187042144009609, navy_b 1447200097621376, navy_c 2355557591515346; full 1077472185393690), waiting for product link.
