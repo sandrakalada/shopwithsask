@@ -415,3 +415,4 @@ Ads: heart patch bomber 52563885287920, colorblock windbreaker 52563885301720, l
 - Floral Print Open Front Jacket (4.2s): video 2456604225168819, creative 1909358450099130; ads JACKETS 52564010872520, R2 52564010894520.
 - All 1 piece left (owner wants every jacket advertised). Budget move (pause B, C, Top items, Stories; jackets 250->380, R2 150->285) waiting for owner to confirm amounts.
 - 2026-11-18 ~09:30 Cairo, owner approved: paused AB B 52563728056120, AB C 52563728100920, TOP ITEMS 52563622391520, STORIES 52563733350320 (0 ATC). JACKETS 250->380/day, ROUND 2 150->285/day. Live: jackets 380, R2 285, AB A 75, AB D 75 = 815/day. A/B 24h reminder deleted (decision made).
+- Navy pinstripe shirt + bubble skirt set video (3 clips, 20.4s, music): video 1077472185393690, thumb hash 10ed6295a500dee150c6dc07bf1fea8a, product not found in Shopify; waiting for owner link.
