@@ -83,3 +83,11 @@ Budget 10 -> 30 SAR/day (~+19 SAR = ~250 EGP over Nov 10 evening + Nov 11). Prom
 Shopify's Google channel adds utm_source=google&utm_medium=product_sync&utm_campaign=sag_organic to every product link in the feed, so paid Shopping/PMax clicks also arrive tagged sag_organic. Google Ads shopping_performance_view confirms: #1375 (2,790 EGP, Nov 4-5) = PMax click on "طقم صيفي قطعتين بالورد" (2 conv, 378 SAR value, double-counted); #1384 (1,730 EGP, Nov 10) = PMax click on "جاكيت بومبر بطبعة بوب آرت" (2 conv, 226.6 SAR). So paid Google brought ~4,520 EGP on ~298 SAR (Nov 1-14), roughly break-even, not zero. Earlier reports calling these free-listing orders were wrong.
 Merchant Center (owner screenshot, Oct 1 - Nov 16): 483 clicks, all Ads, Organic 0 for the whole period -> free listings are not running. Owner must turn them on in Merchant Center (Marketing methods / Free listings) - not possible with our API scope (adwords only). Google Ads campaigns: both PAUSED, no spend since Nov 14.
 Judge Google orders by gclid / Google Ads shopping_performance_view conversions by product and date, not by sag_organic.
+
+## 2026-11-18 (later) Merchant Center screenshots from owner
+- Free listings: ON (Marketing methods shows "Free listings enabled: On"). My earlier claim that they were off was wrong. Organic still ~0.
+- Store quality: Overall LOW. Return cost: INCOMPLETE (no return policy set in Merchant Center). Shipping cost: Good.
+- Products: 628 total, 627 approved, 1 not approved.
+- Advisor: 113 Shirts & Tops missing details (attributes such as material, pattern, colour); 22 sale price suggestions; image min 500x500 from 2027-01-31 (ours are 900x1200).
+- Local inventory error (Business Profile link): not relevant, online-only store; ignore.
+- Fix for owner: Merchant Center > Settings > Shipping and returns > Returns > add Egypt policy matching the Shopify refund policy (returns only at the door while courier is present; after that final sale), link https://shopwithsask.com/policies/refund-policy.
