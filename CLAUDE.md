@@ -48,7 +48,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - Exception approved by the owner: the 4 Meta ads running on 2026-11-05 (DM B, DM D, Sales WARM, Sales COLD) keep their store-photo creatives until 2026-11-08 night; replace them from 2026-11-09. No new exceptions.
 - Store product photos (900x1200, often made from small WhatsApp photos) are NOT ad material. Do not use them in ads, and do not make ad images by enlarging, padding or blur-filling them.
 - Default ad creative: the owner's own Instagram post or reel (source_instagram_media_id), which keeps Instagram's original upload quality.
-- Video ads from the owner's own video files: ALWAYS remove the original audio completely and replace it with music cleared for ads (owner's rule, 2026-11-17). Use the store's own original track ads-assets/sask_track.wav (generated from scratch, no third-party samples) or another track that is licensed for commercial ad use; never use copyrighted songs.
+- Video ads from the owner's own video files: ALWAYS remove the original audio completely (owner's rule, 2026-11-17) and use Meta's own licensed music: upload the video silent and set degrees_of_freedom_spec.creative_features_spec.audio OPT_IN so Meta adds and varies tracks (owner's rule, 2026-11-18: "just use Meta's", no self-made tracks). Never use copyrighted songs.
 - Any other image must be an original of at least 1080 px on the short side (1080x1350 for feed, 1080x1920 for stories/reels) with no upscaling; videos at least 1080 px tall and never upscaled from 720p. Before launching, look at the actual file at full size and check it is sharp; if you cannot view it, do not launch it and ask the owner for the original photo or the post link.
 
 ## Meta ads

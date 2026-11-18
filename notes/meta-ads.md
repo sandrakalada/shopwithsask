@@ -431,3 +431,6 @@ All audio replaced with ads-assets/sask_track.wav, 1080x1920, checked. Each ad i
 - Polka B 4.3s 4804846089748500: 52564052806120 / 52564052840120
 - Navy set cuts uploaded (videos navy_a 1187042144009609, navy_b 1447200097621376, navy_c 2355557591515346; full 1077472185393690), waiting for product link.
 - Navy Pinstripe Shirt & Bubble Skirt Set (navy-pinstripe-shirt-bubble-skirt-set, 1,850, Medium x1) connected: full + 3 cuts, creatives 1048177694994682, 3086885631653335, 1491688739499377, 2124026921809358; ads JACKETS 52564056698320/706520/719320/757320, R2 52564056702720/710520/733320/777920.
+
+## 2026-11-18 afternoon - Meta music (owner: "use multiple tracks", then "dont make anything just use meta's")
+- All 13 owner videos re-uploaded silent and given Meta's licensed music (creative degrees_of_freedom_spec.creative_features_spec.audio OPT_IN; asset_feed_spec audios is ignored by the API). New ads in JACKETS and R2 (log: scratchpad mute/ads_log.json); the 26 store-track ads paused. Rule updated in CLAUDE.md. sask_track.wav no longer used for new ads.
