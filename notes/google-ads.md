@@ -78,3 +78,8 @@ Budget 10 -> 30 SAR/day (~+19 SAR = ~250 EGP over Nov 10 evening + Nov 11). Prom
 2026-11-12 daily check: Nov 11 42.1 SAR (30 SAR 11.11 budget until morning), 15 clicks, 0 conv; 7d 196.4 SAR, still no utm-tracked paid Google order. Assets approved.
 2026-11-14 daily check: Nov 13 16.8 SAR, 6 clicks, 0 conv; 7d 181 SAR, still no tracked paid order. Verdict due Nov 17.
 2026-11-14: owner stopped all ads. Performance Max-2 24362293653 PAUSED. Do not re-enable without the owner.
+
+## 2026-11-18 CORRECTION: "sag_organic" is NOT proof of free listings
+Shopify's Google channel adds utm_source=google&utm_medium=product_sync&utm_campaign=sag_organic to every product link in the feed, so paid Shopping/PMax clicks also arrive tagged sag_organic. Google Ads shopping_performance_view confirms: #1375 (2,790 EGP, Nov 4-5) = PMax click on "طقم صيفي قطعتين بالورد" (2 conv, 378 SAR value, double-counted); #1384 (1,730 EGP, Nov 10) = PMax click on "جاكيت بومبر بطبعة بوب آرت" (2 conv, 226.6 SAR). So paid Google brought ~4,520 EGP on ~298 SAR (Nov 1-14), roughly break-even, not zero. Earlier reports calling these free-listing orders were wrong.
+Merchant Center (owner screenshot, Oct 1 - Nov 16): 483 clicks, all Ads, Organic 0 for the whole period -> free listings are not running. Owner must turn them on in Merchant Center (Marketing methods / Free listings) - not possible with our API scope (adwords only). Google Ads campaigns: both PAUSED, no spend since Nov 14.
+Judge Google orders by gclid / Google Ads shopping_performance_view conversions by product and date, not by sag_organic.
