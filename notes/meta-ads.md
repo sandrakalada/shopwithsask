@@ -407,3 +407,4 @@ Ads: heart patch bomber 52563885287920, colorblock windbreaker 52563885301720, l
 - ORDER #1389 1,115 EGP (heart patch bomber), utm campaign 52563885256720 / ad 52563885287920 = 11.11 AUDIENCE ROUND 2, ~3h after launch.
 - Account day Nov 17 final: 807 EGP. Jackets 9 ATC / 174; Round 2 3 ATC, 1 purchase / 39; AB D 2 / 96; AB A 1 / 83; B 72, C 78, Top items 77, Stories 61: 0 ATC (B, C under 85). Nothing paused.
 - Heart patch bomber now 1 left (Large only; Small sold out). Ads keep running (owner asked for every jacket), flag to owner.
+- 2026-11-18 08:35 Cairo check: early day, 91 EGP spent; round 2 1 ATC. No new orders since #1389. Stock unchanged (heart patch 1 left). Nothing paused.
