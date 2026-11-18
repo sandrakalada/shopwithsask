@@ -362,4 +362,76 @@ Skipped: pop art bomber (photo blurry); toucan puffer, retro colorblock zip, cor
 - Audit: 54 live ads. All images >=1080 px (store/owner hashes 1080-1932 short side; IG posts checked at creation). All 29 linked products ACTIVE and in stock.
 - Fixed: 5 Colorblock Windbreaker ads linked to /collections/jackets. New creative 1479333544328970 -> product page; new ads AB A 52563754937920, B 52563754974920, C 52563754991920, D 52563755003320, BEST WEB 52563755068320; old ads paused.
 - Note: many advertised items are down to 1 piece (owner asked for every jacket); tropical mini dress and Bermuda shorts are summer pieces in the Stories ad set.
-2026-11-17 daily report (12:48 Cairo, routine trig_01VdqKkcqEg6uLfVgfGTwkrH): Nov 16 Meta 337 EGP (traffic 149, catalog 55, polka 49, DMs 64, followers 12, top items 9), 79 LPV, 0 ATC, 0 orders. Last 7 days 4,502 EGP: Meta counted 4 purchases (5,965), Shopify 2 real (6,105) + 1 cancelled. No Shopify order since #1388 (Nov 12). Live now: 19 ad sets, 1,120 EGP/day daily budgets (owner-set push; A/B test decision Nov 18). No live ad set at 85 EGP lifetime yet, nothing paused. Stock audit by the 3h check earlier today (all advertised products active and in stock; many 1-piece jackets by owner request).
+
+## 2026-11-17 14:36 Cairo 3h check
+- Spend today 276 EGP. Shopify: 149 sessions, 2 add-to-cart, 2 reached checkout, 0 orders.
+- AB D WARM: 2 add-to-carts for 62.8 EGP (only results). A 49.5, B 37.0, C 25.5, FB visits 29.7, Top items 46.0: 0 ATC, none at 85 EGP yet.
+- Jackets campaign (11 ad sets) and Stories ad set: ACTIVE, approved, no issues, but 0 impressions since 10:40 Cairo. Likely auction overlap: 11 jacket ad sets share cell B's audience. Watch next check; if still 0, propose merging jackets into 1-2 ad sets to the owner.
+
+## 2026-11-17 14:50 Cairo fixes (owner: "fix what needs fixing")
+- Jackets: 11 per-jacket ad sets had 0 impressions all day (auction overlap). Paused all 11; new single ad set 52563789776920 "JACKETS - all in-stock jackets - WARM" 150/day, ADD_TO_CART, cell D warm audience (IG engagers 365d + site visitors), age 21-44, value rule on. 12 ads re-created with the same creatives (52563789823920 ... 52563790155120).
+- Summer pieces paused (cold-season rule): Stories tropical mini dress 52563733385520, Stories Bermuda shorts 52563733364720, Top items Bermuda shorts 52563624071920.
+- Stories 52563733350320 (0 impressions): switched to broad Advantage+ (age_min 21, suggestion 21-44, Cairo+Giza women, stories only, followers excluded) to stop overlapping Top items. Ads left: rust maxi dress video, polka denim jacket video, black knit vest photo.
+- Live budget now ~665 EGP/day: A/B 4x75, Jackets 150, FB visits 100, Top items 60, Stories 55.
+
+## 2026-11-17 17:35 Cairo 3h check
+- Spend today ~400 EGP. Shopify: 253 sessions, 6 cart sessions, 2 checkouts, 0 orders.
+- Merged JACKETS warm ad set: 5 add-to-carts for 73.7 EGP (~15 EGP each) in ~3h, clear leader. AB D warm: 2 ATC / 73. A, B, C, Top items, FB visits: 0 ATC, all under 85 EGP.
+- Stories 52563733350320: still 0 impressions all day after switching to broad. Proposed to owner: pause it and add its 55/day to jackets.
+
+## 2026-11-17 evening: why visitors drop (owner asked to fix)
+- Shopify landing pages, last 7d: velvet top 1,108 visits ~9-10s, boho skirt 883 ~12-16s, jackets collection 373, all 0 carts; homepage 129 visits 2.5 min, 12 carts.
+- Meta ad level, last 7d: those visits came from traffic/landing-page-view ads (old TRAFFIC ad set: boho skirt 1,062 clicks / 582 EGP, velvet top 1,122 clicks / 520 EGP, 0 ATC). Offer ads (11.11 reel IG 17 ATC, FB 16, owner boost 10) are what produced carts.
+- Paused the last traffic ad set: FB WEBSITE VISITS 52563578814720 (LANDING_PAGE_VIEWS, 0 ATC). Live budget now ~565/day.
+- Asked website chat for a mobile sticky add-to-cart bar, shorter main image and faster first image on a duplicate theme (owner previews and publishes).
+- Owner approved: jackets warm ad set 52563789776920 raised 150 -> 250/day (FB visits budget moved). Live ~565/day.
+
+## 2026-11-17 20:35 Cairo 3h check
+- Spend today 524 EGP. Shopify: 328 sessions, 8 cart sessions, 2 checkouts, 0 orders.
+- Jackets warm 6 ATC / 90 EGP (heart patch bomber 6 of them). AB D 2 / 84, AB A 1 / 64. B, C, Top items 0 ATC, all under 85. Stories 12.7, delivering slowly. Nothing paused.
+- Pending owner: 11.11-audience round 2 (150/day proposed), budget not yet confirmed.
+
+## 2026-11-17 night - 11.11 audience round 2 (owner approved 150/day)
+Campaign 52563885256720 (OUTCOME_SALES), ad set 52563885268320 150/day, ADD_TO_CART, 11.11 audience (Engaged Shoppers + skirt/boho/blouse/accessories/street fashion/women's clothing, women 21-44 Cairo+Giza, IG engagers excluded, Advantage+ off), IG feed/stories/reels + FB feed/stories/reels, value rule on.
+Ads: heart patch bomber 52563885287920, colorblock windbreaker 52563885301720, leopard tote 980 52563885321320, embroidered boho jacket 52563885334520. Live total ~715/day.
+- 2026-11-17 22:40 Cairo: owner asked to stop her Polka boost. Ad set edit refused (boost, IG app only); campaign 52563733453520 paused via API, ad set now CAMPAIGN_PAUSED.
+
+## 2026-11-17 23:35 Cairo 3h check
+- Spend today 653. Jackets 7 ATC / 137 (best, ~20/ATC). AB D 2 / 94, AB A 1 / 76. AB B 59, C 68, Top items 69, Stories 23: 0 ATC, none at 85. No orders today. Stock OK.
+- Round 2 52563885268320: ads ACTIVE, 0 impressions ~2h after launch (new; recheck next run). Polka boost campaign paused.
+
+## 2026-11-18 02:35 Cairo 3h check (account timezone is Etc/GMT+2 = UTC-2, so Meta "today" still = Nov 17)
+- Nov 17 (account day) so far 794 EGP. Jackets 8 ATC / 173 (~22/ATC). Round 2 started: 2 ATC / 31.6 (~16/ATC). AB D 2 / 95.5, AB A 1 / 82. B 71, C 78, Top items 76, Stories 59: 0 ATC, none at 85. No orders. Nothing paused.
+
+## 2026-11-18 05:35 Cairo 3h check
+- ORDER #1389 1,115 EGP (heart patch bomber), utm campaign 52563885256720 / ad 52563885287920 = 11.11 AUDIENCE ROUND 2, ~3h after launch.
+- Account day Nov 17 final: 807 EGP. Jackets 9 ATC / 174; Round 2 3 ATC, 1 purchase / 39; AB D 2 / 96; AB A 1 / 83; B 72, C 78, Top items 77, Stories 61: 0 ATC (B, C under 85). Nothing paused.
+- Heart patch bomber now 1 left (Large only; Small sold out). Ads keep running (owner asked for every jacket), flag to owner.
+- 2026-11-18 08:35 Cairo check: early day, 91 EGP spent; round 2 1 ATC. No new orders since #1389. Stock unchanged (heart patch 1 left). Nothing paused.
+
+## 2026-11-18 morning - owner videos (audio removed, store track ads-assets/sask_track.wav, 1080x1920, frames checked sharp)
+- Embroidered Suede Jacket (3 clips, 31.5s): video 2625006197999716, creative 1152637153815282; ads JACKETS 52564010595520, R2 52564010598120.
+- Polka Dot Denim Jacket (2 clips, 8.5s): video 1136789828957952, creative 1671902991303715; ads JACKETS 52564010689120, R2 52564010692720.
+- Floral Print Open Front Jacket (4.2s): video 2456604225168819, creative 1909358450099130; ads JACKETS 52564010872520, R2 52564010894520.
+- All 1 piece left (owner wants every jacket advertised). Budget move (pause B, C, Top items, Stories; jackets 250->380, R2 150->285) waiting for owner to confirm amounts.
+- 2026-11-18 ~09:30 Cairo, owner approved: paused AB B 52563728056120, AB C 52563728100920, TOP ITEMS 52563622391520, STORIES 52563733350320 (0 ATC). JACKETS 250->380/day, ROUND 2 150->285/day. Live: jackets 380, R2 285, AB A 75, AB D 75 = 815/day. A/B 24h reminder deleted (decision made).
+- Navy pinstripe shirt + bubble skirt set video (3 clips, 20.4s, music): video 1077472185393690, thumb hash 10ed6295a500dee150c6dc07bf1fea8a, product not found in Shopify; waiting for owner link.
+
+## 2026-11-18 11:35 Cairo 3h check
+- New order #1390 1,290 EGP (Instagram link in bio, organic). Orders today: #1389 (round 2 ad) + #1390.
+- Today so far 175 EGP: R2 2 ATC / 29; AB D 0 / 36; Jackets 0 / 25 (just raised); AB A 0 / 10. Nothing at 85. Stock unchanged, all ACTIVE.
+
+## 2026-11-18 midday - short cuts (owner: "chop the videos to smaller videos to boost more ads inside the ad set")
+All audio replaced with ads-assets/sask_track.wav, 1080x1920, checked. Each ad in JACKETS 52563789776920 and R2 52563885268320.
+- Suede reel v2 (owner edit, 13.7s) creative 1121746050844306: ads 52564052467120 / 52564052619120
+- Suede back 6.5s 1164127599385866: 52564052692920 / 52564052698720
+- Suede walk 8s 1686663363009859: 52564052712120 / 52564052717120
+- Suede walk 2 8.3s 2126627184625438: 52564052732520 / 52564052740920
+- Polka A 4.1s 987609237269045: 52564052771920 / 52564052784720
+- Polka B 4.3s 4804846089748500: 52564052806120 / 52564052840120
+- Navy set cuts uploaded (videos navy_a 1187042144009609, navy_b 1447200097621376, navy_c 2355557591515346; full 1077472185393690), waiting for product link.
+- Navy Pinstripe Shirt & Bubble Skirt Set (navy-pinstripe-shirt-bubble-skirt-set, 1,850, Medium x1) connected: full + 3 cuts, creatives 1048177694994682, 3086885631653335, 1491688739499377, 2124026921809358; ads JACKETS 52564056698320/706520/719320/757320, R2 52564056702720/710520/733320/777920.
+
+## 2026-11-18 afternoon - Meta music (owner: "use multiple tracks", then "dont make anything just use meta's")
+- All 13 owner videos re-uploaded silent and given Meta's licensed music (creative degrees_of_freedom_spec.creative_features_spec.audio OPT_IN; asset_feed_spec audios is ignored by the API). New ads in JACKETS and R2 (log: scratchpad mute/ads_log.json); the 26 store-track ads paused. Rule updated in CLAUDE.md. sask_track.wav no longer used for new ads.
+2026-11-18 daily report (12:49 Cairo, routine trig_01VdqKkcqEg6uLfVgfGTwkrH): Nov 17 Meta 813 EGP, 315 LPV, 15 ATC (jackets 9, A/B 3, R2 3), Meta 1 purchase 1,115 = Shopify #1389 (R2 ad, placed 02:27 Cairo Nov 18; Meta's account clock puts it on Nov 17). No Shopify order on Nov 17 Cairo date. Last 7 days (Nov 11-17) Meta 4,018 EGP, Meta counted 4 purchases, Shopify 1 Meta-paid order (#1386, 3,160) -> ROAS 0.79; 7 days before 2 Meta-paid orders. Live: JACKETS 380, R2 285, AB A 75, AB D 75 = 815/day (owner-approved). Pause-losers: no live ad set at 85+ EGP with 0 results and none over 2x campaign cost per cart; nothing paused. Stock per 11:35 3h check (all ACTIVE, unchanged).
