@@ -41,6 +41,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - Suggest sale prices (compare-at) and product reviews to the owner; never change prices without the owner.
 
 ## Reporting
+- Status replies ("how are we doing", ad checks): owner's preferred format (2026-11-19), 2-3 short lines only: (1) today's orders with item and amount, and which came from ads; (2) today's ad spend and add-to-carts per ad set in one line; (3) a short multi-day line, e.g. last 2 days ads orders and revenue vs spend. No tables, no extra advice unless something needs a decision.
 - Real revenue = orders that are fulfilled AND paid. ShopifyQL filter: `WHERE order_fulfillment_status = 'fulfilled' AND order_payment_status = 'paid'`.
 
 ## Ad image and video quality (owner's rule, all platforms: Meta, Google, anywhere)
