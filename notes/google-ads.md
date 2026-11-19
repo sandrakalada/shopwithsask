@@ -91,4 +91,20 @@ Judge Google orders by gclid / Google Ads shopping_performance_view conversions 
 - Advisor: 113 Shirts & Tops missing details (attributes such as material, pattern, colour); 22 sale price suggestions; image min 500x500 from 2027-01-31 (ours are 900x1200).
 - Local inventory error (Business Profile link): not relevant, online-only store; ignore.
 - Fix for owner: Merchant Center > Settings > Shipping and returns > Returns > add Egypt policy matching the Shopify refund policy (returns only at the door while courier is present; after that final sale), link https://shopwithsask.com/policies/refund-policy.
-2026-11-18: campaigns still PAUSED, 0 spend Nov 17, no changes, no disapprovals; 9 bid recommendation subscriptions PAUSED; PURCHASE 7550949594 still primary (owner to set Secondary).
+
+## 2026-11-18 Product attributes for Google (store quality)
+- Enabled Shopify category metafields shopify.color-pattern and shopify.fabric; created 101 color-pattern metaobjects (colours + pattern checked against each main photo) and fabric metaobjects.
+- All 155 active clothing products now have colour/pattern and fabric. Fabric = Viscose, Elastane, Polyester, Cotton for every item (owner's instruction: "just write contains viscose elastane polyester cotton"; do not elaborate).
+- Two products had no category or Google metafields: Tropical Print Balloon Sleeve Mini Dress (set Dresses) and Embroidered Denim Puff Sleeve Jacket (set Coats & Jackets) plus gender/age/condition/custom_product. Renamed the dress image files from Instagram numbers to {handle}-{k}.jpg.
+- Return policy: "Standard for Egypt" exists and is verified (owner). Return cost = 75 EGP (pickup fee, Cairo/Giza/Alexandria) per owner; owner enters it in Merchant Center (our token has no Merchant scope: Merchant API and Content API both 403 ACCESS_TOKEN_SCOPE_INSUFFICIENT).
+- Unused duplicate theme "Updated (Google return policy)" (194269348024) holds an unused snippet sask-org-schema; not needed.
+- Merchant feed titles come from the SEO title ("... for Women | Shop With Sask"), per Google Ads shopping_product.
+- Owner (2026-11-18): return cost is 75 EGP Cairo/Giza, 120 EGP Alexandria (website refund policy already says this; keep it). Merchant Center allows one fixed return fee per country, so MC stays 75.
+- 2026-11-18 full run: all active products complete; 6 draft clothing products given color-pattern + fabric (new metaobjects navy-floral, beige-brown-animal, purple-pink-yellow-geometric). No badly named product image files found (2 UUID-named files have no alt, not product images). Daily task trig_01SM1sPtWQeALybVh6Ko9vGA (22:13 Cairo) keeps this up.
+- 2026-11-18 owner: returns after courier leaves accepted within 1 day, 120 EGP return fee, refund to Instapay within 5 days (matches Merchant Center policy). New text in notes/policies/refund-policy-*.html. Our access cannot write the refund policy (needs write_legal_policies); owner pastes it in Settings > Policies. After that, register the Arabic translation (translationsRegister on gid://shopify/ShopPolicy/55466524856 with a fresh digest).
+- 2026-11-18: refund policy updated (EN+AR) via Sandra Sask app (owner allowed it for policies). Legal notice email -> orders@shopwithsask.com + Arabic added. Contact, Privacy, Shipping, Terms are auto-managed by Shopify (pull store contact email; owner changes it in Settings > General). Their Arabic translations now say orders@.
+
+## 2026-11-19 Weekend test (owner approved: "Do it")
+- Performance Max-2 24362293653: budget 10 -> 20 SAR/day; Alexandria location removed (Cairo 21468 + Giza 21465, presence); listing groups now SUBDIVISION root, beach set / أطقم البحر excluded, everything else included. Sold-out items are not eligible anyway.
+- Scheduled: enable Thu Nov 19 21:00 Cairo (trig_015yzDxhoC5qPGJt5Wqi4S4y); pause + budget back to 10 + report Sun Nov 22 00:05 Cairo (trig_01QpvERhaVz6yYrgN438VYUG). Worst case ~120 SAR (Google can spend 2x/day).
+2026-11-19: PMax-2 still PAUSED, 0 spend Nov 18. Changes today: API (other session) budget 10 -> 20 SAR and removed campaign criterion 21463 (10:22 Riyadh); Google Ads mobile app (not API) budget 20 -> 56 SAR/day at 13:40 Riyadh. PURCHASE 7550949594 still primary: fix before any restart. Rec subscriptions PAUSED, no disapprovals.
