@@ -111,3 +111,4 @@ Judge Google orders by gclid / Google Ads shopping_performance_view conversions 
 - 2026-11-19 14:55 Cairo 2h check: today 4.13 SAR, 841 impr, 1 click, 0 conv; no orders since start; no junk search terms; targeting unchanged. No change.
 - 2026-11-19 16:25 Cairo 2h check: today 16.1 SAR, 2,480 impr, 5 clicks, 0 conv; no orders since start; search categories leocansa / in your shoe already negative (0 clicks); targeting intact (12 criteria). No change.
 - 2026-11-19 18:25 Cairo 2h check: today 41.4 SAR, 4,921 impr, 14 clicks, 0 conv, 0 orders. Over the 40 SAR/day stop: PAUSED for rest of day; resume task trig_01Q23mA7kBzeXK9HdCngPpuM at Nov 20 00:05 Cairo. Google overspends 2x budget in high-end areas.
+- 2026-11-19 20:25 Cairo 2h check: paused (daily cap), final today 43.7 SAR, 18 clicks, 0 orders. Resumes 00:05.
