@@ -116,3 +116,4 @@ Judge Google orders by gclid / Google Ads shopping_performance_view conversions 
 - 2026-11-19 22:25 Cairo 2h check: campaign paused by daily 40 SAR stop (43.7 SAR today); resumes 00:05. Product details check: all complete; Navy Pinstripe set has category aa-1 (Clothing) not aa-1-11, change was not approved in time, retry next run.
 - 2026-11-20 00:06 Cairo: campaign re-ENABLED after daily cap pause (now 7 asset groups, Cairo+Giza).
 - 2026-11-20 00:25 Cairo 2h check: enabled, just resumed; nothing to change.
+- 2026-11-20: owner approved product fixes through the Sandra Sask app (client credentials, scratchpad shop.py) to avoid Shopify MCP confirmation prompts. Navy Pinstripe set category -> Outfit Sets (aa-1-11). Daily product-details task updated to write via the app.
