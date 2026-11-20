@@ -45,7 +45,22 @@ def text_img(runs,alpha=1.0,blur=0,scale=1.0,dy=0):
 def put(f,im,cy):
     base=Image.fromarray(np.clip(f,0,255).astype(np.uint8)).convert('RGBA'); base.alpha_composite(im,(int(W/2-im.width/2),int(cy-im.height/2)))
     return np.array(base.convert('RGB'),np.float32)
-frames=[]; cues=[]
+from collections import deque
+VID=os.path.splitext(cfg['out'])[0]+'.video.mp4'
+writer=subprocess.Popen(['ffmpeg','-v','error','-y','-f','rawvideo','-pix_fmt','rgb24','-s',f'{W}x{H}','-r',str(FPS),'-i','-',
+   '-vf','format=yuv420p','-c:v','libx264','-preset','medium','-crf','17','-profile:v','high',VID],stdin=subprocess.PIPE)
+class Frames:
+    def __init__(s,keep=12): s.buf=deque(); s.keep=keep; s.n=0
+    def append(s,f):
+        s.buf.append(np.clip(f,0,255).astype(np.uint8)); s.n+=1
+        while len(s.buf)>s.keep: writer.stdin.write(s.buf.popleft().tobytes())
+    def __iadd__(s,lst):
+        for f in lst: s.append(f)
+        return s
+    def __len__(s): return s.n
+    def flush(s):
+        while s.buf: writer.stdin.write(s.buf.popleft().tobytes())
+frames=Frames(); cues=[]
 def now(): return len(frames)/FPS
 for sh in cfg['shots']:
     t0=now(); seq=footage(cfg['src'],sh['start'],sh['dur'],sh.get('speed',1),sh.get('zoom',1),sh.get('cx',.5),sh.get('cy',.5))
@@ -77,18 +92,21 @@ for sh in cfg['shots']:
     if sh.get('black_after'):
         nb=int(round(sh['black_after']*FPS))
         for s in sh.get('sfx_black',[]): cues.append((now()+s[1],s[0]))
-        frames+= [np.zeros((H,W,3),np.float32)]*nb
+        frames+= [np.zeros((H,W,3),np.uint8)]*nb
 # end card with zoom-through
 logo=Image.open(f'{B}/logo-dark.png'); end=Image.new('RGB',(W,H),CREAM); d=ImageDraw.Draw(end)
 lg=logo.resize((560,int(560*logo.height/logo.width)),Image.LANCZOS); end.paste(lg,(260,780),lg)
 for yy,tx,f,sz in [(1000,'S T Y L E   W I T H O U T   L I M I T S',F4,30),(1500,'shopwithsask.com',F4,34)]:
     fo=ImageFont.truetype(f,sz); d.text(((W-d.textlength(tx,font=fo))/2,yy),tx,font=fo,fill=BROWN)
 E=np.array(end,np.float32); N=12; cues.append((now()-N/FPS,'whoosh'))
-for i in range(N):
-    k=1.06**(i+1); im=Image.fromarray(np.clip(frames[-N+i],0,255).astype(np.uint8)); w,h=int(W*k),int(H*k)
+tail=list(frames.buf); frames.buf.clear()
+for i,fr in enumerate(tail[-N:]):
+    k=1.06**(i+1); im=Image.fromarray(fr); w,h=int(W*k),int(H*k)
     im=im.resize((w,h),Image.BILINEAR).crop(((w-W)//2,(h-H)//2,(w-W)//2+W,(h-H)//2+H)).filter(ImageFilter.GaussianBlur(i*1.4))
-    a=max(0,(i-4)/(N-4)); frames[-N+i]=np.array(im,np.float32)*(1-a)+E*a
-frames+=[E]*int(2.4*FPS)
+    a=max(0,(i-4)/(N-4)); writer.stdin.write(np.clip(np.array(im,np.float32)*(1-a)+E*a,0,255).astype(np.uint8).tobytes())
+Eb=E.astype(np.uint8).tobytes(); nend=int(2.4*FPS)
+for _ in range(nend): writer.stdin.write(Eb)
+frames.n+=nend; writer.stdin.close(); writer.wait()
 total=len(frames)/FPS
 # ---------- sound design (synthesized foley, no music)
 rng=np.random.default_rng(7); L=int(total*SR)+SR; mix=np.zeros(L)
@@ -134,8 +152,6 @@ mix=mix/np.max(np.abs(mix))*0.9
 wav=os.path.splitext(cfg['out'])[0]+'.wav'
 import wave
 with wave.open(wav,'w') as w: w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((mix*32767).astype('<i2').tobytes())
-p=subprocess.Popen(['ffmpeg','-v','error','-y','-f','rawvideo','-pix_fmt','rgb24','-s',f'{W}x{H}','-r',str(FPS),'-i','-','-i',wav,
-   '-af','loudnorm=I=-14:TP=-1','-vf','format=yuv420p','-c:v','libx264','-preset','slow','-crf','17','-profile:v','high',
-   '-c:a','aac','-b:a','192k','-ac','2','-shortest','-movflags','+faststart',cfg['out']],stdin=subprocess.PIPE)
-for f in frames: p.stdin.write(np.clip(f,0,255).astype(np.uint8).tobytes())
-p.stdin.close(); p.wait(); os.remove(wav); seg.close(); print(round(total,2), [ (round(t,2),n) for t,n in cues])
+subprocess.run(['ffmpeg','-v','error','-y','-i',VID,'-i',wav,'-af','loudnorm=I=-14:TP=-1','-c:v','copy',
+   '-c:a','aac','-b:a','192k','-ac','2','-shortest','-movflags','+faststart',cfg['out']],check=True)
+os.remove(wav); os.remove(VID); seg.close(); print(round(total,2), [ (round(t,2),n) for t,n in cues])
