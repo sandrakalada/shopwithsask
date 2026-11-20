@@ -10,6 +10,8 @@ cfg=json.load(open(sys.argv[1])); out=cfg['out_dir']; os.makedirs(out,exist_ok=T
 seg=vision.ImageSegmenter.create_from_options(vision.ImageSegmenterOptions(base_options=mpt.BaseOptions(model_asset_path=cfg['model']),output_confidence_masks=True))
 BG=(236,234,230); font=ImageFont.truetype(cfg['font'],40)
 def grab(src,t):
+    if src.lower().endswith(('.jpg','.jpeg','.png','.webp')):
+        im=Image.open(src).convert('RGB'); r=min(1,2200/max(im.size)); return im.resize((int(im.width*r),int(im.height*r)),Image.LANCZOS)
     raw=subprocess.run(['ffmpeg','-v','error','-ss',str(t),'-i',src,'-frames:v','1','-f','rawvideo','-pix_fmt','rgb24','-'],capture_output=True,check=True).stdout
     return Image.frombuffer('RGB',(1080,1920),raw).copy()
 def mask(im):
@@ -23,13 +25,15 @@ def mask(im):
 tiles=[]
 for v in cfg['views']:
     im=grab(v['src'],v['t']); m=mask(im)
+    if v.get('cropf'):
+        f=v['cropf']; v['crop']=[f[0]*im.width,f[1]*im.height,f[2]*im.width,f[3]*im.height]
     if v.get('crop'):
         x0,y0,x1,y1=[int(c) for c in v['crop']]; im=im.crop((x0,y0,x1,y1)); m=m.crop((x0,y0,x1,y1))
     if v.get('keep_bg'): res=im
     else:
         bg=Image.new('RGB',im.size,BG); res=Image.composite(im,bg,m)
         bb=m.point(lambda p:255 if p>40 else 0).getbbox()
-        if bb and not v.get('crop'):
+        if bb and (not v.get('crop') or v.get('trim')):
             pad=60; bb=(max(0,bb[0]-pad),max(0,bb[1]-pad),min(im.width,bb[2]+pad),min(im.height,bb[3]+pad)); res=res.crop(bb)
     # fit into 1080x1440 portrait canvas (3:4), no upscale artifacts beyond 2x
     can=Image.new('RGB',(1080,1440),BG); r=min(1080/res.width,1440/res.height); r=min(r,2.4)
