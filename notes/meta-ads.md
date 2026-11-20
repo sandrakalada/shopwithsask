@@ -463,3 +463,4 @@ IG post creatives -> product pages, added to JACKETS, R2, iOS and AB A (AB A ski
 Skipped: Colorblock Floral Patchwork Shirt (post has >10 slides, API refuses), black polka lace maxi skirt / black ruffled high-low skirt / brown polka midi (post photos under 1080 px), crochet vest (post may show a different colour), summer pieces (sundresses, beach sets, one-shoulder dress).
 JACKETS hit Meta's 50-ad limit: archived its 19 paused ads (old store-track, navy, floral) to make room.
 2026-11-20 16:00 Cairo check: 508 EGP today; R2 6 ATC / 173; Jackets 3 / 177; iOS 1 ATC + 1 checkout / 74; AB A 0 / 84. No orders today yet. Stock unchanged.
+- 2026-11-20 17:35 Cairo check: ORDER #1395 1,005 (Colorblock Windbreaker Jacket, no tracking data; windbreaker is in all ad sets, now 1 left). 546 EGP today: R2 7 ATC / 184; Jackets 3 / 193; iOS 1 ATC + 1 checkout / 79; AB A 0 / 90 (21 ATC yesterday; no other live set in its campaign, rule not triggered). Stock OK.
