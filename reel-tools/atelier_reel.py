@@ -140,10 +140,25 @@ def thread(dur=0.8):
     for k in range(int(dur*14)):
         c=click()*0.35; i=int(k/14*SR); out[i:i+len(c)]+=c[:len(out)-i]
     return out
-LIB={'rustle':rustle,'click':click,'whoosh':whoosh,'riser':riser,'boom':boom,'thread':thread}
+import soundfile as sf
+def load(path,gain_db=0.0):
+    x,sr=sf.read(path,always_2d=True); x=x.mean(axis=1)
+    if sr!=SR: x=signal.resample_poly(x,SR,sr)
+    return x*10**(gain_db/20)
+SFX=cfg.get('sfx_files',{})
+LIB={k:(lambda v=v: load(v[0],v[1])) for k,v in SFX.items()}
+for k,fn in {'rustle':rustle,'click':click,'whoosh':whoosh,'riser':riser,'boom':boom,'thread':thread}.items(): LIB.setdefault(k,fn)
 for t,name in cues:
     s=LIB[name](); i=int(t*SR); mix[i:i+len(s)]+=s[:L-i]
 room=lp(rng.standard_normal(L),300)*0.02
+if cfg.get('bed'):
+    bd=cfg['bed']; x,sr=sf.read(bd['file'],start=int(bd['start']*44100),frames=int((total+2)*44100),always_2d=True); x=x.mean(axis=1)*10**(bd.get('gain_db',-8)/20)
+    bed=np.zeros(L); bed[:min(L,len(x))]=x[:L]
+    fi=int(0.6*SR); bed[:fi]*=np.linspace(0,1,fi)
+    d0=int(bd['drop']*SR); r0=int(bd['resume']*SR)
+    fo=int(0.25*SR); bed[d0-fo:d0]*=np.linspace(1,0,fo); bed[d0:r0]=0
+    ri=int(1.5*SR); bed[r0:r0+ri]*=np.linspace(0,1,ri); bed[r0:]*=10**(bd.get('after_db',-4)/20)
+    mix=mix+bed
 gaps=[(g0,g1) for g0,g1 in cfg.get('silence',[])]
 for g0,g1 in gaps: room[int(g0*SR):int(g1*SR)]=0; mix[int(g0*SR):int(g1*SR)]*=0
 mix=(mix+room)[:int(total*SR)]
