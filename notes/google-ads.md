@@ -122,3 +122,13 @@ Judge Google orders by gclid / Google Ads shopping_performance_view conversions 
 - 2026-11-20 04:25 Cairo 2h check: paused (daily cap), awaiting owner on Friday restart; resume task set for 23:05.
 - 2026-11-20 09:25 Cairo (owner: run today from 10am, fix campaign, use Meta videos): campaign ENABLED (schedule 10:00-23:00 Cairo); Fri cap 75 SAR (owner allowed fresh 40). Diagnosis Nov 19-20: 81.5 SAR all on Search/Shopping, 31 clicks (~2.6 SAR/click), 0 conv; Full Catalog 59.3 SAR (much on cheap accessories/bags), Bags 10.5. Fix: paused asset groups Bags and Accessories, Tops and Shirts, Dresses; Full Catalog now excludes accessories, bags, beach sets. Meta ad videos via API are 720p only (rule needs 1080): asked owner's ads session (session_01EYie83FamYRgi2JAypoXTP) to upload its 1080 silent originals to YouTube and link to Jackets + Full Catalog. Suggest to owner: lower target ROAS 310% if delivery stays poor.
 - 2026-11-20 owner approved: target ROAS 310% -> 200%.
+
+## 2026-11-20 - Owner videos added to PMax (owner approved in Meta chat; request from Google chat)
+Silent 1080x1920 owner originals uploaded UNLISTED via YouTubeVideoUploadService (all PROCESSED), YOUTUBE_VIDEO assets linked:
+- Embroidered Suede Jacket (31.5s) 7MHNr-NzMAo asset 441191421455 -> Jackets 6775429208 + Full Catalog 6761615488
+- Embroidered Suede Jacket reel (13.7s) aOme2odxEyQ asset 441368275710 -> both
+- Polka Dot Denim Jacket (8.5s) A_ZBj2BA3hg asset 441368280843 -> both
+- Embroidered Suede Jacket walk (8s) G0GM2eh-FTo asset 441295334299 -> both
+- Colorful Abstract Print Shirt (13.3s) qUBvdeTlwxs asset 441191427698 -> Full Catalog only
+- Colorful Abstract Print Shirt walk (9s) qa8z8YCVE0o asset 441368296404 -> Full Catalog only
+Floral jacket and navy set excluded (sold out). Each item is 1 piece: remove its video when it sells.
