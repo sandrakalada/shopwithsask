@@ -457,3 +457,9 @@ Ad set 52564336749720 in R2 campaign 52563885256720, 120/day, ADD_TO_CART, value
 - 2026-11-20 05:35 Cairo check: new account day, 25 EGP so far; R2 3 ATC. No new orders. Stock unchanged.
 - 2026-11-20 08:35 Cairo check: 93 EGP today; R2 3 ATC / 30, Jackets 0 / 47, AB A 0 / 9, iOS 0 / 8. No new orders. Stock unchanged.
 - 2026-11-20 11:35 Cairo check: 252 EGP today. R2 3 ATC / 58; Jackets 1 / 95; iOS 1 ATC + 1 checkout / 39; AB A 0 / 59. No orders today yet. Stock unchanged. Nothing paused.
+
+## 2026-11-20 - High-stock items added (owner: "add more in the same ad sets with my items that have the highest in stock varieties")
+IG post creatives -> product pages, added to JACKETS, R2, iOS and AB A (AB A skips items it already had): Boho Patchwork Skirt (post 18394130632199005, creative 2198187307576244), Yellow Star Print Layered Skirt (18099487298217659 / 1148622858087549), Light Blue Polka Dot Skirt (17896916715510344 / 1890866078593720), Boho Maxi Skirt (17903344440562057 / 1124815517206809), Color Block Collared Shirt (17907275031327307 / 1638824327978960), Black Polka Dot Long Sleeve Shirt (18593775148020446 / 1150094657753154), Asymmetric Black Ruffle Skirt (18133243672637986 / 1013709917741960), Sleeveless Velvet Buttoned Top (17940325842153129 / 1670143981470259). Log: scratchpad highstock_ads.json.
+Skipped: Colorblock Floral Patchwork Shirt (post has >10 slides, API refuses), black polka lace maxi skirt / black ruffled high-low skirt / brown polka midi (post photos under 1080 px), crochet vest (post may show a different colour), summer pieces (sundresses, beach sets, one-shoulder dress).
+JACKETS hit Meta's 50-ad limit: archived its 19 paused ads (old store-track, navy, floral) to make room.
+2026-11-20 16:00 Cairo check: 508 EGP today; R2 6 ATC / 173; Jackets 3 / 177; iOS 1 ATC + 1 checkout / 74; AB A 0 / 84. No orders today yet. Stock unchanged.
