@@ -136,3 +136,4 @@ Floral jacket and navy set excluded (sold out). Each item is 1 piece: remove its
 - 2026-11-20 12:25 Cairo 2h check: today 53.7 SAR (about 19 since 10:00), 19 clicks, 0 conv; no new orders since #1394 (Nov 19, Meta). Under Fri 75 cap. No change.
 - 2026-11-20 16:00 Cairo check: today 61.3 SAR (about 26.5 since 10:00), 23 clicks, 0 conv; no orders today. Under Fri 75 cap.
 - 2026-11-20 16:25 Cairo 2h check: today 61.3 SAR, 23 clicks, 0 conv, no new orders. No change.
+- 2026-11-20 18:25 Cairo 2h check: Google today 61.3 SAR (no new spend since 16:00), 23 clicks, 0 conv. New order #1395 1,005 EGP Colorblock Windbreaker Jacket from Meta ad (campaign 52563728051920, ad 52563754937920).
