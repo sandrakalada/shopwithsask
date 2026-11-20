@@ -456,3 +456,4 @@ Ad set 52564336749720 in R2 campaign 52563885256720, 120/day, ADD_TO_CART, value
 - 2026-11-20 02:35 Cairo check (account day Nov 19): 1,025 EGP. AB A 21 ATC / 122 (5.8/ATC, best); Jackets 10 ATC / 468; R2 6 ATC + #1394 / 326; iOS 2 ATC / 107 (54/ATC, same as R2 avg; CPM 269). No new orders. Stock unchanged. Nothing paused.
 - 2026-11-20 05:35 Cairo check: new account day, 25 EGP so far; R2 3 ATC. No new orders. Stock unchanged.
 - 2026-11-20 08:35 Cairo check: 93 EGP today; R2 3 ATC / 30, Jackets 0 / 47, AB A 0 / 9, iOS 0 / 8. No new orders. Stock unchanged.
+- 2026-11-20 11:35 Cairo check: 252 EGP today. R2 3 ATC / 58; Jackets 1 / 95; iOS 1 ATC + 1 checkout / 39; AB A 0 / 59. No orders today yet. Stock unchanged. Nothing paused.
