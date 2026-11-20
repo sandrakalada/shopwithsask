@@ -134,3 +134,4 @@ Silent 1080x1920 owner originals uploaded UNLISTED via YouTubeVideoUploadService
 Floral jacket and navy set excluded (sold out). Each item is 1 piece: remove its video when it sells.
 - 2026-11-20 10:25 Cairo 2h check: today 37.9 SAR (34.8 overnight + 3.1 since 10:00), 15 clicks, 0 conv; no new orders. Under Fri 75 cap. No change.
 - 2026-11-20 12:25 Cairo 2h check: today 53.7 SAR (about 19 since 10:00), 19 clicks, 0 conv; no new orders since #1394 (Nov 19, Meta). Under Fri 75 cap. No change.
+- 2026-11-20 16:00 Cairo check: today 61.3 SAR (about 26.5 since 10:00), 23 clicks, 0 conv; no orders today. Under Fri 75 cap.
