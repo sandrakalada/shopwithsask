@@ -132,3 +132,4 @@ Silent 1080x1920 owner originals uploaded UNLISTED via YouTubeVideoUploadService
 - Colorful Abstract Print Shirt (13.3s) qUBvdeTlwxs asset 441191427698 -> Full Catalog only
 - Colorful Abstract Print Shirt walk (9s) qa8z8YCVE0o asset 441368296404 -> Full Catalog only
 Floral jacket and navy set excluded (sold out). Each item is 1 piece: remove its video when it sells.
+- 2026-11-20 10:25 Cairo 2h check: today 37.9 SAR (34.8 overnight + 3.1 since 10:00), 15 clicks, 0 conv; no new orders. Under Fri 75 cap. No change.
