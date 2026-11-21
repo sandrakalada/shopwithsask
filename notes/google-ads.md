@@ -134,5 +134,13 @@ Silent 1080x1920 owner originals uploaded UNLISTED via YouTubeVideoUploadService
 Floral jacket and navy set excluded (sold out). Each item is 1 piece: remove its video when it sells.
 - 2026-11-20 10:25 Cairo 2h check: today 37.9 SAR (34.8 overnight + 3.1 since 10:00), 15 clicks, 0 conv; no new orders. Under Fri 75 cap. No change.
 - 2026-11-20 12:25 Cairo 2h check: today 53.7 SAR (about 19 since 10:00), 19 clicks, 0 conv; no new orders since #1394 (Nov 19, Meta). Under Fri 75 cap. No change.
-2026-11-20 daily report: PMax-2 ENABLED again (API, Nov 19 19:24 Riyadh), budget 56 SAR/day, campaign goal still "Real purchases (Shopify)". Nov 19 (partial day): 48.5 SAR, 19 clicks, 5,357 impr, 0 purchases. Nov 20 so far 57.1 SAR, 22 clicks, 0 purchases. No Google-attributed Shopify order yet. All changes since were API (other session: assets/videos). Rec subscriptions PAUSED; no disapprovals.
-2026-11-20 13:00 Cairo (owner in daily-report chat: 'Too high, control spend, cap at 40 SAR'): PMax-2 budget 56 -> 40 SAR/day. Any weekend/Friday cap above 40 is cancelled; do not raise without the owner.
+- 2026-11-20 16:00 Cairo check: today 61.3 SAR (about 26.5 since 10:00), 23 clicks, 0 conv; no orders today. Under Fri 75 cap.
+- 2026-11-20 16:25 Cairo 2h check: today 61.3 SAR, 23 clicks, 0 conv, no new orders. No change.
+- 2026-11-20 18:25 Cairo 2h check: Google today 61.3 SAR (no new spend since 16:00), 23 clicks, 0 conv. New order #1395 1,005 EGP Colorblock Windbreaker Jacket from Meta ad (campaign 52563728051920, ad 52563754937920).
+- 2026-11-20 20:25 Cairo 2h check: Google still 61.3 SAR today, no spend since 16:00 (tROAS 200 + paused groups likely limiting). Orders today #1395 (Meta), #1396 (direct). No change.
+- 2026-11-20 22:25 Cairo 2h check: today 61.3 SAR (no spend since ~16:00, under 75 cap), 23 clicks, 0 conv; Nov 19-20 109.8 SAR. Added 11 junk negatives (تونس, discount code, lingerie, key chain, 9k gold, ذهب, koya silver, بيجامات, carin home, pixi shoes, حلق طبي; 86 total). Video items in stock (suede jacket 1, polka denim 1, abstract shirt 1). #1396 Velvet Buttoned Vest 795 EGP came from Google (google.com referrer, no gclid/utm: likely free listing). Targeting unchanged.
+- 2026-11-21 00:25 Cairo 2h check: Nov 20 closed at 61.3 SAR, 23 clicks, 0 conv; Nov 21 no spend yet (schedule starts 10:00 Cairo). No new orders. No change.
+- 2026-11-21 02:25 Cairo 2h check: outside ad hours, no spend today, no new orders. No change.
+- 2026-11-21 04:25 Cairo 2h check: outside ad hours, no spend, no new orders. No change.
+- 2026-11-21 06:25 Cairo 2h check: outside ad hours, no spend, new order #1397 Light Blue Bomber Jacket with Red Heart Patch 1,115 EGP from Meta (campaign 52563885256720). Google unchanged.
+2026-11-21 daily report: PMax-2 ENABLED, budget 40 SAR (owner cap from Nov 20 13:00 Cairo). Nov 20 61.3 SAR (mostly before the cap), 23 clicks; Nov 21 44.6 SAR so far, 11 clicks. 0 Google-attributed Shopify orders since restart (~150 SAR). Campaign goal unchanged; rec subscriptions PAUSED; no non-API changes; no disapprovals.
