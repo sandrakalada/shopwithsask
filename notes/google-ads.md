@@ -143,3 +143,4 @@ Floral jacket and navy set excluded (sold out). Each item is 1 piece: remove its
 - 2026-11-21 02:25 Cairo 2h check: outside ad hours, no spend today, no new orders. No change.
 - 2026-11-21 04:25 Cairo 2h check: outside ad hours, no spend, no new orders. No change.
 - 2026-11-21 06:25 Cairo 2h check: outside ad hours, no spend, new order #1397 Light Blue Bomber Jacket with Red Heart Patch 1,115 EGP from Meta (campaign 52563885256720). Google unchanged.
+- 2026-11-21 23:00 Cairo (checks 08:25-22:25 missed: session restarts): Sat Nov 21 (Riyadh) 44.6 SAR, 11 clicks, 0 conv (4.6 over 40 cap, missed while down; Sunday Riyadh day has no ad hours before the 00:05 stop). Since start 154.5 SAR, 0 Google orders. Orders today all Meta: #1397 heart-patch bomber 1,115, #1398 Colorblock Windbreaker 1,030, #1399 Floral Vintage Vest 1,125. Product details check: complete.
