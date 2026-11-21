@@ -144,3 +144,4 @@ Floral jacket and navy set excluded (sold out). Each item is 1 piece: remove its
 - 2026-11-21 04:25 Cairo 2h check: outside ad hours, no spend, no new orders. No change.
 - 2026-11-21 06:25 Cairo 2h check: outside ad hours, no spend, new order #1397 Light Blue Bomber Jacket with Red Heart Patch 1,115 EGP from Meta (campaign 52563885256720). Google unchanged.
 2026-11-21 daily report: PMax-2 ENABLED, budget 40 SAR (owner cap from Nov 20 13:00 Cairo). Nov 20 61.3 SAR (mostly before the cap), 23 clicks; Nov 21 44.6 SAR so far, 11 clicks. 0 Google-attributed Shopify orders since restart (~150 SAR). Campaign goal unchanged; rec subscriptions PAUSED; no non-API changes; no disapprovals.
+2026-11-21 23:10 Cairo (owner: 'Pause both'): Meta iOS HIGH-END ad set 52564336749720 PAUSED (119 EGP/1 cart on Nov 20); Google PMax-2 24362293653 PAUSED (~150 SAR since Nov 19 restart, 0 orders). Do not restart without the owner.
