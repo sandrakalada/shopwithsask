@@ -142,4 +142,4 @@ Floral jacket and navy set excluded (sold out). Each item is 1 piece: remove its
 - 2026-11-21 00:25 Cairo 2h check: Nov 20 closed at 61.3 SAR, 23 clicks, 0 conv; Nov 21 no spend yet (schedule starts 10:00 Cairo). No new orders. No change.
 - 2026-11-21 02:25 Cairo 2h check: outside ad hours, no spend today, no new orders. No change.
 - 2026-11-21 04:25 Cairo 2h check: outside ad hours, no spend, no new orders. No change.
-- 2026-11-21 06:25 Cairo 2h check: outside ad hours, no spend, no new orders. No change.
+- 2026-11-21 06:25 Cairo 2h check: outside ad hours, no spend, new order #1397 Light Blue Bomber Jacket with Red Heart Patch 1,115 EGP from Meta (campaign 52563885256720). Google unchanged.
