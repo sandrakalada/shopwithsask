@@ -249,6 +249,17 @@ export function startSync() {
     if (document.visibilityState === "visible") void syncNow();
   }, 60_000);
   requestSync(100);
+  listenLive();
+}
+
+/** Instant updates: any change in the database (new order, stock moved on another phone,
+ * a Shopify webhook) triggers a sync within a second instead of waiting for the next minute. */
+function listenLive() {
+  if (!supabase) return;
+  const ch = supabase.channel("live-changes");
+  for (const table of ["orders", "variants", "stock_movements", "products", "customers", "invoices"])
+    ch.on("postgres_changes", { event: "*", schema: "public", table }, () => requestSync(800));
+  ch.subscribe();
 }
 
 /** Wipe local data (used on sign-out). Pending changes are lost, so callers confirm first. */

@@ -66,7 +66,7 @@ export default function Orders() {
           <input className="field pl-10" placeholder="Order number, name or phone" value={q} onChange={(e) => setQ(e.target.value)} type="search" />
         </label>
         <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4">
-          {([["all", "All"], ["open", "To ship"], ["unpaid", "Unpaid"], ["fulfilled", "Fulfilled"], ["cancelled", "Cancelled"]] as [F, string][]).map(([k, l]) => (
+          {(role === "shipping" ? ([["open", "To ship"], ["all", "All"]] as [F, string][]) : ([["all", "All"], ["open", "To ship"], ["unpaid", "Unpaid"], ["fulfilled", "Fulfilled"], ["cancelled", "Cancelled"]] as [F, string][])).map(([k, l]) => (
             <button key={k} onClick={() => setF(k)} className={`shrink-0 rounded-full border px-3 py-1.5 text-sm ${f === k ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
               {l}
             </button>
@@ -79,7 +79,7 @@ export default function Orders() {
               <Link href={`/order?id=${o.id}`} className="block px-4 py-3 active:bg-sand">
                 <div className="flex items-baseline justify-between gap-3">
                   <p className="font-semibold">{o.name}</p>
-                  <p className="text-sm font-semibold">{egp(o.total)}</p>
+                  {role !== "shipping" && <p className="text-sm font-semibold">{egp(o.total)}</p>}
                 </div>
                 <div className="mt-0.5 flex items-center justify-between gap-3">
                   <p className="truncate text-sm text-taupe">{orderCustomerName(o)}</p>

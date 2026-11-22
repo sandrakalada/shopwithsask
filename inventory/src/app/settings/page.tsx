@@ -150,13 +150,6 @@ export default function Settings() {
           <button className="btn-light w-full" onClick={exportStock}>Export stock list (CSV)</button>
         </section>
 
-        <section className="card p-4 text-sm">
-          <p className="font-semibold">Install on iPhone</p>
-          <p className="mt-1 text-taupe">
-            Open sask-inventory.vercel.app in Safari, tap Share, then Add to Home Screen. Open it once while online so it is saved for offline use.
-          </p>
-        </section>
-
         <button className="btn-light w-full text-red-700" onClick={signOut}>Sign out</button>
       </main>
     </>

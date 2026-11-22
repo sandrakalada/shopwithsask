@@ -59,6 +59,36 @@ function OrderView() {
   if (order === undefined) return <Header title="" back />;
   if (!order) return (<><Header title="Order" back /><p className="p-4 text-sm text-taupe">This order is not on this phone yet.</p></>);
 
+  if (shippingOnly) {
+    // labels-only account: the label and the two print buttons, nothing else
+    return (
+      <>
+        <Header title={order.name} back />
+        <main className="space-y-4 p-4">
+          <div className="grid grid-cols-2 gap-2">
+            <button className="btn-dark py-4" disabled={!label} onClick={() => label && printImages([label.url], 100, 150)}>
+              <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
+            </button>
+            <button className="btn-light py-4" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
+              Share label
+            </button>
+          </div>
+          {label ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={label.url} alt="Shipping label preview" className="mx-auto w-full max-w-sm rounded-xl border border-line" />
+          ) : (
+            <div className="mx-auto aspect-[2/3] w-full max-w-sm animate-pulse rounded-xl bg-sand" />
+          )}
+        </main>
+        {assets && (
+          <div style={{ position: "fixed", left: -10000, top: 0 }} aria-hidden>
+            <ShippingLabel ref={labelRef} order={order} store={assets.store} qr={assets.qr} barcode={assets.barcode} logo="/brand-wordmark.png" />
+          </div>
+        )}
+      </>
+    );
+  }
+
   const phone = orderPhone(order);
   const name = orderCustomerName(order);
   const msg = `Hi ${name.split(" ")[0]}, this is Shop With Sask about your order ${order.name}.`;

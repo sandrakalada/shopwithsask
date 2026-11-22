@@ -77,22 +77,6 @@ export default function Login({ onUnlock }: { onUnlock?: () => void }) {
           {busy ? "Signing in" : "Sign in"}
         </button>
       </form>
-      <InstallHint />
     </main>
-  );
-}
-
-function InstallHint() {
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
-    const standalone = (navigator as Navigator & { standalone?: boolean }).standalone || matchMedia("(display-mode: standalone)").matches;
-    setShow(ios && !standalone);
-  }, []);
-  if (!show) return null;
-  return (
-    <p className="mt-8 rounded-xl bg-sand p-3 text-center text-xs text-taupe">
-      Install the app: tap Share at the bottom of Safari, then Add to Home Screen.
-    </p>
   );
 }

@@ -79,7 +79,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     }
     if (navigator.storage?.persist) void navigator.storage.persist();
     if (!supabase) return;
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      // pick up role changes (e.g. an account switched to labels-only) as soon as the app opens
+      if (data.session && navigator.onLine) void supabase!.auth.refreshSession().catch(() => {});
+    });
     const { data } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);
       if (event === "SIGNED_IN") setLocked(false); // just signed in with password or Face ID
@@ -88,7 +92,16 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (session) startSync();
+    if (!session) return;
+    if (session.user.app_metadata?.role === "shipping") {
+      // labels-only: keep no product, customer or invoice data on this phone
+      void Promise.all([
+        db.products.clear(), db.variants.clear(), db.customers.clear(), db.invoices.clear(), db.movements.clear(),
+        // forget download positions so the data comes back if the account gets full access again
+        db.meta.bulkDelete(["cursor:products", "cursor:variants", "cursor:movements", "cursor:customers", "cursor:invoices"]),
+      ]);
+    }
+    startSync();
   }, [session]);
 
   // Face ID lock: on opening the app, and after 5 minutes in the background

@@ -7,7 +7,6 @@ import { costInEgp, reasonLabel, variantLabel } from "@/lib/stock";
 import { Header, timeAgo, VariantRow } from "@/components/ui";
 import { egp } from "@/lib/pdf";
 import { ChartIcon, GearIcon, PlusIcon, ScanIcon } from "@/components/Icons";
-import FaceIdOffer from "@/components/FaceIdOffer";
 
 
 export default function Home() {
@@ -50,7 +49,6 @@ export default function Home() {
         }
       />
       <main className="space-y-5 p-4">
-        <FaceIdOffer />
         <div className="grid grid-cols-2 gap-3">
           <Stat label="Products in stock" value={data ? data.productsInStock.toLocaleString() : "–"} />
           <Stat label="Pieces in stock" value={data ? data.units.toLocaleString() : "–"} />
