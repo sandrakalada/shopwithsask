@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/lib/db";
+import { db, WRITE_OFF } from "@/lib/db";
+import { productMatcher } from "@/lib/lines";
 import { costInEgp } from "@/lib/stock";
 import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
@@ -40,9 +41,46 @@ export default function Home() {
     const yearStart = new Date(new Date().getFullYear(), 0, 1).toISOString();
     // real revenue = orders that are fulfilled AND paid
     const real = orders.filter((o) => !o.cancelled_at && o.fulfillment_status === "FULFILLED" && o.financial_status === "PAID");
-    const sum = (list: typeof real) => ({ total: list.reduce((t, o) => t + Number(o.total ?? 0), 0), count: list.length });
-    const mtd = sum(real.filter((o) => o.created_at >= monthStart));
-    const ytd = sum(real.filter((o) => o.created_at >= yearStart));
+    // purchase cost of each sold line: its size's cost, or the product's average cost for old orders
+    const byShopify = new Map(variants.filter((v) => v.shopify_variant_id).map((v) => [v.shopify_variant_id!, v]));
+    const avgByProduct = new Map<string, number>();
+    for (const p of products) {
+      const cs = variants.filter((v) => v.product_id === p.id).map((v) => costInEgp(v, rate)).filter((c): c is number => c != null);
+      if (cs.length) avgByProduct.set(p.id, cs.reduce((a, b) => a + b, 0) / cs.length);
+    }
+    const match = productMatcher(products);
+    const lineCost = (l: (typeof orders)[number]["line_items"][number]) => {
+      const v = l.shopify_variant_id ? byShopify.get(l.shopify_variant_id) : undefined;
+      const c = v ? costInEgp(v, rate) : null;
+      if (c != null) return c * l.quantity;
+      const pid = v?.product_id ?? match(l.title).product?.id;
+      const a = pid ? avgByProduct.get(pid) : undefined;
+      return a != null ? a * l.quantity : null;
+    };
+    const writeOffs = (await db.movements.toArray()).filter((m) => WRITE_OFF.includes(m.reason));
+    const vmap = new Map(variants.map((v) => [v.id, v]));
+    const sum = (since: string) => {
+      const list = real.filter((o) => o.created_at >= since);
+      let items = 0, cost = 0, noCost = 0;
+      for (const o of list) {
+        items += Number(o.subtotal ?? 0) - Number(o.discounts ?? 0);
+        for (const l of o.line_items) {
+          const c = lineCost(l);
+          if (c == null) noCost += l.quantity;
+          else cost += c;
+        }
+      }
+      const lost = writeOffs.filter((m) => m.created_at >= since).reduce((t, m) => t + -m.delta * (costInEgp(vmap.get(m.variant_id) ?? {}, rate) ?? 0), 0);
+      return {
+        total: list.reduce((t, o) => t + Number(o.total ?? 0), 0),
+        count: list.length,
+        allOrders: orders.filter((o) => !o.cancelled_at && o.created_at >= since).length,
+        profit: items - cost - lost,
+        noCost,
+      };
+    };
+    const mtd = sum(monthStart);
+    const ytd = sum(yearStart);
     return {
       products: new Set(inStock.map((v) => v.product_id)).size,
       pieces: inStock.reduce((s, v) => s + v.quantity, 0),
@@ -83,7 +121,7 @@ export default function Home() {
             <SalesRow label="Month to date" sub={new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" })} data={data?.mtd} />
             <SalesRow label="Year to date" sub={String(new Date().getFullYear())} data={data?.ytd} />
           </div>
-          <p className="mt-1.5 px-1 text-[12px] text-taupe">Delivered and paid orders only.</p>
+          <p className="mt-1.5 px-1 text-[12px] text-taupe">Sales and net profit: delivered and paid orders only. Net profit = items sold minus purchase cost and write-offs (delivery fees not counted). Total orders includes all orders not cancelled.</p>
         </section>
       </main>
     </>
@@ -100,17 +138,28 @@ function Tile({ href, label, value, sub }: { href: string; label: string; value:
   );
 }
 
-function SalesRow({ label, sub, data }: { label: string; sub: string; data?: { total: number; count: number } }) {
+function SalesRow({ label, sub, data }: { label: string; sub: string; data?: { total: number; count: number; allOrders: number; profit: number; noCost: number } }) {
   return (
-    <Link href="/items?view=top" className="row justify-between hover:bg-sand/50 lg:px-5 lg:py-4">
-      <div>
+    <Link href="/items?view=top" className="block px-4 py-3 hover:bg-sand/50 lg:px-5 lg:py-4">
+      <div className="flex items-baseline justify-between">
         <p className="text-[15px] font-medium">{label}</p>
         <p className="text-[12px] text-taupe">{sub}</p>
       </div>
-      <div className="text-right">
-        <p className="text-[17px] font-semibold">{data ? egp(data.total) : "–"}</p>
-        <p className="text-[12px] text-taupe">{data ? `${data.count} ${data.count === 1 ? "order" : "orders"}` : ""}</p>
+      <div className="mt-2 grid grid-cols-3 gap-2">
+        <Cell k="Sales" v={data ? egp(data.total) : "–"} />
+        <Cell k="Total orders" v={data ? String(data.allOrders) : "–"} sub={data ? `${data.count} delivered` : ""} />
+        <Cell k="Net profit" v={data ? egp(data.profit) : "–"} tone={data && data.profit < 0 ? "text-danger" : "text-success"} sub={data?.noCost ? `${data.noCost} pcs no cost` : ""} />
       </div>
     </Link>
+  );
+}
+
+function Cell({ k, v, sub, tone = "" }: { k: string; v: string; sub?: string; tone?: string }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-[12px] text-taupe">{k}</p>
+      <p className={`truncate text-[16px] font-semibold ${tone}`}>{v}</p>
+      {sub && <p className="truncate text-[11px] text-taupe">{sub}</p>}
+    </div>
   );
 }

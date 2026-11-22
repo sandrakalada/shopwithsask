@@ -60,6 +60,16 @@ export default function ScanPage() {
       if (code === last.current.code && now - last.current.t < 2000) return;
       last.current = { code, t: now };
 
+      // shipment tracking (manual parcels SWM..., or a courier number typed in a shipment); QR is "name tracking"
+      for (const t of new Set([code, ...code.split(/\s+/)].filter((x) => x.length >= 6))) {
+        const sh = await db.shipments.filter((x) => x.tracking.toUpperCase() === t.toUpperCase()).first();
+        if (sh) {
+          beep(true);
+          router.push(`/shipment?id=${sh.id}`);
+          return;
+        }
+      }
+
       // shipping label: barcode "SWS1397" (order number, up to 6 digits) or QR "#1397 SWS1397"
       const orderNo = /#(\d{3,7})/.exec(code)?.[1] ?? /^SWS(\d{3,6})$/i.exec(code)?.[1];
       if (orderNo) {

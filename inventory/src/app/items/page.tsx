@@ -183,7 +183,7 @@ function Inventory() {
             <li key={p.id} className="card overflow-hidden">
               <div className="flex items-center gap-2 pr-4 pt-3">
                 <Link href={assign ? "#" : `/item?id=${p.id}`} onClick={(e) => assign && e.preventDefault()} className="flex min-w-0 flex-1 items-center gap-3 pl-4 active:opacity-70">
-                  <Thumb src={p.image_url} size={40} />
+                  <Thumb src={p.image_url} size={40} zoom={p.images?.length ? p.images : true} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[15px] font-semibold">{p.title}</p>
                     <p className="truncate text-[13px] text-taupe">{[p.product_type, p.location].filter(Boolean).join(" · ")}</p>
@@ -214,7 +214,10 @@ function Inventory() {
                         <p className="text-[15px]">{variantLabel(v.title)}</p>
                         <p className={`truncate text-[12px] ${v.sku ? "text-taupe" : "text-warn"}`}>{v.sku ?? "No SKU yet"}</p>
                       </div>
-                      <Stepper value={v.quantity + pendingDelta(pend, v.id)} highlight={!!pendingDelta(pend, v.id)} label={variantLabel(v.title)} onChange={(d) => quick(v, p, d)} />
+                      <div className="text-right">
+                        <p className="text-[15px] font-semibold">{v.price != null ? egp(v.price) : "-"}</p>
+                        <p className={`text-[12px] ${v.quantity > 0 ? "text-taupe" : "text-danger"}`}>{v.quantity > 0 ? `${v.quantity} in stock` : "Sold out"}</p>
+                      </div>
                     </div>
                   ) : (
                     <CostRow key={v.id} v={v} rate={data!.rate} />

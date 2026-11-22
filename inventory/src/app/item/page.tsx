@@ -30,6 +30,7 @@ function Item() {
   );
   const [sheet, setSheet] = useState<{ v: Variant; r: Reason } | null>(null);
   const [edit, setEdit] = useState<Variant | "new" | "product" | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const pend = usePending();
 
@@ -46,11 +47,19 @@ function Item() {
 
   return (
     <>
-      <Header title={product.title} back />
-      <main className="space-y-5 p-4 lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-6 lg:space-y-0">
+      <Header
+        title={product.title}
+        back
+        right={
+          <button onClick={() => setShowHistory(true)} className="flex h-10 w-10 items-center justify-center rounded-full text-taupe active:bg-sand" aria-label="Stock history">
+            <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+          </button>
+        }
+      />
+      <main className="space-y-5 p-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0">
         <div className="space-y-5">
         <div className="flex gap-4">
-          <Thumb src={product.image_url} size={96} />
+          <Thumb src={product.image_url} size={96} zoom={product.images?.length ? product.images : true} />
           <div className="min-w-0 flex-1">
             <p className="text-sm text-taupe">{product.product_type ?? "No type"}</p>
             <p className="mt-1 text-3xl font-semibold">{total}</p>
@@ -130,26 +139,27 @@ function Item() {
         <SkuByColour variants={live} />
         </div>
 
-        <section className="lg:sticky lg:top-24">
-          <h2 className="mb-2 font-semibold">History</h2>
-          <ul className="card divide-y divide-line">
-            {moves.map((m) => {
-              const v = variants.find((x) => x.id === m.variant_id);
-              return (
-                <li key={m.id} className="flex items-center gap-3 px-4 py-2.5 text-sm">
-                  <span className={`w-10 text-right font-semibold ${m.delta > 0 ? "text-emerald-700" : "text-red-700"}`}>{m.delta > 0 ? `+${m.delta}` : m.delta}</span>
-                  <div className="min-w-0 flex-1">
-                    <p>{reasonLabel(m.reason)} · {v ? variantLabel(v.title) : ""}</p>
-                    <p className="truncate text-xs text-taupe">{timeAgo(m.created_at)}{m.note ? ` · ${m.note}` : ""}{m.pending ? " · waiting to sync" : ""}</p>
-                  </div>
-                </li>
-              );
-            })}
-            {moves.length === 0 && <li className="p-4 text-sm text-taupe">No changes recorded yet.</li>}
-          </ul>
-        </section>
       </main>
 
+      {showHistory && (
+        <Sheet title="Stock history" onClose={() => setShowHistory(false)}>
+          <ul className="card divide-y divide-line">
+              {moves.map((m) => {
+                const v = variants.find((x) => x.id === m.variant_id);
+                return (
+                  <li key={m.id} className="flex items-center gap-3 px-4 py-2.5 text-sm">
+                    <span className={`w-10 text-right font-semibold ${m.delta > 0 ? "text-emerald-700" : "text-red-700"}`}>{m.delta > 0 ? `+${m.delta}` : m.delta}</span>
+                    <div className="min-w-0 flex-1">
+                      <p>{reasonLabel(m.reason)} · {v ? variantLabel(v.title) : ""}</p>
+                      <p className="truncate text-xs text-taupe">{timeAgo(m.created_at)}{m.note ? ` · ${m.note}` : ""}{m.pending ? " · waiting to sync" : ""}</p>
+                    </div>
+                  </li>
+                );
+              })}
+              {moves.length === 0 && <li className="p-4 text-sm text-taupe">No changes recorded yet.</li>}
+            </ul>
+        </Sheet>
+      )}
       {sheet && <AdjustSheet variant={variants.find((v) => v.id === sheet.v.id) ?? sheet.v} product={product} initialReason={sheet.r} onClose={() => setSheet(null)} />}
       {edit === "product" && <ProductForm product={product} onClose={() => setEdit(null)} />}
       {edit && edit !== "product" && <VariantForm productId={product.id} variant={edit === "new" ? null : edit} onClose={() => setEdit(null)} />}

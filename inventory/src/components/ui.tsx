@@ -8,6 +8,7 @@ import { recordMovement, setCount, thumb, variantLabel } from "@/lib/stock";
 import { BackIcon, MinusIcon, PlusIcon } from "./Icons";
 import { SyncBadge } from "./Shell";
 import SideMenu from "./SideMenu";
+import Lightbox from "./Lightbox";
 
 export function Header({ title, back, right, logo }: { title: string; back?: boolean; right?: React.ReactNode; logo?: boolean }) {
   const router = useRouter();
@@ -38,11 +39,35 @@ export function Header({ title, back, right, logo }: { title: string; back?: boo
   );
 }
 
-export function Thumb({ src, size = 48 }: { src: string | null | undefined; size?: number }) {
+/** Product photo. With `zoom`, tapping it opens all the photos full screen. */
+export function Thumb({ src, size = 48, zoom }: { src: string | null | undefined; size?: number; zoom?: string[] | true }) {
+  const [open, setOpen] = useState(false);
   const t = thumb(src, size * 3);
-  return t ? (
+  const imgs = zoom === true ? (src ? [src] : []) : zoom?.length ? zoom : src ? [src] : [];
+  const img = t ? (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={t} alt="" width={size} height={size * (4 / 3)} className="shrink-0 rounded-[8px] bg-sand object-cover" style={{ width: size, height: size * (4 / 3) }} loading="lazy" />
+  ) : null;
+  if (img && zoom && imgs.length)
+    return (
+      <>
+        <button
+          type="button"
+          className="shrink-0 active:opacity-70"
+          aria-label="View photos"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(true);
+          }}
+        >
+          {img}
+        </button>
+        {open && <Lightbox images={imgs} start={Math.max(0, imgs.indexOf(src!))} onClose={() => setOpen(false)} />}
+      </>
+    );
+  return img ? (
+    img
   ) : (
     <div className="shrink-0 rounded-[8px] bg-sand" style={{ width: size, height: size * (4 / 3) }} />
   );

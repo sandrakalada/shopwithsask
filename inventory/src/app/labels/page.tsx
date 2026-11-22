@@ -215,7 +215,7 @@ function Labels() {
                   </svg>
                 )}
               </button>
-              <Thumb src={r.p.image_url} size={34} />
+              <Thumb src={r.p.image_url} size={44} zoom={r.p.images?.length ? r.p.images : true} />
               <button className="min-w-0 flex-1 text-left" onClick={() => set(r.key, { selected: !r.selected })}>
                 {r.img ? (
                   // eslint-disable-next-line @next/next/no-img-element

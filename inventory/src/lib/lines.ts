@@ -5,6 +5,13 @@ const isSize = (part: string) => part.split(/\s+/).every((w) => SIZE_WORD.test(w
 const STOP = new Set(["and", "with", "the", "a", "of", "&", "-"]);
 const words = (s: string) => s.toLowerCase().replace(/[^a-z0-9؀-ۿ]+/g, " ").split(" ").filter((w) => w && !STOP.has(w));
 
+/** Colour part of a size title like "Beige / Small" (null for "Medium"). */
+export function colourOf(variantTitle: string | null | undefined) {
+  if (!variantTitle) return null;
+  const parts = variantTitle.split("/").map((x) => x.trim()).filter(Boolean);
+  return parts.find((x) => !isSize(x)) ?? null;
+}
+
 /** Old orders (moved from the previous store) have plain titles like "Bohemian Desert Maxi Skirt (White, Medium)".
  * Splits that into the item name, its colour and its size. */
 export function parseLineTitle(title: string) {

@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { costInEgp } from "@/lib/stock";
-import { productMatcher } from "@/lib/lines";
+import { colourOf, parseLineTitle, productMatcher } from "@/lib/lines";
 import { egp } from "@/lib/pdf";
 import { Thumb } from "./ui";
 
@@ -31,8 +31,26 @@ export default function TopProducts() {
     const match = productMatcher(data.products);
     const costVariant = new Map<string, (typeof data.variants)[number]>();
     for (const v of data.variants) if (v.cost != null && !costVariant.has(v.product_id)) costVariant.set(v.product_id, v);
+    // products sold in several colours are ranked per colour (e.g. the maxi skirt in white, black and beige)
+    const coloursOf = new Map<string, Set<string>>();
+    for (const v of data.variants) {
+      const c = colourOf(v.title);
+      if (c) coloursOf.set(v.product_id, (coloursOf.get(v.product_id) ?? new Set()).add(c.toLowerCase()));
+    }
+    const multi = (pid?: string) => !!pid && (coloursOf.get(pid)?.size ?? 0) > 1;
+    // the old "Bohemian Desert Maxi Skirt" and its beige duplicate belong to the 3-colour skirt
+    const skirt = data.products.find((p) => /white, black & beige/i.test(p.title) && !p.archived);
+    const beigeDup = data.products.find((p) => /^bohemian desert maxi skirt - beige$/i.test(p.title));
     const stockByProduct = new Map<string, number>();
-    for (const v of data.variants) if (!v.archived) stockByProduct.set(v.product_id, (stockByProduct.get(v.product_id) ?? 0) + Math.max(0, v.quantity));
+    const stockByColour = new Map<string, number>();
+    for (const v of data.variants) {
+      if (v.archived) continue;
+      const pid = v.product_id;
+      const col = colourOf(v.title)?.toLowerCase() ?? null;
+      if (skirt && beigeDup && pid === beigeDup.id) continue; // duplicate of the skirt's beige sizes
+      stockByProduct.set(pid, (stockByProduct.get(pid) ?? 0) + Math.max(0, v.quantity));
+      if (multi(pid) && col) stockByColour.set(`${pid}|${col}`, (stockByColour.get(`${pid}|${col}`) ?? 0) + Math.max(0, v.quantity));
+    }
 
     const agg = new Map<string, { key: string; title: string; image: string | null; productId?: string; units: number; revenue: number; cost: number; costKnown: boolean; orders: Set<string> }>();
     for (const o of data.orders) {
@@ -43,11 +61,26 @@ export default function TopProducts() {
         const v = l.shopify_variant_id ? vByShopify.get(l.shopify_variant_id) : undefined;
         const guess = v ? null : match(l.title);
         const p = v ? pById.get(v.product_id) : guess!.product ?? undefined;
-        const key = p?.id ?? `t:${guess!.key}`;
-        const row = agg.get(key) ?? { key, title: p?.title ?? guess!.label, image: p?.image_url ?? l.image ?? null, productId: p?.id, units: 0, revenue: 0, cost: 0, costKnown: true, orders: new Set<string>() };
+        let prod = p;
+        let colour = v ? colourOf(v.title) : parseLineTitle(l.title).colour;
+        if (skirt && !v && /^bohemian desert maxi skirt/i.test(l.title)) {
+          prod = skirt;
+          colour = colour ?? "Beige";
+        }
+        if (skirt && beigeDup && prod?.id === beigeDup.id) {
+          prod = skirt;
+          colour = "Beige";
+        }
+        const split = multi(prod?.id) && colour;
+        const key = prod ? (split ? `${prod.id}|${colour!.toLowerCase()}` : prod.id) : `t:${guess!.key}`;
+        const title = prod ? (split ? `${prod.title.replace(/ in [^,]+,.*$/i, "")} - ${colour![0].toUpperCase()}${colour!.slice(1).toLowerCase()}` : prod.title) : guess!.label;
+        const row = agg.get(key) ?? { key, title, image: prod?.image_url ?? l.image ?? null, productId: prod?.id, units: 0, revenue: 0, cost: 0, costKnown: true, orders: new Set<string>() };
         row.units += l.quantity;
         row.revenue += Number(l.total ?? (l.price ?? 0) * l.quantity);
-        const cv = v ?? (p ? costVariant.get(p.id) : undefined);
+        const cv =
+          v ??
+          (prod && split ? data.variants.find((x) => x.product_id === prod!.id && x.cost != null && colourOf(x.title)?.toLowerCase() === colour!.toLowerCase()) : undefined) ??
+          (prod ? costVariant.get(prod.id) : undefined);
         const c = cv ? costInEgp(cv, data.rate) : null;
         if (c == null) row.costKnown = false;
         else row.cost += c * l.quantity;
@@ -57,7 +90,7 @@ export default function TopProducts() {
     }
     return [...agg.values()]
       .map((r) => {
-        const stock = r.productId ? stockByProduct.get(r.productId) ?? 0 : null;
+        const stock = r.productId ? (r.key.includes("|") ? stockByColour.get(r.key) ?? 0 : stockByProduct.get(r.productId) ?? 0) : null;
         const through = stock != null && r.units + stock > 0 ? Math.round((r.units / (r.units + stock)) * 100) : null;
         return { ...r, profit: r.costKnown ? r.revenue - r.cost : null, stock, through };
       })
