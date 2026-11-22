@@ -1,13 +1,13 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import QRCode from "qrcode";
 import { db, type Product, type Variant } from "@/lib/db";
 import { stickerLink, variantLabel } from "@/lib/stock";
-import { imagesToPdf, printFile, shareFile } from "@/lib/pdf";
-import { Header, Thumb } from "@/components/ui";
+import { imagesToPdf, preparePrint, printNow, shareFile } from "@/lib/pdf";
+import { Header, Stepper, Thumb } from "@/components/ui";
 import { PrintIcon } from "@/components/Icons";
 
 // Sticker: 50 x 30 mm. Drawn at 12 px per mm (600 x 360) for sharp thermal printing.
@@ -84,109 +84,149 @@ async function drawSticker(v: Variant, p: Product) {
   return c.toDataURL("image/png");
 }
 
+type Row = { key: string; v: Variant; p: Product; img: string | null; copies: number; selected: boolean };
+
 function Labels() {
   const params = useSearchParams();
   const productId = params.get("product");
   const variantId = params.get("variant");
   const [scope, setScope] = useState<"one" | "product" | "instock" | "all">(variantId ? "one" : productId ? "product" : "instock");
-  const [perStock, setPerStock] = useState(!variantId);
+  const [q, setQ] = useState("");
+  const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);
-  const [ready, setReady] = useState<{ key: string; images: string[]; pdf: Blob } | null>(null);
-  const [previews, setPreviews] = useState<{ img: string; v: Variant; p: Product; copies: number }[]>([]);
+  const [file, setFile] = useState<{ sig: string; pdf: Blob } | null>(null);
 
   const data = useLiveQuery(async () => {
     const [products, variants] = await Promise.all([db.products.toArray(), db.variants.toArray()]);
     return { pmap: new Map(products.map((p) => [p.id, p])), variants };
   }, []);
 
-  const labels = useMemo(() => {
-    if (!data) return [];
-    const list: { v: Variant; p: Product }[] = [];
+  // one row per size in scope; copies default to pieces in stock
+  useEffect(() => {
+    if (!data) return;
+    const list: Row[] = [];
     for (const v of data.variants) {
       const p = data.pmap.get(v.product_id);
       if (!p || v.archived || p.archived) continue;
       if (scope === "one" && v.id !== variantId) continue;
       if (scope === "product" && v.product_id !== productId) continue;
       if (scope === "instock" && v.quantity <= 0) continue;
-      const copies = perStock ? Math.max(1, v.quantity) : 1;
-      for (let i = 0; i < copies; i++) list.push({ v, p });
+      list.push({ key: `${v.id}|${v.sku}|${p.title}`, v, p, img: null, copies: Math.max(1, v.quantity), selected: scope === "one" || scope === "product" });
     }
-    return list.sort((a, b) => a.p.title.localeCompare(b.p.title) || a.v.title.localeCompare(b.v.title));
-  }, [data, scope, perStock, productId, variantId]);
+    list.sort((a, b) => a.p.title.localeCompare(b.p.title) || a.v.title.localeCompare(b.v.title));
+    setRows((old) => {
+      const prev = new Map(old.map((r) => [r.key, r]));
+      return list.map((r) => ({ ...r, ...(prev.get(r.key) ? { img: prev.get(r.key)!.img, copies: prev.get(r.key)!.copies, selected: prev.get(r.key)!.selected } : {}) }));
+    });
+  }, [data, scope, productId, variantId]);
 
-  const key = `${scope}|${perStock}|${labels.map((l) => l.v.id + l.v.sku).join(",")}`;
+  // draw sticker previews lazily (first 60 straight away, the rest in the background)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      for (const r of rows) {
+        if (cancelled) return;
+        if (r.img) continue;
+        const img = await drawSticker(r.v, r.p);
+        if (cancelled) return;
+        setRows((list) => list.map((x) => (x.key === r.key ? { ...x, img } : x)));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [rows.map((r) => r.key + (r.img ? "1" : "0")).join(",")]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function prepare() {
-    setBusy(true);
-    const cache = new Map<string, string>();
-    const images: string[] = [];
-    for (const { v, p } of labels.slice(0, 500)) {
-      if (!cache.has(v.id)) cache.set(v.id, await drawSticker(v, p));
-      images.push(cache.get(v.id)!);
-    }
-    const pdf = await imagesToPdf(images.map((url) => ({ url, ratio: H / W })), W, H);
-    setReady({ key, images, pdf });
-    // one preview row per size, with the product photo (shown in the app only, not printed)
-    const rows = new Map<string, { img: string; v: Variant; p: Product; copies: number }>();
-    for (const { v, p } of labels.slice(0, 500)) {
-      const r = rows.get(v.id);
-      if (r) r.copies++;
-      else rows.set(v.id, { img: cache.get(v.id)!, v, p, copies: 1 });
-    }
-    setPreviews([...rows.values()]);
-    setBusy(false);
-  }
+  const chosen = rows.filter((r) => r.selected);
+  const images = chosen.flatMap((r) => (r.img ? Array(r.copies).fill(r.img) : []));
+  const waitingImages = chosen.some((r) => !r.img);
+  const sig = chosen.map((r) => `${r.key}x${r.copies}`).join(",");
 
-  const isReady = ready?.key === key;
+  // keep the print sheet and the PDF ready so Print / Share open instantly on the tap
+  useEffect(() => {
+    if (waitingImages || !images.length) return;
+    preparePrint(images, W, H);
+    let cancelled = false;
+    const t = setTimeout(async () => {
+      setBusy(true);
+      const pdf = await imagesToPdf(images.map((url) => ({ url, ratio: H / W })), W, H);
+      if (!cancelled) setFile({ sig, pdf });
+      setBusy(false);
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [sig, waitingImages]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const term = q.trim().toLowerCase();
+  const visible = term ? rows.filter((r) => r.p.title.toLowerCase().includes(term) || (r.v.sku ?? "").toLowerCase().includes(term)) : rows;
+  const set = (key: string, patch: Partial<Row>) => setRows((list) => list.map((r) => (r.key === key ? { ...r, ...patch } : r)));
+  const ready = !!images.length && !waitingImages;
 
   return (
     <>
       <Header title="Barcode stickers" back />
-      <main className="space-y-3 p-4">
-        <div className="flex flex-wrap gap-2">
+      <main className="space-y-3 p-4 pb-40">
+        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
           {variantId && <Chip on={scope === "one"} onClick={() => setScope("one")}>This size</Chip>}
           {productId && <Chip on={scope === "product"} onClick={() => setScope("product")}>This item</Chip>}
-          <Chip on={scope === "instock"} onClick={() => setScope("instock")}>Everything in stock</Chip>
+          <Chip on={scope === "instock"} onClick={() => setScope("instock")}>In stock</Chip>
           <Chip on={scope === "all"} onClick={() => setScope("all")}>All items</Chip>
         </div>
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={perStock} onChange={(e) => setPerStock(e.target.checked)} /> One sticker per piece in stock</label>
+        <input className="field" type="search" placeholder="Search name or SKU" value={q} onChange={(e) => setQ(e.target.value)} />
+        <div className="flex items-center justify-between px-1 text-[13px]">
+          <span className="text-taupe">
+            {chosen.length} of {rows.length} selected · {chosen.reduce((t, r) => t + r.copies, 0)} stickers
+          </span>
+          <span className="flex gap-4 font-semibold text-caramel">
+            <button onClick={() => setRows((l) => l.map((r) => (visible.includes(r) ? { ...r, selected: true } : r)))}>Select all</button>
+            <button onClick={() => setRows((l) => l.map((r) => ({ ...r, selected: false })))}>None</button>
+          </span>
+        </div>
 
-        {!isReady ? (
-          <button className="btn-dark w-full" onClick={prepare} disabled={busy || !labels.length}>
-            {busy ? "Preparing stickers" : `Prepare ${labels.length} stickers (50 x 30 mm)`}
-          </button>
-        ) : (
-          <div className="grid grid-cols-2 gap-2">
-            <button className="btn-dark" onClick={() => printFile(ready.images, ready.pdf, `stickers-${ready.images.length}.pdf`, W, H)}>
-              <PrintIcon className="h-5 w-5" /> Print
-            </button>
-            <button className="btn-light" onClick={() => shareFile(ready.pdf, `stickers-${ready.images.length}.pdf`)}>
-              Share PDF
-            </button>
-          </div>
-        )}
-        {isReady && previews.length > 0 && (
-          <section className="space-y-2">
-            <p className="text-xs text-taupe">
-              {ready.images.length} stickers · {previews.length} sizes. Photos are only shown here, they are not printed.
-            </p>
-            <ul className="card divide-y divide-line overflow-hidden">
-              {previews.slice(0, 200).map(({ img, v, p, copies }) => (
-                <li key={v.id} className="flex items-center gap-3 p-3">
-                  <Thumb src={p.image_url} size={44} />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt={`Sticker for ${p.title}`} className="min-w-0 flex-1 rounded border border-line" />
-                  <span className="w-8 shrink-0 text-center text-sm font-semibold">x{copies}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-        <p className="text-xs text-taupe">
-          Print opens the print dialog: choose your label printer and 50 x 30 mm paper. Share PDF sends the file to a printer app such as Phomemo.
-          Scanning the QR with any phone camera opens the item on shopwithsask.com; the Scan tab reads the exact size.
-        </p>
+        <ul className="card divide-y divide-line overflow-hidden">
+          {visible.slice(0, 300).map((r) => (
+            <li key={r.key} className="flex items-center gap-3 px-3 py-2.5">
+              <button
+                onClick={() => set(r.key, { selected: !r.selected })}
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ring-2 ring-inset ${r.selected ? "bg-ink ring-ink text-white" : "ring-line"}`}
+                aria-label={`${r.selected ? "Unselect" : "Select"} ${r.p.title} ${variantLabel(r.v.title)}`}
+                aria-pressed={r.selected}
+              >
+                {r.selected && (
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="m5 12 4 4 10-10" />
+                  </svg>
+                )}
+              </button>
+              <Thumb src={r.p.image_url} size={34} />
+              <button className="min-w-0 flex-1 text-left" onClick={() => set(r.key, { selected: !r.selected })}>
+                {r.img ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={r.img} alt={`Sticker for ${r.p.title}`} className="w-full max-w-[220px] rounded-[6px] ring-1 ring-line" />
+                ) : (
+                  <div className="aspect-[5/3] w-full max-w-[220px] animate-pulse rounded-[6px] bg-sand" />
+                )}
+              </button>
+              <Stepper value={r.copies} label={`${r.p.title} copies`} onChange={(d) => set(r.key, { copies: Math.max(1, r.copies + d), selected: true })} />
+            </li>
+          ))}
+          {!rows.length && <li className="p-4 text-sm text-taupe">Nothing to print here.</li>}
+        </ul>
+        <p className="px-1 text-[12px] text-taupe">Photos are only shown here, they are not printed. Stickers are 50 x 30 mm.</p>
       </main>
+
+      <div className="no-print fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+60px)] z-30 px-3">
+        <div className="mx-auto grid max-w-xl grid-cols-2 gap-2 rounded-2xl bg-canvas/90 p-2 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] backdrop-blur-xl">
+          <button className="btn-dark" disabled={!ready} onClick={printNow}>
+            <PrintIcon className="h-5 w-5" /> {ready ? `Print ${images.length}` : chosen.length ? "Preparing" : "Select stickers"}
+          </button>
+          <button className="btn-light" disabled={!ready || !file || file.sig !== sig || busy} onClick={() => file && shareFile(file.pdf, `stickers-${images.length}.pdf`)}>
+            Share PDF
+          </button>
+        </div>
+      </div>
     </>
   );
 }

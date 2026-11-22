@@ -31,10 +31,10 @@ export async function elementToPdf(el: HTMLElement, widthMm: number, heightMm?: 
 
 export const isIOS = () => typeof navigator !== "undefined" && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
 
-/** One-tap print on computers: prints ready images at an exact paper size through the browser's
- * print dialog. (iPhone uses printFile instead.) The print area stays in the page until the next
- * print, because some browsers render the preview after window.print() has returned. */
-export function printImages(images: string[], widthMm: number, heightMm: number) {
+/** Puts ready images into a hidden print area sized exactly widthMm x heightMm per page.
+ * Call it as soon as the images are ready, then call printNow() straight from the tap:
+ * iPhone only opens the print screen if window.print() runs immediately on the tap. */
+export function preparePrint(images: string[], widthMm: number, heightMm: number) {
   let root = document.getElementById("print-root");
   if (!root) {
     root = document.createElement("div");
@@ -51,16 +51,21 @@ export function printImages(images: string[], widthMm: number, heightMm: number)
   style.textContent = `@page { size: ${widthMm}mm ${heightMm}mm; margin: 0 }
     @media print { body > *:not(#print-root) { display: none !important } #print-root { display: block !important } html, body { margin: 0 !important; padding: 0 !important; background: #fff } }
     @media screen { #print-root { display: none } }`;
-  const imgs = [...root.querySelectorAll("img")];
-  Promise.all(imgs.map((i) => (i.complete ? null : new Promise((r) => (i.onload = r))))).then(() => window.print());
 }
 
-/** Print button: on iPhone opens the share sheet with the exact-size PDF (Print / Phomemo / Files);
- * on computers opens the print dialog at the exact paper size. */
+export function printNow() {
+  window.print();
+}
+
+/** Prepares and prints in one go (use preparePrint ahead of time for large batches on iPhone). */
+export function printImages(images: string[], widthMm: number, heightMm: number) {
+  preparePrint(images, widthMm, heightMm);
+  window.print();
+}
+
 export async function printFile(images: string[], pdf: Blob, filename: string, widthMm: number, heightMm: number) {
   void pdf;
   void filename;
-  // opens the system print screen on iPhone and computers; Share is the route to printer apps (Phomemo)
   printImages(images, widthMm, heightMm);
 }
 

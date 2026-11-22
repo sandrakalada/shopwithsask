@@ -6,7 +6,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { getSetting } from "@/lib/stock";
-import { addressLines, egp, elementToImage, imagesToPdf, printFile, qrDataUrl, shareFile, waLink } from "@/lib/pdf";
+import { addressLines, egp, elementToImage, imagesToPdf, preparePrint, printNow, qrDataUrl, shareFile, waLink } from "@/lib/pdf";
 import { Header, Thumb } from "@/components/ui";
 import { PhoneIcon, PrintIcon, WhatsAppIcon } from "@/components/Icons";
 import ShippingLabel, { shipmentNumber, type LabelStore } from "@/components/ShippingLabel";
@@ -52,7 +52,10 @@ function OrderView() {
       if (cancelled || !labelRef.current) return;
       const img = await elementToImage(labelRef.current);
       const pdf = await imagesToPdf([img], 100, 150);
-      if (!cancelled) setLabel({ url: img.url, pdf });
+      if (!cancelled) {
+        setLabel({ url: img.url, pdf });
+        preparePrint([img.url], 100, 150); // ready in advance: Print opens instantly on iPhone
+      }
     })();
     return () => {
       cancelled = true;
@@ -69,7 +72,7 @@ function OrderView() {
         <Header title={order.name} back />
         <main className="space-y-4 p-4">
           <div className="grid grid-cols-2 gap-2">
-            <button className="btn-dark py-4" disabled={!label} onClick={() => label && printFile([label.url], label.pdf, `label-${order.name.replace("#", "")}.pdf`, 100, 150)}>
+            <button className="btn-dark py-4" disabled={!label} onClick={() => label && printNow()}>
               <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
             </button>
             <button className="btn-light py-4" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
@@ -111,7 +114,7 @@ function OrderView() {
         </section>
 
         <div className="grid grid-cols-2 gap-2">
-          <button className="btn-dark" disabled={!label} onClick={() => label && printFile([label.url], label.pdf, `label-${order.name.replace("#", "")}.pdf`, 100, 150)}>
+          <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
             <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
           </button>
           <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>

@@ -6,7 +6,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db, type Invoice, type InvoiceItem, type Order, type Variant } from "@/lib/db";
 import { getSetting, recordMovement, variantLabel } from "@/lib/stock";
 import { requestSync } from "@/lib/sync";
-import { addressLines, egp, elementToImage, imagesToPdf, printFile, shareFile, waLink } from "@/lib/pdf";
+import { addressLines, egp, elementToImage, imagesToPdf, preparePrint, printNow, shareFile, waLink } from "@/lib/pdf";
 import { Header, Labeled, Thumb } from "@/components/ui";
 import { MinusIcon, PlusIcon, PrintIcon, SearchIcon, WhatsAppIcon } from "@/components/Icons";
 import InvoiceDoc, { type InvoiceStore } from "@/components/InvoiceDoc";
@@ -107,7 +107,10 @@ function InvoiceView({ id }: { id: string }) {
       await document.fonts?.ready;
       const img = await elementToImage(docRef.current!);
       const pdf = await imagesToPdf([img], 210);
-      if (!cancelled) setReady({ img, pdf });
+      if (!cancelled) {
+        setReady({ img, pdf });
+        preparePrint([img.url], 210, Math.round(210 * img.ratio));
+      }
     })();
     return () => {
       cancelled = true;
@@ -148,7 +151,7 @@ function InvoiceView({ id }: { id: string }) {
           <WhatsAppIcon className="h-5 w-5" /> {ready ? "Send PDF on WhatsApp" : "Preparing PDF"}
         </button>
         <div className="grid grid-cols-2 gap-2">
-          <button className="btn-light" disabled={!ready} onClick={() => ready && printFile([ready.img.url], ready.pdf, file, 210, Math.round(210 * ready.img.ratio))}>
+          <button className="btn-light" disabled={!ready} onClick={() => ready && printNow()}>
             <PrintIcon className="h-5 w-5" /> Print
           </button>
           <a className="btn-light" href={waLink(inv.customer_phone, text)} target="_blank" rel="noreferrer">
