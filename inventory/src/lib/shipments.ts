@@ -4,11 +4,9 @@ import { db, type Order, type Shipment, type ShipmentStatus } from "./db";
 import { requestSync, shopify } from "./sync";
 import { supabase } from "./supabase";
 
-export const COURIERS = ["Bosta", "Aramex", "J&T Express", "Mylerz", "R2S", "Own delivery", "Other"] as const;
-
 export const STATUS_LABEL: Record<ShipmentStatus, string> = {
   ready: "Ready for pick-up",
-  picked_up: "With courier",
+  picked_up: "Out for delivery",
   delivered: "Delivered",
   returned: "Returned",
   cancelled: "Cancelled",
@@ -42,12 +40,12 @@ export async function saveShipment(s: Shipment) {
   return row;
 }
 
-/** Marks the Shopify order as shipped with the courier and tracking number. */
+/** Marks the Shopify order as shipped with the tracking number. */
 export async function sendToShopify(s: Shipment, notify: boolean) {
   if (!s.order_id) return null;
   const r = await shopify("fulfill-order", {
     orderId: s.order_id,
-    tracking: { company: s.courier === "Own delivery" || s.courier === "Other" ? undefined : s.courier, number: s.tracking, url: trackingUrl(s.courier, s.tracking), notify },
+    tracking: { company: s.courier || undefined, number: s.tracking, url: trackingUrl(s.courier, s.tracking), notify },
   });
   await saveShipment({ ...s, shopify_fulfilled: true });
   return r;
@@ -73,7 +71,7 @@ export function newShipmentForOrder(o: Order): Shipment {
     id: crypto.randomUUID(),
     order_id: o.id,
     order_name: o.name,
-    courier: "Bosta",
+    courier: "",
     tracking: `SWS${o.name.replace(/\D/g, "")}`,
     status: "ready",
     cod_amount: codFor(o),
@@ -95,7 +93,7 @@ export function newManualShipment(): Shipment {
     id: crypto.randomUUID(),
     order_id: null,
     order_name: null,
-    courier: "Bosta",
+    courier: "",
     tracking: `SWM${ymd}${String(Math.floor(Math.random() * 900) + 100)}`,
     status: "ready",
     cod_amount: 0,
@@ -129,7 +127,7 @@ export function shipmentAsOrder(s: Shipment): Order {
     discounts: 0,
     customer_id: null,
     shipping_address: s.recipient,
-    shipping_title: s.courier,
+    shipping_title: s.courier || null,
     line_items: [],
   } as unknown as Order;
 }

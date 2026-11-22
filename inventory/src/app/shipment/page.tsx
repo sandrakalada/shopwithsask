@@ -10,7 +10,7 @@ import { Header } from "@/components/ui";
 import { PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
 import { useShippingLabel } from "@/components/useShippingLabel";
 import {
-  COURIERS, STATUS_LABEL, STATUS_TONE, markPaidInShopify, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder, trackingUrl,
+  STATUS_LABEL, STATUS_TONE, markPaidInShopify, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
 } from "@/lib/shipments";
 
 const CITIES = ["Cairo", "Giza", "Alexandria", "Qalyubia", "Sharqia", "Dakahlia", "Gharbia", "Monufia", "Beheira", "Kafr El Sheikh", "Damietta", "Port Said", "Ismailia", "Suez", "Fayoum", "Beni Suef", "Minya", "Asyut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "Matrouh", "North Sinai", "South Sinai", "New Valley"];
@@ -77,19 +77,12 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
       <main className={editing ? "space-y-4" : "space-y-4 p-4 pb-32 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0"}>
         <div className="space-y-4">
           <section className="card space-y-3 p-4">
-            <p className="section-title px-0">Courier</p>
-            <div className="no-scrollbar -mx-1 flex flex-wrap gap-2 px-1">
-              {COURIERS.map((c) => (
-                <button key={c} type="button" onClick={() => set({ courier: c })} className={`chip ${s.courier === c ? "chip-on" : ""}`}>
-                  {c}
-                </button>
-              ))}
-            </div>
+            <p className="section-title px-0">Shipment</p>
             <label className="block text-sm">
               <span className="text-taupe">Tracking number</span>
-              <input className="field mt-1" dir="ltr" value={s.tracking} onChange={(e) => set({ tracking: e.target.value })} placeholder="From the courier, or keep ours" />
+              <input className="field mt-1" dir="ltr" value={s.tracking} onChange={(e) => set({ tracking: e.target.value })} placeholder="Tracking number" />
             </label>
-            <p className="text-xs text-taupe">Paste the courier&apos;s airway bill number when you have it. Until then our own number is printed on the label.</p>
+            <p className="text-xs text-taupe">Keep our number, or paste the delivery company&apos;s number.</p>
           </section>
 
           <section className="card space-y-3 p-4">
@@ -136,7 +129,7 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
                 <input type="checkbox" className="mt-1" checked={toShopify} onChange={(e) => setToShopify(e.target.checked)} />
                 <span>
                   <span className="font-semibold">Mark as shipped in Shopify</span>
-                  <span className="block text-taupe">Adds the courier and tracking number to the order.</span>
+                  <span className="block text-taupe">Adds the tracking number to the order.</span>
                 </span>
               </label>
               {toShopify && (
@@ -195,8 +188,7 @@ function ShipmentView({ id }: { id: string }) {
     setBusy(null);
   };
   const r = s.recipient;
-  const track = trackingUrl(s.courier, s.tracking);
-  const waText = `Hi ${(r.name ?? "").split(" ")[0]}, your Shop With Sask order${s.order_name ? ` ${s.order_name}` : ""} is on its way with ${s.courier}. Tracking number: ${s.tracking}${track ? `\n${track}` : ""}${s.cod_amount > 0 ? `\nAmount to pay on delivery: ${egp(s.cod_amount)}` : ""}`;
+  const waText = `Hi ${(r.name ?? "").split(" ")[0]}, your Shop With Sask order${s.order_name ? ` ${s.order_name}` : ""} is on its way. Tracking number: ${s.tracking}${s.cod_amount > 0 ? `\nAmount to pay on delivery: ${egp(s.cod_amount)}` : ""}`;
 
   return (
     <>
@@ -210,8 +202,8 @@ function ShipmentView({ id }: { id: string }) {
               <section className="card p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-xl font-semibold">{s.courier}</p>
-                    <p className="text-sm text-taupe" dir="ltr">{s.tracking}</p>
+                    <p className="text-xs text-taupe">Tracking number</p>
+                    <p className="text-xl font-semibold" dir="ltr">{s.tracking}</p>
                   </div>
                   <span className={`shrink-0 rounded-full px-2.5 py-1 text-[12px] font-semibold ${STATUS_TONE[s.status]}`}>{STATUS_LABEL[s.status]}</span>
                 </div>

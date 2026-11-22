@@ -11,7 +11,7 @@ import { PlusIcon, TruckIcon } from "@/components/Icons";
 import { STATUS_LABEL, STATUS_TONE } from "@/lib/shipments";
 
 type Filter = "active" | ShipmentStatus | "all";
-const FILTERS: [Filter, string][] = [["active", "Open"], ["ready", "Ready"], ["picked_up", "With courier"], ["delivered", "Delivered"], ["returned", "Returned"], ["all", "All"]];
+const FILTERS: [Filter, string][] = [["active", "Open"], ["ready", "Ready"], ["picked_up", "Out for delivery"], ["delivered", "Delivered"], ["returned", "Returned"], ["all", "All"]];
 
 export default function ShipmentsPage() {
   const router = useRouter();
@@ -32,7 +32,7 @@ export default function ShipmentsPage() {
       if (f === "active" && !(s.status === "ready" || s.status === "picked_up")) return false;
       if (f !== "active" && f !== "all" && s.status !== f) return false;
       if (!t) return true;
-      return [s.tracking, s.order_name, s.recipient.name, s.recipient.phone, s.courier].some((x) => (x ?? "").toLowerCase().includes(t));
+      return [s.tracking, s.order_name, s.recipient.name, s.recipient.phone].some((x) => (x ?? "").toLowerCase().includes(t));
     });
   }, [all, f, q]);
   const toCollect = rows.filter((s) => s.status === "ready" || s.status === "picked_up").reduce((t, s) => t + s.cod_amount, 0);
@@ -86,7 +86,6 @@ export default function ShipmentsPage() {
                 <th className="px-4 py-3 font-medium">Order</th>
                 <th className="px-4 py-3 font-medium">Customer</th>
                 <th className="px-4 py-3 font-medium">City</th>
-                <th className="px-4 py-3 font-medium">Courier</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 text-right font-medium">Collect</th>
               </tr>
@@ -98,7 +97,6 @@ export default function ShipmentsPage() {
                   <td className="px-4 py-3">{s.order_name ?? "Manual"}</td>
                   <td className="px-4 py-3">{s.recipient.name}</td>
                   <td className="px-4 py-3">{s.recipient.city}</td>
-                  <td className="px-4 py-3">{s.courier}</td>
                   <td className="px-4 py-3"><span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${STATUS_TONE[s.status]}`}>{STATUS_LABEL[s.status]}</span></td>
                   <td className="px-4 py-3 text-right">{s.cod_amount > 0 ? egp(s.cod_amount) : "-"}</td>
                 </tr>
@@ -115,7 +113,7 @@ export default function ShipmentsPage() {
               <Link href={`/shipment?id=${s.id}`} className="row">
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[15px] font-semibold">{s.recipient.name ?? "Customer"}{s.order_name ? ` · ${s.order_name}` : ""}</p>
-                  <p className="truncate text-xs text-taupe">{s.courier} · <span dir="ltr">{s.tracking}</span>{s.recipient.city ? ` · ${s.recipient.city}` : ""}</p>
+                  <p className="truncate text-xs text-taupe"><span dir="ltr">{s.tracking}</span>{s.recipient.city ? ` · ${s.recipient.city}` : ""}</p>
                 </div>
                 <div className="text-right">
                   <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${STATUS_TONE[s.status]}`}>{STATUS_LABEL[s.status]}</span>

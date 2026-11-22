@@ -57,7 +57,7 @@ const ShippingLabel = forwardRef<HTMLDivElement, { order: Order; store: LabelSto
         <img src={barcode} alt="" style={{ width: "100%", height: 62, objectFit: "fill", display: "block" }} />
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 800, marginTop: 3, letterSpacing: 2 }}>
           <span>{tracking}</span>
-          <span>{sh && !sh.order_name ? (sh.courier || "").toUpperCase() : `ORDER ${o.name}`}</span>
+          <span>{sh && !sh.order_name ? "" : `ORDER ${o.name}`}</span>
         </div>
       </div>
 
@@ -120,7 +120,7 @@ const ShippingLabel = forwardRef<HTMLDivElement, { order: Order; store: LabelSto
       {/* footer */}
       <div style={{ ...cell, display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700 }}>
         <span>{new Date(o.created_at).toLocaleDateString("en-GB")}</span>
-        <span>{sh?.courier ?? o.shipping_title ?? "Standard"}</span>
+        <span>{sh?.courier || o.shipping_title || "Standard"}</span>
         <span>{cod ? "COLLECT ON DELIVERY" : "DO NOT COLLECT"}</span>
       </div>
     </div>

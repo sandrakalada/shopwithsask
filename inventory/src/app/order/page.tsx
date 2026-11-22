@@ -84,7 +84,7 @@ function OrderView() {
             <Link href={`/shipment?id=${shipment.id}`} className="mt-2 flex items-center gap-3">
               <TruckIcon className="h-5 w-5 text-taupe" />
               <div className="min-w-0 flex-1">
-                <p className="font-semibold">{shipment.courier} · <span dir="ltr">{shipment.tracking}</span></p>
+                <p className="font-semibold"><span dir="ltr">{shipment.tracking}</span></p>
                 <p className="text-xs text-taupe">
                   {shipment.cod_amount > 0 ? `Collect ${egp(shipment.cod_amount)}` : "Nothing to collect"}
                   {shipment.shopify_fulfilled ? " · Shipped in Shopify" : ""}
