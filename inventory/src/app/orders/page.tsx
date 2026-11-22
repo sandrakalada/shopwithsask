@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { egp } from "@/lib/pdf";
@@ -10,20 +11,31 @@ import { PlusIcon, SearchIcon } from "@/components/Icons";
 import { fmtDate, orderCustomerName, orderPhone, StatusPills } from "@/components/orderUi";
 import { useRole } from "@/components/Shell";
 import { useIncremental } from "@/components/useIncremental";
-import { signOut } from "@/components/SideMenu";
 
 type F = "all" | "open" | "unpaid" | "fulfilled" | "cancelled";
 
-export default function Orders() {
+export default function OrdersPage() {
+  return (
+    <Suspense>
+      <Orders />
+    </Suspense>
+  );
+}
+
+function Orders() {
   const role = useRole();
+  const params = useSearchParams();
   const [q, setQ] = useState("");
-  const [f, setF] = useState<F>(role === "shipping" ? "open" : "all");
+  const [f, setF] = useState<F>((params.get("f") as F) ?? (role === "shipping" ? "open" : "all"));
+  const [month, setMonth] = useState(params.get("since") === "month");
   const orders = useLiveQuery(() => db.orders.orderBy("created_at").reverse().toArray(), [], []);
 
   const rows = useMemo(() => {
     const t = q.trim().toLowerCase().replace(/^#/, "");
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
     return orders.filter((o) => {
-      if (f === "open" && (o.cancelled_at || o.fulfillment_status === "FULFILLED")) return false;
+      if (month && o.created_at < monthStart) return false;
+      if (f === "open" && (o.cancelled_at || o.fulfillment_status !== "UNFULFILLED")) return false;
       if (f === "unpaid" && (o.cancelled_at || o.financial_status !== "PENDING")) return false;
       if (f === "fulfilled" && o.fulfillment_status !== "FULFILLED") return false;
       if (f === "cancelled" && !o.cancelled_at) return false;
@@ -35,20 +47,16 @@ export default function Orders() {
         (o.email ?? "").toLowerCase().includes(t)
       );
     });
-  }, [orders, q, f]);
+  }, [orders, q, f, month]);
 
-  const { count, Sentinel } = useIncremental(rows.length, 40, `${q}|${f}`);
+  const { count, Sentinel } = useIncremental(rows.length, 40, `${q}|${f}|${month}`);
 
   return (
     <>
       <Header
         title="Orders"
         right={
-          role === "shipping" ? (
-            <button className="text-sm underline" onClick={signOut}>
-              Sign out
-            </button>
-          ) : (
+          role === "shipping" ? null : (
             <Link href="/invoice?new=1" className="p-1" aria-label="New invoice">
               <PlusIcon />
             </Link>
@@ -67,7 +75,10 @@ export default function Orders() {
             </button>
           ))}
         </div>
-        <p className="mt-3 text-xs text-taupe">{rows.length} orders</p>
+        <label className="mt-3 flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={month} onChange={(e) => setMonth(e.target.checked)} /> This month only
+        </label>
+        <p className="mt-2 text-xs text-taupe">{rows.length} orders</p>
         <ul className="card mt-2 divide-y divide-line overflow-hidden">
           {rows.slice(0, count).map((o) => (
             <li key={o.id}>
