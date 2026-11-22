@@ -9,7 +9,7 @@ import { Header } from "@/components/ui";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-/** Home: six tappable numbers, nothing else. */
+/** Home: four tappable numbers, nothing else. */
 function useFirstName() {
   const [name, setName] = useState<string | null>(null);
   useEffect(() => {
@@ -67,8 +67,6 @@ export default function Home() {
           <Tile href="/orders?f=open&since=month" label="Orders to ship" value={data ? String(data.toShip) : "–"} sub="this month, unfulfilled" />
           <Tile href="/items?view=costs" label="Selling value" value={data ? egp(data.value) : "–"} sub="stock at selling price" />
           <Tile href="/items?view=costs" label="Cost value" value={data ? (data.cost ? egp(data.cost) : "Add costs") : "–"} sub="stock at cost price" />
-          <Tile href="/history?reason=sale" label="Sold today" value={data ? String(data.soldToday) : "–"} sub="pieces" />
-          <Tile href="/history?reason=receive" label="Received today" value={data ? String(data.receivedToday) : "–"} sub="pieces" />
         </div>
       </main>
     </>
