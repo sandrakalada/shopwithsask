@@ -217,23 +217,29 @@ async function pull() {
     after = d.productVariants.pageInfo.hasNextPage ? d.productVariants.pageInfo.endCursor : null;
   } while (after);
 
-  const [{ data: products }, { data: variants }] = await Promise.all([
+  const [{ data: products, error: pe }, { data: variants, error: ve }] = await Promise.all([
     admin.from("products").select("id, handle, title, product_type, image_url, archived, shopify_product_id"),
-    admin.from("variants").select("id, product_id, title, sku, price, quantity, archived, shopify_variant_id, shopify_inventory_item_id"),
+    admin.from("variants").select("id, product_id, title, sku, barcode, price, quantity, archived, shopify_variant_id, shopify_inventory_item_id"),
   ]);
+  if (pe || ve) throw pe ?? ve;
   const pByShopify = new Map(products!.filter((p) => p.shopify_product_id).map((p) => [p.shopify_product_id, p]));
   const pByHandle = new Map(products!.filter((p) => p.handle).map((p) => [p.handle, p]));
   const vByShopify = new Map(variants!.filter((v) => v.shopify_variant_id).map((v) => [v.shopify_variant_id, v]));
 
-  let newProducts = 0, newVariants = 0, changed = 0;
-  const seenProducts = new Map<string, string>(); // shopify product id → app product id
+  // everything is collected first and written in a few batch calls (free-tier compute limits)
+  const productRows = new Map<string, Record<string, unknown>>();
+  const variantRows: Record<string, unknown>[] = [];
+  const appState: { id: string; quantity: number; qty: number; tracked: boolean }[] = [];
+  let newProducts = 0, newVariants = 0;
 
   for (const sv of shopify) {
     const sp = sv.product;
     const spId = num(sp.id);
-    let pid = seenProducts.get(spId);
-    if (!pid) {
+    const existingP = pByShopify.get(spId) ?? pByHandle.get(sp.handle);
+    const pid = existingP?.id ?? uuidFromId("a", spId);
+    if (!productRows.has(spId)) {
       const row = {
+        id: pid,
         handle: sp.handle,
         title: sp.title,
         product_type: sp.productType || null,
@@ -241,45 +247,65 @@ async function pull() {
         archived: sp.status === "ARCHIVED",
         shopify_product_id: spId,
       };
-      const existing = pByShopify.get(spId) ?? pByHandle.get(sp.handle);
-      if (existing) {
-        pid = existing.id;
-        const diff = Object.entries(row).some(([k, v]) => (existing as any)[k] !== v);
-        if (diff) await admin.from("products").update(row).eq("id", pid);
-      } else {
-        pid = uuidFromId("a", spId);
-        const { error } = await admin.from("products").upsert({ id: pid, ...row });
-        if (error) throw error;
-        newProducts++;
-      }
-      seenProducts.set(spId, pid!);
+      const changed = !existingP || Object.entries(row).some(([k, v]) => (existingP as any)[k] !== v);
+      if (!existingP) newProducts++;
+      productRows.set(spId, changed ? row : {});
     }
 
     const svId = num(sv.id);
-    const item = num(sv.inventoryItem.id);
-    const qty = sv.inventoryItem.inventoryLevel?.quantities?.[0]?.quantity ?? 0;
-    const row = { product_id: pid, title: sv.title, sku: sv.sku || null, price: Number(sv.price), shopify_inventory_item_id: item, archived: sp.status === "ARCHIVED" };
-    let v = vByShopify.get(svId);
-    if (v) {
-      const diff = Object.entries(row).some(([k, val]) => (k === "price" ? Number(v![k]) !== val : (v as any)[k] !== val));
-      if (diff) await admin.from("variants").update(row).eq("id", v.id);
-    } else {
-      const id = uuidFromId("b", svId);
-      const { error } = await admin
-        .from("variants")
-        .upsert({ id, ...row, shopify_variant_id: svId, barcode: `SWS${svId.slice(-7)}`, quantity: 0 });
-      if (error) throw error;
-      v = { id, quantity: 0 } as any;
-      newVariants++;
-    }
-    (sv as any)._app = { id: v!.id, quantity: v!.quantity, qty, tracked: sv.inventoryItem.tracked };
+    const v = vByShopify.get(svId);
+    const row = {
+      id: v?.id ?? uuidFromId("b", svId),
+      product_id: pid,
+      title: sv.title,
+      sku: sv.sku || null,
+      barcode: v?.barcode ?? `SWS${svId.slice(-7)}`,
+      price: Number(sv.price),
+      shopify_variant_id: svId,
+      shopify_inventory_item_id: num(sv.inventoryItem.id),
+      archived: sp.status === "ARCHIVED",
+    };
+    const changed = !v || Object.entries(row).some(([k, val]) => (k === "price" ? Number((v as any)[k]) !== val : (v as any)[k] !== val));
+    if (!v) newVariants++;
+    if (changed) variantRows.push(row);
+    appState.push({
+      id: row.id,
+      quantity: v?.quantity ?? 0,
+      qty: sv.inventoryItem.inventoryLevel?.quantities?.[0]?.quantity ?? 0,
+      tracked: sv.inventoryItem.tracked,
+    });
   }
 
-  const pending = await unpushedByVariant(shopify.map((s) => s._app.id));
-  for (const sv of shopify) {
-    const a = sv._app;
-    if (!a.tracked) continue;
-    if (await matchShopify(a, a.qty, pending.get(a.id) ?? 0, "Matched to Shopify")) changed++;
+  const pRows = [...productRows.values()].filter((r) => Object.keys(r).length);
+  for (let i = 0; i < pRows.length; i += 500) {
+    const { error } = await admin.from("products").upsert(pRows.slice(i, i + 500));
+    if (error) throw error;
+  }
+  for (let i = 0; i < variantRows.length; i += 500) {
+    const { error } = await admin.from("variants").upsert(variantRows.slice(i, i + 500));
+    if (error) throw error;
+  }
+
+  // one batch of stock movements so app quantities equal Shopify (keeping unsent app changes)
+  const pending = await unpushedByVariant(appState.map((a) => a.id));
+  const now = new Date().toISOString();
+  const moves = appState
+    .filter((a) => a.tracked)
+    .map((a) => ({ a, diff: a.qty - (a.quantity - (pending.get(a.id) ?? 0)) }))
+    .filter((x) => x.diff !== 0)
+    .map(({ a, diff }) => ({
+      id: crypto.randomUUID(),
+      variant_id: a.id,
+      delta: diff,
+      reason: "shopify",
+      note: "Matched to Shopify",
+      source: "shopify",
+      user_email: "Shopify",
+      shopify_pushed_at: now,
+    }));
+  for (let i = 0; i < moves.length; i += 500) {
+    const { error } = await admin.from("stock_movements").insert(moves.slice(i, i + 500));
+    if (error) throw error;
   }
 
   // sizes deleted in Shopify
@@ -287,8 +313,8 @@ async function pull() {
   const gone = variants!.filter((v) => v.shopify_variant_id && !live.has(v.shopify_variant_id) && !v.archived).map((v) => v.id);
   if (gone.length) await admin.from("variants").update({ archived: true }).in("id", gone);
 
-  await admin.from("variants").update({ shopify_synced_at: new Date().toISOString() }).not("shopify_variant_id", "is", null);
-  return { shopifyVariants: shopify.length, newProducts, newVariants, stockChanged: changed, hidden: gone.length };
+  await admin.from("variants").update({ shopify_synced_at: now }).not("shopify_variant_id", "is", null);
+  return { shopifyVariants: shopify.length, newProducts, newVariants, stockChanged: moves.length, hidden: gone.length };
 }
 
 // ---------- setup: register webhook ----------

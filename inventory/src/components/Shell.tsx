@@ -10,6 +10,8 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { BoxIcon, ClockIcon, GearIcon, HomeIcon, ScanIcon } from "./Icons";
 import Login from "./Login";
+import { faceIdEnabled, unlockWithFaceId } from "@/lib/faceid";
+import Image from "next/image";
 
 const tabs = [
   { href: "/", label: "Home", Icon: HomeIcon },
@@ -49,6 +51,7 @@ export function SyncBadge() {
 export default function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
@@ -65,6 +68,18 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     if (session) startSync();
   }, [session]);
 
+  // Face ID lock: on opening the app, and after 5 minutes in the background
+  useEffect(() => {
+    if (faceIdEnabled()) setLocked(true);
+    let hiddenAt = 0;
+    const onVis = () => {
+      if (document.visibilityState === "hidden") hiddenAt = Date.now();
+      else if (faceIdEnabled() && hiddenAt && Date.now() - hiddenAt > 5 * 60_000) setLocked(true);
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
   if (!supabaseConfigured) {
     return (
       <main className="mx-auto max-w-md p-6 pt-16">
@@ -77,6 +92,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   }
   if (session === undefined) return <div className="min-h-dvh" />;
   if (!session) return <Login />;
+  if (locked) return <LockScreen onUnlock={() => setLocked(false)} />;
 
   const isPrint = pathname.startsWith("/labels");
   return (
@@ -105,5 +121,33 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </ul>
       </nav>
     </div>
+  );
+}
+
+function LockScreen({ onUnlock }: { onUnlock: () => void }) {
+  const [failed, setFailed] = useState(false);
+  async function unlock() {
+    setFailed(false);
+    if (await unlockWithFaceId()) onUnlock();
+    else setFailed(true);
+  }
+  return (
+    <main className="mx-auto flex min-h-dvh max-w-sm flex-col items-center justify-center px-6 text-center">
+      <Image src="/brand-wordmark.png" alt="SASK" width={180} height={64} className="h-auto w-40" priority />
+      <p className="mt-6 text-sm text-taupe">Inventory is locked</p>
+      <button className="btn-dark mt-8 w-full" onClick={unlock}>
+        Unlock with Face ID
+      </button>
+      {failed && <p className="mt-3 text-sm text-red-600">Face ID did not unlock. Try again.</p>}
+      <button
+        className="mt-6 text-sm text-taupe underline"
+        onClick={async () => {
+          await supabase?.auth.signOut({ scope: "local" });
+          onUnlock();
+        }}
+      >
+        Use password instead
+      </button>
+    </main>
   );
 }

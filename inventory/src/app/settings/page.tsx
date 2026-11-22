@@ -9,6 +9,7 @@ import { variantLabel } from "@/lib/stock";
 import { Header, timeAgo } from "@/components/ui";
 import { useSync } from "@/components/Shell";
 import { SyncIcon } from "@/components/Icons";
+import { disableFaceId, enableFaceId, faceIdAvailable, faceIdEnabled } from "@/lib/faceid";
 
 function download(name: string, rows: (string | number | null)[][]) {
   const csv = rows.map((r) => r.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
@@ -46,6 +47,20 @@ export default function Settings() {
   const pending = useLiveQuery(() => db.outbox.count(), [], 0);
   const counts = useLiveQuery(async () => ({ p: await db.products.count(), v: await db.variants.count() }), []);
   const failed = useLiveQuery(async () => JSON.parse((await getMeta("failed")) ?? "[]") as { error: string }[], [], []);
+
+  const [faceId, setFaceId] = useState<{ available: boolean; on: boolean; msg: string | null }>({ available: false, on: false, msg: null });
+  useEffect(() => {
+    faceIdAvailable().then((available) => setFaceId({ available, on: faceIdEnabled(), msg: null }));
+  }, []);
+  async function toggleFaceId() {
+    try {
+      if (faceId.on) disableFaceId();
+      else await enableFaceId(email ?? "owner");
+      setFaceId((f) => ({ ...f, on: faceIdEnabled(), msg: null }));
+    } catch (e) {
+      setFaceId((f) => ({ ...f, msg: (e as Error).message || "Face ID was not set up" }));
+    }
+  }
 
   useEffect(() => {
     supabase?.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? null));
@@ -94,6 +109,19 @@ export default function Settings() {
             <p className="mt-1 text-taupe">{failed[failed.length - 1].error}</p>
           </section>
         )}
+
+        <section className="card space-y-3 p-4 text-sm">
+          <p className="font-semibold">Face ID</p>
+          <p className="text-taupe">
+            {faceId.available
+              ? "Open the app with Face ID instead of typing your password. Works offline."
+              : "Face ID is not available in this browser. Open the app from your Home Screen on iPhone."}
+          </p>
+          {faceId.msg && <p className="text-red-600">{faceId.msg}</p>}
+          <button className={faceId.on ? "btn-light w-full" : "btn-dark w-full"} disabled={!faceId.available} onClick={toggleFaceId}>
+            {faceId.on ? "Turn off Face ID" : "Turn on Face ID"}
+          </button>
+        </section>
 
         <section className="card space-y-3 p-4 text-sm">
           <p className="font-semibold">Shopify</p>

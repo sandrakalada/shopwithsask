@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { reasonLabel, variantLabel } from "@/lib/stock";
 import { Header, timeAgo, VariantRow } from "@/components/ui";
 import { PlusIcon, PrintIcon, ScanIcon } from "@/components/Icons";
+import FaceIdOffer from "@/components/FaceIdOffer";
 
 const egp = (n: number) => `${Math.round(n).toLocaleString("en-US")} EGP`;
 
@@ -36,6 +37,7 @@ export default function Home() {
     <>
       <Header title="Shop With Sask" logo />
       <main className="space-y-5 p-4">
+        <FaceIdOffer />
         <div className="grid grid-cols-2 gap-3">
           <Stat label="Units in stock" value={data ? data.units.toLocaleString() : "–"} />
           <Stat label="Stock value" value={data ? egp(data.value) : "–"} />
