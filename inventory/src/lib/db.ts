@@ -9,7 +9,17 @@ export type Product = {
   title_ar?: string | null;
   archived: boolean;
   updated_at: string;
+  created_at?: string;
+  shopify_product_id?: string | null;
 };
+
+/** Newest product first: Shopify product numbers grow over time, so the latest upload has the biggest number. */
+export function newestFirst(a: Product, b: Product) {
+  const x = a.shopify_product_id ?? "", y = b.shopify_product_id ?? "";
+  if (x && y && x !== y) return y.length - x.length || (y > x ? 1 : -1);
+  if (!!x !== !!y) return x ? 1 : -1; // products made in the app (no Shopify number yet) are the newest
+  return (b.created_at ?? "").localeCompare(a.created_at ?? "") || a.title.localeCompare(b.title);
+}
 
 export type Variant = {
   id: string;

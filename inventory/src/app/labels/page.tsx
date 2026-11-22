@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import QRCode from "qrcode";
-import { db, type Product, type Variant } from "@/lib/db";
+import { db, newestFirst, type Product, type Variant } from "@/lib/db";
 import { stickerLink, variantLabel } from "@/lib/stock";
 import { imagesToPdf, isIOS, preparePdfPrint, preparePrint, printNow, shareFile } from "@/lib/pdf";
 import { Header, Stepper, Thumb } from "@/components/ui";
@@ -114,7 +114,7 @@ function Labels() {
       if (scope === "instock" && v.quantity <= 0) continue;
       list.push({ key: `${v.id}|${v.sku}|${p.title}`, v, p, img: null, copies: Math.max(1, v.quantity), selected: scope === "one" || scope === "product" });
     }
-    list.sort((a, b) => a.p.title.localeCompare(b.p.title) || a.v.title.localeCompare(b.v.title));
+    list.sort((a, b) => newestFirst(a.p, b.p) || a.v.title.localeCompare(b.v.title));
     setRows((old) => {
       const prev = new Map(old.map((r) => [r.key, r]));
       return list.map((r) => ({ ...r, ...(prev.get(r.key) ? { img: prev.get(r.key)!.img, copies: prev.get(r.key)!.copies, selected: prev.get(r.key)!.selected } : {}) }));

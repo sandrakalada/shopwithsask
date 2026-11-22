@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, type Product, type Variant } from "@/lib/db";
+import { db, newestFirst, type Product, type Variant } from "@/lib/db";
 import { costInEgp, saveVariant, setSetting, variantLabel } from "@/lib/stock";
 void saveVariant;
 import { pending, pendingDelta, usePending } from "@/lib/pending";
@@ -42,12 +42,8 @@ function Inventory() {
     const rows = products
       .filter((p) => !p.archived)
       .map((p) => ({ p, vs: (byProduct.get(p.id) ?? []).sort((a, b) => a.title.localeCompare(b.title)) }))
-      // in stock first, sold out last
-      .sort((a, b) => {
-        const ia = a.vs.some((v) => v.quantity > 0) ? 0 : 1;
-        const ib = b.vs.some((v) => v.quantity > 0) ? 0 : 1;
-        return ia - ib || a.p.title.localeCompare(b.p.title);
-      });
+      // latest products first
+      .sort((a, b) => newestFirst(a.p, b.p));
     return { rows, rate: Number(rate?.value ?? 13) || 13 };
   }, []);
 
