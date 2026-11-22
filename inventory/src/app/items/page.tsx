@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type Product, type Variant } from "@/lib/db";
-import { costInEgp, recordMovement, saveVariant, setSetting, variantLabel } from "@/lib/stock";
+import { costInEgp, saveVariant, setSetting, variantLabel } from "@/lib/stock";
+void saveVariant;
+import { pending, pendingDelta, usePending } from "@/lib/pending";
 import { egp } from "@/lib/pdf";
 import { Header, QtyPill, Thumb, Toast } from "@/components/ui";
 import TopProducts from "@/components/TopProducts";
@@ -95,10 +97,11 @@ function Inventory() {
     }
   }
 
-  async function quick(v: Variant, p: Product, delta: number) {
-    const n = await recordMovement(v.id, delta, delta > 0 ? "receive" : "sale");
-    setToast(`${delta > 0 ? "+1" : "-1"} ${p.title} · ${variantLabel(v.title)} → ${n}`);
-    setTimeout(() => setToast(null), 1800);
+  const pend = usePending();
+  function quick(v: Variant, p: Product, delta: number) {
+    // not saved yet: the Save bar at the bottom confirms it
+    pending.addStock(v.id, delta, delta > 0 ? "receive" : "sale");
+    void p;
   }
 
   const filters: [Filter, string][] =
@@ -185,7 +188,9 @@ function Inventory() {
                       <button className="btn-light h-9 w-9 rounded-full p-0" onClick={() => quick(v, p, -1)} aria-label="Remove one">
                         <MinusIcon className="h-4 w-4" />
                       </button>
-                      <span className="w-8 text-center text-sm font-semibold">{v.quantity}</span>
+                      <span className={`w-8 text-center text-sm font-semibold ${pendingDelta(pend, v.id) ? "rounded bg-amber-100 text-amber-800" : ""}`}>
+                        {v.quantity + pendingDelta(pend, v.id)}
+                      </span>
                       <button className="btn-light h-9 w-9 rounded-full p-0" onClick={() => quick(v, p, 1)} aria-label="Add one">
                         <PlusIcon className="h-4 w-4" />
                       </button>
@@ -253,11 +258,12 @@ function CostRow({ v, rate }: { v: Variant; rate: number }) {
     setCur(v.cost_currency ?? "EGP");
   }, [v.cost, v.cost_currency]);
 
-  async function save(nextCost = cost, nextCur = cur) {
+  function save(nextCost = cost, nextCur = cur) {
     const n = nextCost.trim() === "" ? null : Number(nextCost);
     if (n != null && !(n >= 0)) return;
     if (n === (v.cost ?? null) && nextCur === (v.cost_currency ?? "EGP")) return;
-    await saveVariant({ ...v, cost: n, cost_currency: nextCur });
+    // waits for the Save bar
+    pending.setCost(v.id, n, nextCur);
   }
 
   const inEgp = costInEgp({ cost: cost === "" ? null : Number(cost), cost_currency: cur }, rate);
@@ -281,7 +287,7 @@ function CostRow({ v, rate }: { v: Variant; rate: number }) {
         onChange={(e) => {
           const c = e.target.value as "EGP" | "SAR";
           setCur(c);
-          void save(cost, c);
+          save(cost, c);
         }}
       >
         <option>EGP</option>

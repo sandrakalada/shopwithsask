@@ -6,9 +6,23 @@ import { db } from "@/lib/db";
 import { costInEgp } from "@/lib/stock";
 import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 /** Home: six tappable numbers, nothing else. */
+function useFirstName() {
+  const [name, setName] = useState<string | null>(null);
+  useEffect(() => {
+    supabase?.auth.getSession().then(({ data }) => {
+      const n = (data.session?.user.user_metadata?.name as string | undefined)?.trim();
+      setName(n ? n.split(" ")[0] : null);
+    });
+  }, []);
+  return name;
+}
+
 export default function Home() {
+  const firstName = useFirstName();
   const data = useLiveQuery(async () => {
     const [products, variants, rateRow, orders] = await Promise.all([
       db.products.toArray(),
@@ -40,6 +54,7 @@ export default function Home() {
     <>
       <Header title="Shop With Sask" logo />
       <main className="space-y-5 p-4">
+        <h1 className="pt-1 text-2xl font-semibold text-espresso">{firstName ? `Hi ${firstName}` : "Hi"}</h1>
         {data?.empty && <p className="card p-4 text-sm text-taupe">Your products download from Shopify automatically when you are online.</p>}
 
         <div className="grid grid-cols-2 gap-3">

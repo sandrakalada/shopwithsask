@@ -10,6 +10,8 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { BoxIcon, HomeIcon, ReceiptIcon, ScanIcon, UsersIcon } from "./Icons";
 import Login from "./Login";
+import SaveBar from "./SaveBar";
+import PullToRefresh from "./PullToRefresh";
 import { faceIdEnabled } from "@/lib/faceid";
 
 const tabs = [
@@ -144,6 +146,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     <RoleContext.Provider value={role}>
     <div className="mx-auto min-h-dvh max-w-xl">
       <div className="pt-safe pb-28">{children}</div>
+      {!shippingOnly && <SaveBar />}
+      <PullToRefresh />
       <nav className={`no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream/95 backdrop-blur pb-safe ${isPrint ? "" : ""}`}>
         <ul className={`mx-auto grid max-w-xl ${shippingOnly ? "grid-cols-1" : "grid-cols-5"}`}>
           {visibleTabs.map(({ href, label, Icon, match }) => {

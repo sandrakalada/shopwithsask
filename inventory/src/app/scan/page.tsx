@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { db, type Product, type Reason, type Variant } from "@/lib/db";
-import { findAllByCode, recordMovement, variantLabel } from "@/lib/stock";
+import { findAllByCode, variantLabel } from "@/lib/stock";
+import { pending } from "@/lib/pending";
 import Scanner from "@/components/Scanner";
 import { AdjustSheet, Header, QtyPill, Thumb, Toast } from "@/components/ui";
 
@@ -103,11 +104,12 @@ export default function ScanPage() {
           beep(false);
           flash(`${name} shows 0 in stock`, "warn");
         }
-        const q = await recordMovement(v.id, delta, mode);
+        // collected until Save is tapped in the bar at the bottom
+        pending.addStock(v.id, delta, mode);
         beep(true);
-        flash(`${delta > 0 ? "+1" : "-1"} ${name} → ${q}`);
+        flash(`${delta > 0 ? "+1" : "-1"} ${name} · tap Save to keep`);
         setSession((s) => ({ n: s.n + 1, units: s.units + delta }));
-        setFound({ v: { ...v, quantity: q ?? v.quantity }, p });
+        setFound({ v, p });
         return;
       }
       beep(true);

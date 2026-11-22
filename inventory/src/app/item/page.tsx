@@ -5,7 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type Product, type Reason, type Variant } from "@/lib/db";
-import { newBarcode, reasonLabel, recordMovement, saveProduct, saveVariant, variantLabel } from "@/lib/stock";
+import { newBarcode, reasonLabel, saveProduct, saveVariant, variantLabel } from "@/lib/stock";
+import { pending, pendingDelta, usePending } from "@/lib/pending";
 import { AdjustSheet, Header, Labeled, QtyPill, Thumb, timeAgo, Toast } from "@/components/ui";
 import { MinusIcon, PlusIcon, PrintIcon } from "@/components/Icons";
 
@@ -27,6 +28,7 @@ function Item() {
   const [sheet, setSheet] = useState<{ v: Variant; r: Reason } | null>(null);
   const [edit, setEdit] = useState<Variant | "new" | "product" | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const pend = usePending();
 
   if (product === undefined) return <Header title="" back />;
   if (!product) return (<><Header title="Not found" back /><p className="p-4 text-sm text-taupe">This item is not on this phone.</p></>);
@@ -34,10 +36,9 @@ function Item() {
   const live = variants.filter((v) => !v.archived);
   const total = live.reduce((s, v) => s + v.quantity, 0);
 
-  async function quick(v: Variant, delta: number) {
-    const q = await recordMovement(v.id, delta, delta > 0 ? "receive" : "sale");
-    setToast(`${delta > 0 ? "+1" : "-1"} ${variantLabel(v.title)} → ${q}`);
-    setTimeout(() => setToast(null), 1800);
+  function quick(v: Variant, delta: number) {
+    // not saved yet: the Save bar at the bottom confirms it
+    pending.addStock(v.id, delta, delta > 0 ? "receive" : "sale");
   }
 
   return (
@@ -77,8 +78,8 @@ function Item() {
                 <button className="btn-light h-10 w-10 rounded-full p-0" onClick={() => quick(v, -1)} aria-label="Remove one">
                   <MinusIcon className="h-5 w-5" />
                 </button>
-                <button onClick={() => setSheet({ v, r: "count" })}>
-                  <QtyPill qty={v.quantity} low={v.low_stock_at} />
+                <button onClick={() => setSheet({ v, r: "count" })} className={pendingDelta(pend, v.id) ? "rounded-full ring-2 ring-amber-400" : ""}>
+                  <QtyPill qty={v.quantity + pendingDelta(pend, v.id)} low={v.low_stock_at} />
                 </button>
                 <button className="btn-light h-10 w-10 rounded-full p-0" onClick={() => quick(v, 1)} aria-label="Add one">
                   <PlusIcon className="h-5 w-5" />
