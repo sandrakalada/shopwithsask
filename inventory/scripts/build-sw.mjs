@@ -16,7 +16,7 @@ const files = [];
 
 // pages are served at clean addresses (/orders, not /orders.html) by the host
 const precache = files
-  .filter((f) => f !== "/sw.js" && !f.endsWith(".map") && !f.startsWith("/404") && !f.startsWith("/_not-found"))
+  .filter((f) => f !== "/sw.js" && f !== "/version.json" && !f.endsWith(".map") && !f.startsWith("/404") && !f.startsWith("/_not-found"))
   .map((f) => (f === "/index.html" ? "/" : f.endsWith(".html") ? f.slice(0, -5) : f));
 const hash = createHash("sha1");
 for (const f of files) if (f !== "/sw.js") hash.update(f).update(readFileSync(join(OUT, f)));
@@ -68,6 +68,7 @@ self.addEventListener("fetch", (e) => {
     return;
   }
   if (url.origin !== self.location.origin) return; // Supabase etc. go straight to the network
+  if (url.pathname === "/version.json") return; // always from the network
 
   e.respondWith(
     (async () => {

@@ -12,6 +12,7 @@ import { BoxIcon, HomeIcon, ReceiptIcon, ScanIcon, UsersIcon } from "./Icons";
 import Login from "./Login";
 import SaveBar from "./SaveBar";
 import PullToRefresh from "./PullToRefresh";
+import { checkForUpdate } from "@/lib/version";
 
 const tabs = [
   { href: "/", label: "Home", Icon: HomeIcon, match: ["/history", "/settings"] },
@@ -75,6 +76,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         .catch(() => {});
     }
     if (navigator.storage?.persist) void navigator.storage.persist();
+    // newer version published? reload on open and whenever the app comes back to the screen
+    void checkForUpdate();
+    const onShow = () => document.visibilityState === "visible" && void checkForUpdate();
+    document.addEventListener("visibilitychange", onShow);
+    window.addEventListener("focus", onShow);
     if (!supabase) return;
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);

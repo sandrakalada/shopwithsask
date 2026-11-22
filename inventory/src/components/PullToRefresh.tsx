@@ -28,9 +28,10 @@ export default function PullToRefresh() {
         if (p >= THRESHOLD) {
           setBusy(true);
           (async () => {
-            await navigator.serviceWorker?.getRegistration().then((r) => r?.update()).catch(() => {});
-            await syncNow();
-            setBusy(false);
+            // sync (at most 8 s), then reload so the latest version of the app is shown
+            await Promise.race([syncNow(), new Promise((r) => setTimeout(r, 8000))]);
+            navigator.serviceWorker?.getRegistration().then((r) => r?.update()).catch(() => {});
+            location.reload();
           })();
         }
         return 0;
