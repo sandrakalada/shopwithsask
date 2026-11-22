@@ -451,14 +451,48 @@ const CUSTOMER_FIELDS = `
   defaultEmailAddress { emailAddress } defaultPhoneNumber { phoneNumber }
   defaultAddress { address1 address2 city province phone }`;
 
+/** Wall-clock time in Cairo -> UTC ISO string (handles Egypt summer time). */
+function cairoToUtc(y: number, mo: number, d: number, h: number, mi: number) {
+  const naive = Date.UTC(y, mo, d, h, mi);
+  const f = new Intl.DateTimeFormat("en-US", { timeZone: "Africa/Cairo", hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+  const p = Object.fromEntries(f.formatToParts(new Date(naive)).map((x) => [x.type, x.value]));
+  const offset = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) - naive;
+  return new Date(naive - offset).toISOString();
+}
+
+const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+
+/** Orders moved from the previous store keep their real date in the note ("placed Nov 24, 2025 10:34 PM (Cairo time)")
+ * or a tag ("original-date-2025-11-24"); Shopify's own date is the import day. */
+function originalOrderInfo(note: string | null | undefined, tags: string[] = []) {
+  let created: string | null = null;
+  const m = note?.match(/placed (\w{3}) (\d{1,2}), (\d{4}) (\d{1,2}):(\d{2}) ?([AP]M)/i);
+  if (m) {
+    const mo = MONTHS.indexOf(m[1].toLowerCase());
+    let h = +m[4] % 12;
+    if (m[6].toUpperCase() === "PM") h += 12;
+    if (mo >= 0) created = cairoToUtc(+m[3], mo, +m[2], h, +m[5]);
+  }
+  if (!created) {
+    const t = tags.find((x) => /^original-date-\d{4}-\d{2}-\d{2}$/.test(x));
+    if (t) {
+      const [y, mo, d] = t.slice(14).split("-").map(Number);
+      created = cairoToUtc(y, mo - 1, d, 12, 0);
+    }
+  }
+  const cancelled = /Status at export: Canceled/i.test(note ?? "") || tags.includes("status-canceled");
+  return { created, cancelled };
+}
+
 function orderRow(o: any) {
+  const orig = originalOrderInfo(o.note, o.tags ?? []);
   return {
     id: num(o.id),
     name: o.name,
-    created_at: o.createdAt,
+    created_at: orig.created ?? o.createdAt,
     updated_at: o.updatedAt,
     processed_at: o.processedAt,
-    cancelled_at: o.cancelledAt,
+    cancelled_at: o.cancelledAt ?? (orig.cancelled ? orig.created ?? o.createdAt : null),
     closed_at: o.closedAt,
     financial_status: o.displayFinancialStatus,
     fulfillment_status: o.displayFulfillmentStatus,

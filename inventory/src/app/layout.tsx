@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Sask Inventory",
   description: "Stock tracking for Shop With Sask",
   appleWebApp: { capable: true, title: "Inventory", statusBarStyle: "default" },
-  icons: { apple: "/icons/apple-touch-icon.png" },
+  icons: { icon: "/favicon.ico", apple: "/icons/apple-touch-icon.png" },
   robots: { index: false, follow: false },
 };
 

@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { costInEgp } from "@/lib/stock";
+import { productMatcher } from "@/lib/lines";
 import { egp } from "@/lib/pdf";
 import { Thumb } from "./ui";
 
@@ -27,7 +28,9 @@ export default function TopProducts() {
     const since = period ? Date.now() - period * 86400_000 : 0;
     const vByShopify = new Map(data.variants.filter((v) => v.shopify_variant_id).map((v) => [v.shopify_variant_id!, v]));
     const pById = new Map(data.products.map((p) => [p.id, p]));
-    const pByTitle = new Map(data.products.map((p) => [p.title.toLowerCase(), p]));
+    const match = productMatcher(data.products);
+    const costVariant = new Map<string, (typeof data.variants)[number]>();
+    for (const v of data.variants) if (v.cost != null && !costVariant.has(v.product_id)) costVariant.set(v.product_id, v);
     const stockByProduct = new Map<string, number>();
     for (const v of data.variants) if (!v.archived) stockByProduct.set(v.product_id, (stockByProduct.get(v.product_id) ?? 0) + Math.max(0, v.quantity));
 
@@ -38,12 +41,14 @@ export default function TopProducts() {
       if (since && new Date(o.created_at).getTime() < since) continue;
       for (const l of o.line_items) {
         const v = l.shopify_variant_id ? vByShopify.get(l.shopify_variant_id) : undefined;
-        const p = v ? pById.get(v.product_id) : pByTitle.get(l.title.toLowerCase());
-        const key = p?.id ?? `t:${l.title}`;
-        const row = agg.get(key) ?? { key, title: p?.title ?? l.title, image: p?.image_url ?? l.image ?? null, productId: p?.id, units: 0, revenue: 0, cost: 0, costKnown: true, orders: new Set<string>() };
+        const guess = v ? null : match(l.title);
+        const p = v ? pById.get(v.product_id) : guess!.product ?? undefined;
+        const key = p?.id ?? `t:${guess!.key}`;
+        const row = agg.get(key) ?? { key, title: p?.title ?? guess!.label, image: p?.image_url ?? l.image ?? null, productId: p?.id, units: 0, revenue: 0, cost: 0, costKnown: true, orders: new Set<string>() };
         row.units += l.quantity;
         row.revenue += Number(l.total ?? (l.price ?? 0) * l.quantity);
-        const c = v ? costInEgp(v, data.rate) : null;
+        const cv = v ?? (p ? costVariant.get(p.id) : undefined);
+        const c = cv ? costInEgp(cv, data.rate) : null;
         if (c == null) row.costKnown = false;
         else row.cost += c * l.quantity;
         row.orders.add(o.id);
