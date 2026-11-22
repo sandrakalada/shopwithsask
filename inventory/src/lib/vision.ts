@@ -1,6 +1,7 @@
 "use client";
 
 import { db, type Product } from "./db";
+import { supabase } from "./supabase";
 
 /** Find my product: an on-device image model (MobileCLIP S0, served from this app, 22 MB)
  * turns a photo into a fingerprint and compares it with every product photo. Nothing is uploaded. */
@@ -54,7 +55,7 @@ const fromB64 = (b: string) => {
   return q;
 };
 
-export type IndexItem = { p: string; u: string; v: Int8Array };
+export type IndexItem = { p: string; u: string; v: Int8Array; taught?: boolean };
 
 /** Built-in index (made when the app is published) plus fingerprints made on this device for newer photos. */
 export async function loadIndex(): Promise<IndexItem[]> {
@@ -63,6 +64,13 @@ export async function loadIndex(): Promise<IndexItem[]> {
   const local = await db.embeddings.toArray();
   const seen = new Set<string>();
   const out: IndexItem[] = [];
+  // photos you confirmed with "This is it" (shared between your devices)
+  try {
+    const { data } = (await supabase?.from("find_examples").select("id, product_id, e").limit(5000)) ?? { data: null };
+    for (const r of data ?? []) out.push({ p: r.product_id, u: `taught:${r.id}`, v: fromB64(r.e), taught: true });
+  } catch {
+    /* offline: use what is on this device */
+  }
   for (const it of [...local.map((l) => ({ p: l.product_id, u: l.url, e: l.e })), ...base.items]) {
     if (seen.has(it.u)) continue;
     seen.add(it.u);
@@ -104,4 +112,11 @@ export function rank(q: Float32Array, index: IndexItem[], top = 6) {
     if (!b || s > b.score) best.set(it.p, { score: s, u: it.u });
   }
   return [...best.entries()].map(([p, b]) => ({ productId: p, ...b })).sort((a, b) => b.score - a.score).slice(0, top);
+}
+
+/** "This is it": remember this photo for that product, so similar photos match it next time. */
+export async function teach(productId: string, q: Float32Array, index: IndexItem[]) {
+  const e = toB64(q);
+  index.push({ p: productId, u: `taught:new${index.length}`, v: fromB64(e), taught: true });
+  await supabase?.from("find_examples").insert({ product_id: productId, e });
 }

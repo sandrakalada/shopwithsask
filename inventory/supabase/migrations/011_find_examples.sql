@@ -1,0 +1,1 @@
+-- applied: find_examples (photos taught with 'This is it' in Find my product)

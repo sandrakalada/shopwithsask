@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { variantLabel } from "@/lib/stock";
-import { indexNewPhotos, loadIndex, loadModel, rank, type IndexItem } from "@/lib/vision";
+import { indexNewPhotos, loadIndex, loadModel, rank, teach, type IndexItem } from "@/lib/vision";
 import { Header, QtyPill, Thumb } from "@/components/ui";
 
 type Result = { productId: string; score: number; u: string };
@@ -20,6 +20,9 @@ export default function FindPage() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [results, setResults] = useState<Result[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [type, setType] = useState("all");
+  const [query, setQuery] = useState<Float32Array | null>(null);
+  const [taught, setTaught] = useState<string | null>(null);
 
   const data = useLiveQuery(async () => {
     const [products, variants] = await Promise.all([db.products.toArray(), db.variants.toArray()]);
@@ -63,11 +66,26 @@ export default function FindPage() {
       const m = await loadModel();
       const index = indexRef.current ?? (indexRef.current = await loadIndex());
       const q = await m.embed(await shrink(file));
-      setResults(rank(q, index, 6));
+      setQuery(q);
+      setTaught(null);
+      setResults(rank(q, filtered(index), 8));
     } catch (e) {
       setError(`Could not read that photo (${(e as Error).message}).`);
     }
     setBusy(false);
+  }
+
+  // only compare with products of the chosen type
+  const filtered = (index: IndexItem[]) => (type === "all" ? index : index.filter((it) => data?.pmap.get(it.p)?.product_type === type));
+  useEffect(() => {
+    if (query && indexRef.current) setResults(rank(query, filtered(indexRef.current), 8));
+  }, [type]); // eslint-disable-line react-hooks/exhaustive-deps
+  const types = [...new Set((data?.products ?? []).map((p) => p.product_type).filter(Boolean) as string[])].sort();
+
+  async function confirm(pid: string) {
+    if (!query || !indexRef.current) return;
+    setTaught(pid);
+    await teach(pid, query, indexRef.current);
   }
 
   const stockOf = (pid: string) => (data?.variants ?? []).filter((v) => v.product_id === pid && !v.archived);
@@ -94,6 +112,13 @@ export default function FindPage() {
           </div>
           <input ref={camRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => onPhoto(e.target.files?.[0])} />
           <input ref={libRef} type="file" accept="image/*" className="hidden" onChange={(e) => onPhoto(e.target.files?.[0])} />
+          <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1">
+            {["all", ...types].map((t) => (
+              <button key={t} onClick={() => setType(t)} className={`chip min-h-8 text-[13px] ${type === t ? "chip-on" : ""}`}>
+                {t === "all" ? "All types" : t}
+              </button>
+            ))}
+          </div>
           {status && <p className="text-xs text-taupe">{status}</p>}
           {!ready && !error && <div className="h-1 overflow-hidden rounded-full bg-sand"><div className="h-full w-1/3 animate-pulse rounded-full bg-caramel" /></div>}
           {error && <p className="text-sm text-red-700">{error}</p>}
@@ -111,8 +136,8 @@ export default function FindPage() {
                 const vs = stockOf(p.id);
                 const pct = Math.round(Math.max(0, Math.min(1, (r.score - 0.2) / 0.6)) * 100);
                 return (
-                  <li key={r.productId}>
-                    <Link href={`/item?id=${p.id}`} className={`flex items-center gap-3 px-4 py-3 active:bg-sand ${i === 0 ? "bg-cream" : ""}`}>
+                  <li key={r.productId} className="flex items-center">
+                    <Link href={`/item?id=${p.id}`} className={`flex min-w-0 flex-1 items-center gap-3 py-3 pl-4 active:bg-sand ${i === 0 ? "bg-cream" : ""}`}>
                       <Thumb src={r.u} size={56} />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[15px] font-semibold">{p.title}</p>
@@ -126,11 +151,18 @@ export default function FindPage() {
                       </div>
                       <QtyPill qty={vs.reduce((t, v) => t + v.quantity, 0)} low={0} />
                     </Link>
+                    <button
+                      onClick={() => confirm(p.id)}
+                      disabled={!!taught}
+                      className={`mx-3 shrink-0 rounded-full px-3 py-1.5 text-[12px] font-semibold ring-1 ring-inset ${taught === p.id ? "bg-success text-white ring-success" : "ring-line text-ink disabled:opacity-40"}`}
+                    >
+                      {taught === p.id ? "Saved" : "This is it"}
+                    </button>
                   </li>
                 );
               })}
           </ul>
-          {results && !busy && <p className="mt-2 px-1 text-xs text-taupe">Green bar = how close the match is. A plain background and good light give the best results.</p>}
+          {results && !busy && <p className="mt-2 px-1 text-xs text-taupe">Green bar = how close the match is. Pick the type to narrow it down. Tap "This is it" on the right one (find it in Inventory if it is not listed): the app learns your photo, so next time it matches straight away.</p>}
         </section>
       </main>
     </>
