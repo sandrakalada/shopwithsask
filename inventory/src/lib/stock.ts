@@ -74,6 +74,7 @@ export async function saveVariant(
   const clash = await db.variants.where("barcode").equals(v.barcode).first();
   if (clash && clash.id !== v.id) throw new Error(`Barcode ${v.barcode} is already used`);
   const row: Variant = {
+    ...existing,
     ...v,
     archived: v.archived ?? existing?.archived ?? false,
     low_stock_at: v.low_stock_at ?? existing?.low_stock_at ?? 0,
@@ -82,24 +83,76 @@ export async function saveVariant(
   };
   await db.transaction("rw", db.variants, db.outbox, async () => {
     await db.variants.put(row);
-    const { quantity: _q, updated_at: _u, ...send } = row;
+    // only columns the server knows about; quantity changes go through movements
+    const { quantity: _q, updated_at: _u, ...rest } = row;
     void _q;
     void _u;
+    const allowed = ["id", "product_id", "title", "sku", "barcode", "price", "low_stock_at", "archived", "cost", "cost_currency", "shopify_variant_id"];
+    const send = Object.fromEntries(Object.entries(rest).filter(([k]) => allowed.includes(k)));
     await db.outbox.add({ table: "variants", row: send, created_at: row.updated_at });
   });
   if (!existing && initialQty > 0) await recordMovement(v.id, initialQty, "receive", "Opening stock");
   else requestSync();
 }
 
+/** Turns whatever a scanner read (our QR link, a store link, a barcode or a SKU) into a lookup key. */
+export function parseCode(raw: string): { variant?: string; code: string } {
+  const c = raw.trim();
+  if (/^https?:\/\//i.test(c)) {
+    try {
+      const u = new URL(c);
+      const variant = u.searchParams.get("variant");
+      if (variant) return { variant, code: c };
+      const code = u.searchParams.get("c");
+      if (code) return { code };
+    } catch {}
+  }
+  return { code: c };
+}
+
+/** All sizes matching a scan; several when a SKU is shared by every size of a product. */
+export async function findAllByCode(raw: string) {
+  const { variant, code } = parseCode(raw);
+  if (variant) {
+    const v = await db.variants.where("shopify_variant_id").equals(variant).first();
+    if (v) return [v];
+  }
+  if (!code) return [];
+  const exact =
+    (await db.variants.where("barcode").equals(code).first()) ?? (await db.variants.where("barcode").equals(code.toUpperCase()).first());
+  if (exact) return [exact];
+  const bySku = await db.variants.filter((v) => !!v.sku && v.sku.toLowerCase() === code.toLowerCase() && !v.archived).toArray();
+  return bySku;
+}
+
 export async function findByCode(code: string) {
-  const c = code.trim();
-  if (!c) return null;
-  return (
-    (await db.variants.where("barcode").equals(c).first()) ??
-    (await db.variants.where("barcode").equals(c.toUpperCase()).first()) ??
-    (await db.variants.where("sku").equals(c).first()) ??
-    null
-  );
+  return (await findAllByCode(code))[0] ?? null;
+}
+
+/** Link printed in each sticker's QR: opens the product on the website for any phone camera,
+ * and tells the in-app scanner the exact size. */
+export function stickerLink(v: { shopify_variant_id?: string | null; barcode: string }, handle?: string | null) {
+  if (handle && v.shopify_variant_id) return `https://shopwithsask.com/products/${handle}?variant=${v.shopify_variant_id}`;
+  return `https://sask-inventory.vercel.app/s?c=${encodeURIComponent(v.barcode)}`;
+}
+
+export async function getSetting<T>(key: string, fallback: T): Promise<T> {
+  const s = await db.settings.get(key);
+  return (s?.value as T) ?? fallback;
+}
+
+export async function setSetting(key: string, value: unknown) {
+  await db.transaction("rw", db.settings, db.outbox, async () => {
+    await db.settings.put({ key, value });
+    await db.outbox.add({ table: "app_settings", row: { key, value }, created_at: now() });
+  });
+  requestSync();
+}
+
+/** Cost of one piece in EGP. */
+export function costInEgp(v: { cost?: number | null; cost_currency?: string }, sarRate: number) {
+  if (v.cost == null) return null;
+  return v.cost * (v.cost_currency === "SAR" ? sarRate : 1);
 }
 
 export function thumb(url: string | null | undefined, width = 200) {

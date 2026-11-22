@@ -1,11 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, getMeta, setMeta } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 import { resetLocal, shopify, syncNow } from "@/lib/sync";
-import { variantLabel } from "@/lib/stock";
+import { getSetting, setSetting, variantLabel } from "@/lib/stock";
 import { Header, timeAgo } from "@/components/ui";
 import { useSync } from "@/components/Shell";
 import { SyncIcon } from "@/components/Icons";
@@ -28,16 +29,17 @@ export default function Settings() {
   const shopErr = useLiveQuery(() => getMeta("shopifyError"), [], null);
   const shopPull = useLiveQuery(() => getMeta("shopifyPull"), [], null);
 
-  async function runShopify(action: "pull" | "setup") {
+  async function runShopify(action: "all" | "setup") {
     setShop({ busy: true, msg: null });
     try {
       await syncNow();
       const r = await shopify(action);
-      if (action === "pull") {
+      if (action === "all") {
         const p = r.pull as Record<string, number>;
+        const o = r.orders as Record<string, number>;
         await setMeta("shopifyPull", new Date().toISOString());
         await setMeta("shopifyError", "");
-        setShop({ busy: false, msg: `Done. ${p.stockChanged} stock changes, ${p.newProducts} new items from Shopify.` });
+        setShop({ busy: false, msg: `Done. ${p.stockChanged} stock changes, ${p.newProducts} new items, ${o.orders} orders and ${o.customers} customers updated.` });
         await syncNow();
       } else setShop({ busy: false, msg: `Shopify updates: ${r.webhook}.` });
     } catch (e) {
@@ -126,27 +128,32 @@ export default function Settings() {
         <section className="card space-y-3 p-4 text-sm">
           <p className="font-semibold">Shopify</p>
           <p className="text-taupe">
-            Stock changes here go to Shopify automatically, and online orders come back here.
-            Last full match: {shopPull ? timeAgo(shopPull) : "never"}.
+            Stock, SKU, prices and costs you change here go to Shopify. New orders, order status changes and customers come back
+            within seconds, and everything is fully re-checked every day. Last full sync: {shopPull ? timeAgo(shopPull) : "never"}.
           </p>
           {shopErr && <p className="text-red-600">{shopErr}</p>}
           {shop.msg && <p>{shop.msg}</p>}
-          <button className="btn-dark w-full" disabled={shop.busy || !s.online} onClick={() => runShopify("pull")}>
-            {shop.busy ? "Working" : "Refresh from Shopify"}
+          <button className="btn-dark w-full" disabled={shop.busy || !s.online} onClick={() => runShopify("all")}>
+            {shop.busy ? "Working" : "Sync everything with Shopify now"}
           </button>
           <button className="btn-light w-full" disabled={shop.busy || !s.online} onClick={() => runShopify("setup")}>
-            Connect Shopify order updates (once)
+            Reconnect live updates
           </button>
         </section>
 
+        <StoreDetails />
+
+        <Team />
+
         <section className="space-y-2">
+          <Link href="/history" className="btn-light w-full">Stock history</Link>
           <button className="btn-light w-full" onClick={exportStock}>Export stock list (CSV)</button>
         </section>
 
         <section className="card p-4 text-sm">
           <p className="font-semibold">Install on iPhone</p>
           <p className="mt-1 text-taupe">
-            Open this page in Safari, tap Share, then Add to Home Screen. Open it once while online so it is saved for offline use.
+            Open sask-inventory.vercel.app in Safari, tap Share, then Add to Home Screen. Open it once while online so it is saved for offline use.
           </p>
         </section>
 
@@ -162,5 +169,129 @@ function Row({ label, value }: { label: string; value: string }) {
       <span className="text-taupe">{label}</span>
       <span className="truncate font-medium">{value}</span>
     </div>
+  );
+}
+
+function StoreDetails() {
+  const [v, setV] = useState<{ phone: string; address: string; instagram: string } | null>(null);
+  const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    (async () =>
+      setV({
+        phone: await getSetting("store_phone", ""),
+        address: await getSetting("store_address", "Cairo, Egypt"),
+        instagram: await getSetting("store_instagram", ""),
+      }))();
+  }, []);
+  if (!v) return null;
+  async function save() {
+    await setSetting("store_phone", v!.phone.trim());
+    await setSetting("store_address", v!.address.trim());
+    await setSetting("store_instagram", v!.instagram.trim());
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  }
+  return (
+    <section className="card space-y-3 p-4 text-sm">
+      <p className="font-semibold">Store details on invoices and labels</p>
+      <input className="field" placeholder="Store phone" inputMode="tel" value={v.phone} onChange={(e) => setV({ ...v, phone: e.target.value })} />
+      <input className="field" placeholder="Pickup address" value={v.address} onChange={(e) => setV({ ...v, address: e.target.value })} />
+      <input className="field" placeholder="Instagram (e.g. @shopwithsask)" value={v.instagram} onChange={(e) => setV({ ...v, instagram: e.target.value })} />
+      <button className="btn-light w-full" onClick={save}>{saved ? "Saved" : "Save"}</button>
+    </section>
+  );
+}
+
+type TeamUser = { id: string; login: string; name: string | null; role: string; last_sign_in_at: string | null };
+
+function Team() {
+  const [isOwner, setIsOwner] = useState(false);
+  const [users, setUsers] = useState<TeamUser[] | null>(null);
+  const [form, setForm] = useState({ username: "", name: "", password: "" });
+  const [msg, setMsg] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function load() {
+    try {
+      const r = await shopify("team-list");
+      setUsers(r.users as TeamUser[]);
+    } catch (e) {
+      setMsg((e as Error).message);
+    }
+  }
+  useEffect(() => {
+    supabase?.auth.getSession().then(({ data }) => {
+      const owner = data.session?.user.app_metadata?.role === "owner";
+      setIsOwner(owner);
+      if (owner && navigator.onLine) void load();
+    });
+  }, []);
+  if (!isOwner) return null;
+
+  async function run(fn: () => Promise<unknown>, ok: string) {
+    setBusy(true);
+    setMsg(null);
+    try {
+      await fn();
+      setMsg(ok);
+      await load();
+    } catch (e) {
+      setMsg((e as Error).message);
+    }
+    setBusy(false);
+  }
+
+  return (
+    <section className="card space-y-3 p-4 text-sm">
+      <div>
+        <p className="font-semibold">Team</p>
+        <p className="text-taupe">Add staff with just a username and password. They sign in by typing the username instead of an email.</p>
+      </div>
+      <ul className="divide-y divide-line rounded-xl border border-line">
+        {(users ?? []).map((u) => (
+          <li key={u.id} className="flex items-center gap-2 px-3 py-2">
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-medium">{u.name ?? u.login}</p>
+              <p className="truncate text-xs text-taupe">
+                {u.login} · {u.role === "owner" ? "Owner" : "Staff"}
+              </p>
+            </div>
+            {u.role !== "owner" && (
+              <>
+                <button
+                  className="text-xs underline"
+                  disabled={busy}
+                  onClick={() => {
+                    const pw = prompt(`New password for ${u.login} (at least 6 characters)`);
+                    if (pw) void run(() => shopify("team-password", { id: u.id, password: pw }), "Password changed");
+                  }}
+                >
+                  Password
+                </button>
+                <button
+                  className="text-xs text-red-700 underline"
+                  disabled={busy}
+                  onClick={() => confirm(`Remove ${u.login}? They will no longer be able to sign in.`) && run(() => shopify("team-delete", { id: u.id }), "Removed")}
+                >
+                  Remove
+                </button>
+              </>
+            )}
+          </li>
+        ))}
+        {users === null && <li className="px-3 py-2 text-taupe">Loading</li>}
+      </ul>
+      <input className="field" placeholder="Username (English letters, no spaces)" autoCapitalize="none" autoCorrect="off" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} />
+      <input className="field" placeholder="Name (optional)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+      <input className="field" placeholder="Password (at least 6 characters)" type="password" autoComplete="new-password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+      {msg && <p>{msg}</p>}
+      <button
+        className="btn-dark w-full"
+        disabled={busy || !form.username || !form.password}
+        onClick={() => run(() => shopify("team-create", form).then(() => setForm({ username: "", name: "", password: "" })), "User added")}
+      >
+        Add user
+      </button>
+    </section>
   );
 }

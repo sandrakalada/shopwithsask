@@ -8,16 +8,16 @@ import { supabase, supabaseConfigured } from "@/lib/supabase";
 import { startSync, syncNow, syncStore } from "@/lib/sync";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
-import { BoxIcon, ClockIcon, GearIcon, HomeIcon, ScanIcon } from "./Icons";
+import { BoxIcon, HomeIcon, ReceiptIcon, ScanIcon, UsersIcon } from "./Icons";
 import Login from "./Login";
 import { faceIdEnabled } from "@/lib/faceid";
 
 const tabs = [
-  { href: "/", label: "Home", Icon: HomeIcon },
-  { href: "/items", label: "Items", Icon: BoxIcon },
-  { href: "/scan", label: "Scan", Icon: ScanIcon },
-  { href: "/history", label: "History", Icon: ClockIcon },
-  { href: "/settings", label: "Settings", Icon: GearIcon },
+  { href: "/", label: "Home", Icon: HomeIcon, match: ["/history", "/settings"] },
+  { href: "/items", label: "Inventory", Icon: BoxIcon, match: ["/item", "/labels", "/new"] },
+  { href: "/scan", label: "Scan", Icon: ScanIcon, match: [] },
+  { href: "/orders", label: "Orders", Icon: ReceiptIcon, match: ["/order", "/invoice", "/ship"] },
+  { href: "/customers", label: "Customers", Icon: UsersIcon, match: ["/customer"] },
 ];
 
 export function useSync() {
@@ -102,8 +102,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       <div className="pt-safe pb-28">{children}</div>
       <nav className={`no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream/95 backdrop-blur pb-safe ${isPrint ? "" : ""}`}>
         <ul className="mx-auto grid max-w-xl grid-cols-5">
-          {tabs.map(({ href, label, Icon }) => {
-            const active = href === "/" ? pathname === "/" : pathname.startsWith(href) || (href === "/items" && pathname.startsWith("/item"));
+          {tabs.map(({ href, label, Icon, match }) => {
+            const active = (href === "/" ? pathname === "/" : pathname.startsWith(href)) || match.some((m) => pathname.startsWith(m));
             const scan = href === "/scan";
             return (
               <li key={href}>

@@ -5,7 +5,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { reasonLabel, variantLabel } from "@/lib/stock";
 import { Header, timeAgo, VariantRow } from "@/components/ui";
-import { PlusIcon, PrintIcon, ScanIcon } from "@/components/Icons";
+import { GearIcon, PlusIcon, PrintIcon, ScanIcon } from "@/components/Icons";
 import FaceIdOffer from "@/components/FaceIdOffer";
 
 const egp = (n: number) => `${Math.round(n).toLocaleString("en-US")} EGP`;
@@ -35,7 +35,15 @@ export default function Home() {
 
   return (
     <>
-      <Header title="Shop With Sask" logo />
+      <Header
+        title="Shop With Sask"
+        logo
+        right={
+          <Link href="/settings" className="p-1" aria-label="Settings">
+            <GearIcon />
+          </Link>
+        }
+      />
       <main className="space-y-5 p-4">
         <FaceIdOffer />
         <div className="grid grid-cols-2 gap-3">

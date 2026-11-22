@@ -24,7 +24,10 @@ export default function Login({ onUnlock }: { onUnlock?: () => void }) {
     e.preventDefault();
     setBusy(true);
     setError(null);
-    const { error } = await supabase!.auth.signInWithPassword({ email: email.trim(), password });
+    const login = email.trim();
+    // staff accounts sign in with just a username
+    const address = login.includes("@") ? login : `${login.toLowerCase()}@team.shopwithsask.com`;
+    const { error } = await supabase!.auth.signInWithPassword({ email: address, password });
     if (error) setError(navigator.onLine ? error.message : "You are offline. Use Face ID, or sign in once while online.");
     else onUnlock?.();
     setBusy(false);
@@ -59,13 +62,29 @@ export default function Login({ onUnlock }: { onUnlock?: () => void }) {
 
       <form onSubmit={submit} className={`${faceId ? "mt-6" : "mt-8"} space-y-3`}>
         {faceId && <p className="text-center text-xs uppercase tracking-wide text-taupe">or use your password</p>}
-        <input className="field" type="email" autoComplete="username webauthn" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input className="field" type="text" autoCapitalize="none" autoCorrect="off" autoComplete="username webauthn" placeholder="Email or username" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <input className="field" type="password" autoComplete="current-password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button className={faceId ? "btn-light w-full" : "btn-dark w-full"} disabled={busy}>
           {busy ? "Signing in" : "Sign in"}
         </button>
       </form>
+      <InstallHint />
     </main>
+  );
+}
+
+function InstallHint() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const standalone = (navigator as Navigator & { standalone?: boolean }).standalone || matchMedia("(display-mode: standalone)").matches;
+    setShow(ios && !standalone);
+  }, []);
+  if (!show) return null;
+  return (
+    <p className="mt-8 rounded-xl bg-sand p-3 text-center text-xs text-taupe">
+      Install the app: tap Share at the bottom of Safari, then Add to Home Screen.
+    </p>
   );
 }

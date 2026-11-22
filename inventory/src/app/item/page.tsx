@@ -53,7 +53,7 @@ function Item() {
             <div className="mt-3 flex gap-2">
               <button className="btn-light px-3 py-2" onClick={() => setEdit("product")}>Edit</button>
               <Link className="btn-light px-3 py-2" href={`/labels?product=${product.id}`}>
-                <PrintIcon className="h-4 w-4" /> Labels
+                <PrintIcon className="h-4 w-4" /> Stickers
               </Link>
             </div>
           </div>
@@ -70,7 +70,7 @@ function Item() {
                 <button className="min-w-0 flex-1 text-left" onClick={() => setEdit(v)}>
                   <p className="font-medium">{variantLabel(v.title)}</p>
                   <p className="text-xs text-taupe">
-                    {v.barcode}
+                    {v.sku ? `SKU ${v.sku}` : "No SKU"}
                     {v.price != null && ` · ${v.price} EGP`}
                   </p>
                 </button>
@@ -89,6 +89,8 @@ function Item() {
           </ul>
           <p className="mt-2 text-xs text-taupe">Tap the number to count or record a reason. Tap a size to edit it.</p>
         </section>
+
+        <SkuByColour variants={live} />
 
         <section>
           <h2 className="mb-2 font-semibold">History</h2>
@@ -115,6 +117,61 @@ function Item() {
       {edit && edit !== "product" && <VariantForm productId={product.id} variant={edit === "new" ? null : edit} onClose={() => setEdit(null)} />}
       <Toast msg={toast} />
     </>
+  );
+}
+
+const SIZE_WORDS = /^(xxs|xs|s|m|l|xl|xxl|xxxl|x-small|small|medium|large|x-large|xx-large|one size|default title|free size|\d{2})$/i;
+
+/** Colour part of a size title: "Small / Green" -> "Green", "Medium" -> "" */
+function colourOf(title: string) {
+  return title
+    .split("/")
+    .map((x) => x.trim())
+    .filter((x) => !SIZE_WORDS.test(x))
+    .join(" / ");
+}
+
+/** One SKU per colour, shared by all its sizes. */
+function SkuByColour({ variants }: { variants: Variant[] }) {
+  const groups = new Map<string, Variant[]>();
+  for (const v of variants) groups.set(colourOf(v.title), [...(groups.get(colourOf(v.title)) ?? []), v]);
+  const [values, setValues] = useState<Record<string, string>>(() =>
+    Object.fromEntries([...groups].map(([c, vs]) => [c, vs.find((v) => v.sku)?.sku ?? ""])),
+  );
+  const [saved, setSaved] = useState(false);
+  if (!variants.length) return null;
+
+  async function save() {
+    for (const [c, vs] of groups) {
+      const sku = (values[c] ?? "").trim().toUpperCase() || null;
+      for (const v of vs) if ((v.sku ?? null) !== sku) await saveVariant({ ...v, sku });
+    }
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  }
+
+  return (
+    <section className="card space-y-3 p-4">
+      <div>
+        <h2 className="font-semibold">SKU</h2>
+        <p className="text-xs text-taupe">One SKU per colour. All sizes share it; the sticker adds the size.</p>
+      </div>
+      {[...groups.keys()].map((c) => (
+        <label key={c} className="flex items-center gap-3">
+          <span className="w-24 shrink-0 truncate text-sm">{c || "All sizes"}</span>
+          <input
+            className="field py-2"
+            value={values[c] ?? ""}
+            onChange={(e) => setValues((x) => ({ ...x, [c]: e.target.value }))}
+            autoCapitalize="characters"
+            placeholder="e.g. D-104"
+          />
+        </label>
+      ))}
+      <button className="btn-dark w-full" onClick={save}>
+        {saved ? "Saved" : "Save SKU"}
+      </button>
+    </section>
   );
 }
 
@@ -160,6 +217,8 @@ function VariantForm({ productId, variant, onClose }: { productId: string; varia
   const [price, setPrice] = useState(variant?.price != null ? String(variant.price) : "");
   const [barcode, setBarcode] = useState(variant?.barcode ?? newBarcode());
   const [sku, setSku] = useState(variant?.sku ?? "");
+  const [cost, setCost] = useState(variant?.cost != null ? String(variant.cost) : "");
+  const [cur, setCur] = useState<"EGP" | "SAR">(variant?.cost_currency ?? "EGP");
   const [low, setLow] = useState(String(variant?.low_stock_at ?? 0));
   const [qty, setQty] = useState("0");
   const [err, setErr] = useState<string | null>(null);
@@ -174,6 +233,9 @@ function VariantForm({ productId, variant, onClose }: { productId: string; varia
           price: price ? Number(price) : null,
           barcode: barcode.trim().toUpperCase(),
           sku: sku.trim() || null,
+          cost: cost.trim() === "" ? null : Number(cost),
+          cost_currency: cur,
+          shopify_variant_id: variant?.shopify_variant_id ?? null,
           low_stock_at: Math.max(0, parseInt(low || "0", 10)),
           archived,
         },
@@ -191,7 +253,16 @@ function VariantForm({ productId, variant, onClose }: { productId: string; varia
         <Labeled label="Size"><input className="field" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Medium" /></Labeled>
         <Labeled label="Price (EGP)"><input className="field" inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} /></Labeled>
         <Labeled label="Barcode"><input className="field" value={barcode} onChange={(e) => setBarcode(e.target.value)} autoCapitalize="characters" /></Labeled>
-        <Labeled label="SKU (optional)"><input className="field" value={sku} onChange={(e) => setSku(e.target.value)} /></Labeled>
+        <Labeled label="SKU"><input className="field" value={sku} onChange={(e) => setSku(e.target.value)} autoCapitalize="characters" placeholder="e.g. D-104" /></Labeled>
+        <Labeled label="Cost price (what you paid)">
+          <div className="flex gap-2">
+            <input className="field" inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} />
+            <select className="rounded-xl border border-line bg-white px-3" value={cur} onChange={(e) => setCur(e.target.value as "EGP" | "SAR")}>
+              <option>EGP</option>
+              <option>SAR</option>
+            </select>
+          </div>
+        </Labeled>
         <Labeled label="Warn when stock is at or below"><input className="field" inputMode="numeric" value={low} onChange={(e) => setLow(e.target.value)} /></Labeled>
         {!variant && <Labeled label="Opening stock"><input className="field" inputMode="numeric" value={qty} onChange={(e) => setQty(e.target.value)} /></Labeled>}
         {err && <p className="text-sm text-red-600">{err}</p>}

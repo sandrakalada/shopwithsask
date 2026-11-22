@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { db, type Product, type Reason, type Variant } from "@/lib/db";
-import { findByCode, recordMovement, variantLabel } from "@/lib/stock";
+import { findAllByCode, recordMovement, variantLabel } from "@/lib/stock";
 import Scanner from "@/components/Scanner";
 import { AdjustSheet, Header, QtyPill, Thumb, Toast } from "@/components/ui";
 
@@ -36,6 +36,7 @@ export default function ScanPage() {
   const [found, setFound] = useState<{ v: Variant; p?: Product } | null>(null);
   const [sheet, setSheet] = useState<Reason | null>(null);
   const [unknown, setUnknown] = useState<string | null>(null);
+  const [choices, setChoices] = useState<{ v: Variant; p?: Product }[] | null>(null);
   const [toast, setToast] = useState<{ msg: string; tone: "ok" | "warn" } | null>(null);
   const [manual, setManual] = useState("");
   const [session, setSession] = useState<{ n: number; units: number }>({ n: 0, units: 0 });
@@ -56,13 +57,29 @@ export default function ScanPage() {
       if (code === last.current.code && now - last.current.t < 2000) return;
       last.current = { code, t: now };
 
-      const v = await findByCode(code);
-      if (!v) {
+      const matches = await findAllByCode(code);
+      if (!matches.length) {
         beep(false);
         setUnknown(code);
         setFound(null);
         return;
       }
+      if (matches.length > 1) {
+        // a SKU shared by several sizes: ask which one
+        beep(true);
+        setUnknown(null);
+        setChoices(await Promise.all(matches.map(async (m) => ({ v: m, p: await db.products.get(m.product_id) }))));
+        return;
+      }
+      await apply(matches[0]);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [mode],
+  );
+
+  const apply = useCallback(
+    async (v: Variant) => {
+      setChoices(null);
       const p = await db.products.get(v.product_id);
       setUnknown(null);
       const name = `${p?.title ?? "Item"} · ${variantLabel(v.title)}`;
@@ -121,7 +138,7 @@ export default function ScanPage() {
           }}
           className="flex gap-2"
         >
-          <input className="field" placeholder="Type a barcode or SKU" value={manual} onChange={(e) => setManual(e.target.value)} autoCapitalize="characters" />
+          <input className="field" placeholder="Type a SKU or barcode" value={manual} onChange={(e) => setManual(e.target.value)} autoCapitalize="characters" />
           <button className="btn-dark">Go</button>
         </form>
 
@@ -141,6 +158,20 @@ export default function ScanPage() {
               <button className="text-sm font-semibold underline" onClick={() => setSheet("receive")}>
                 Change
               </button>
+            </div>
+          </div>
+        )}
+
+        {choices && (
+          <div className="card p-4">
+            <p className="font-semibold">Which size?</p>
+            <p className="mt-1 text-sm text-taupe">{choices[0].p?.title}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {choices.map(({ v }) => (
+                <button key={v.id} className="btn-light px-4 py-2" onClick={() => apply(v)}>
+                  {variantLabel(v.title)} · {v.quantity}
+                </button>
+              ))}
             </div>
           </div>
         )}

@@ -16,6 +16,7 @@ const SHOP = (Deno.env.get("SHOPIFY_SHOP") ?? "").replace(/\.myshopify\.com$/, "
 const CLIENT_ID = Deno.env.get("SHOPIFY_CLIENT_ID") ?? "";
 const CLIENT_SECRET = Deno.env.get("SHOPIFY_CLIENT_SECRET") ?? "";
 const API = "2026-10";
+const CRON_SECRET = Deno.env.get("CRON_SECRET") ?? "";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const admin = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
 
@@ -124,6 +125,64 @@ const SHOPIFY_REASON: Record<string, string> = {
 // ---------- push: app → Shopify ----------
 
 async function push() {
+  const stock = await pushStock();
+  const details = await pushVariantDetails();
+  return { ...stock, details };
+}
+
+async function sarRate() {
+  const { data } = await admin.from("app_settings").select("value").eq("key", "sar_to_egp").maybeSingle();
+  const n = Number(data?.value);
+  return n > 0 ? n : 13;
+}
+
+/** SKU, price and cost edited in the app → Shopify (cost always sent in EGP). */
+async function pushVariantDetails() {
+  const { data: rows, error } = await admin
+    .from("variants")
+    .select("id, sku, price, cost, cost_currency, shopify_variant_id, products!inner(shopify_product_id)")
+    .eq("shopify_dirty", true)
+    .not("shopify_variant_id", "is", null)
+    .limit(250);
+  if (error) throw error;
+  if (!rows?.length) return { updated: 0 };
+  const rate = await sarRate();
+  const byProduct = new Map<string, any[]>();
+  for (const r of rows as any[]) {
+    const pid = r.products?.shopify_product_id;
+    if (!pid) continue;
+    byProduct.set(pid, [...(byProduct.get(pid) ?? []), r]);
+  }
+  let updated = 0;
+  const errors: string[] = [];
+  for (const [pid, list] of byProduct) {
+    const variants = list.map((r) => ({
+      id: gid("ProductVariant", r.shopify_variant_id),
+      ...(r.price != null ? { price: String(r.price) } : {}),
+      inventoryItem: {
+        sku: r.sku ?? "",
+        ...(r.cost != null ? { cost: (Number(r.cost) * (r.cost_currency === "SAR" ? rate : 1)).toFixed(2) } : {}),
+      },
+    }));
+    try {
+      const d = await gql(
+        `mutation($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
+          productVariantsBulkUpdate(productId: $productId, variants: $variants) { userErrors { field message } }
+        }`,
+        { productId: gid("Product", pid), variants },
+      );
+      const ue = d.productVariantsBulkUpdate.userErrors;
+      if (ue?.length) throw new Error(ue.map((e: any) => e.message).join("; "));
+      await admin.from("variants").update({ shopify_dirty: false }).in("id", list.map((r) => r.id));
+      updated += list.length;
+    } catch (e) {
+      errors.push(String((e as Error).message).slice(0, 200));
+    }
+  }
+  return { updated, errors };
+}
+
+async function pushStock() {
   const { data: rows, error } = await admin
     .from("stock_movements")
     .select("id, delta, reason, variant_id, variants!inner(id, shopify_variant_id, shopify_inventory_item_id)")
@@ -206,8 +265,8 @@ async function pull() {
           pageInfo { hasNextPage endCursor }
           nodes {
             id title sku price
-            product { id handle title productType status featuredMedia { preview { image { url } } } }
-            inventoryItem { id tracked inventoryLevel(locationId: $loc) { quantities(names: ["available"]) { quantity } } }
+            product { id handle title productType status featuredMedia { preview { image { url } } } translations(locale: "ar") { key value } }
+            inventoryItem { id tracked unitCost { amount } inventoryLevel(locationId: $loc) { quantities(names: ["available"]) { quantity } } }
           }
         }
       }`,
@@ -218,8 +277,8 @@ async function pull() {
   } while (after);
 
   const [{ data: products, error: pe }, { data: variants, error: ve }] = await Promise.all([
-    admin.from("products").select("id, handle, title, product_type, image_url, archived, shopify_product_id"),
-    admin.from("variants").select("id, product_id, title, sku, barcode, price, quantity, archived, shopify_variant_id, shopify_inventory_item_id"),
+    admin.from("products").select("id, handle, title, title_ar, product_type, image_url, archived, shopify_product_id"),
+    admin.from("variants").select("id, product_id, title, sku, barcode, price, quantity, archived, cost, shopify_dirty, shopify_variant_id, shopify_inventory_item_id"),
   ]);
   if (pe || ve) throw pe ?? ve;
   const pByShopify = new Map(products!.filter((p) => p.shopify_product_id).map((p) => [p.shopify_product_id, p]));
@@ -246,6 +305,7 @@ async function pull() {
         image_url: sp.featuredMedia?.preview?.image?.url?.split("?")[0] ?? null,
         archived: sp.status === "ARCHIVED",
         shopify_product_id: spId,
+        title_ar: (sp.translations ?? []).find((t: any) => t.key === "title")?.value ?? null,
       };
       const changed = !existingP || Object.entries(row).some(([k, v]) => (existingP as any)[k] !== v);
       if (!existingP) newProducts++;
@@ -254,22 +314,25 @@ async function pull() {
 
     const svId = num(sv.id);
     const v = vByShopify.get(svId);
-    const row = {
+    const shopCost = sv.inventoryItem.unitCost?.amount != null ? Number(sv.inventoryItem.unitCost.amount) : null;
+    const row: Record<string, unknown> = {
       id: v?.id ?? uuidFromId("b", svId),
       product_id: pid,
       title: sv.title,
-      sku: sv.sku || null,
+      // edits made in the app that are not in Shopify yet win over Shopify's values
+      sku: v?.shopify_dirty ? v.sku : sv.sku || null,
       barcode: v?.barcode ?? `SWS${svId.slice(-7)}`,
-      price: Number(sv.price),
+      price: v?.shopify_dirty ? Number(v.price) : Number(sv.price),
       shopify_variant_id: svId,
       shopify_inventory_item_id: num(sv.inventoryItem.id),
       archived: sp.status === "ARCHIVED",
     };
+    if ((!v || v.cost == null) && shopCost) Object.assign(row, { cost: shopCost, cost_currency: "EGP" });
     const changed = !v || Object.entries(row).some(([k, val]) => (k === "price" ? Number((v as any)[k]) !== val : (v as any)[k] !== val));
     if (!v) newVariants++;
     if (changed) variantRows.push(row);
     appState.push({
-      id: row.id,
+      id: row.id as string,
       quantity: v?.quantity ?? 0,
       qty: sv.inventoryItem.inventoryLevel?.quantities?.[0]?.quantity ?? 0,
       tracked: sv.inventoryItem.tracked,
@@ -317,25 +380,230 @@ async function pull() {
   return { shopifyVariants: shopify.length, newProducts, newVariants, stockChanged: moves.length, hidden: gone.length };
 }
 
-// ---------- setup: register webhook ----------
+// ---------- orders & customers: Shopify → app ----------
+
+const money = (m: any) => (m?.shopMoney?.amount != null ? Number(m.shopMoney.amount) : null);
+
+const ORDER_FIELDS = `
+  id name createdAt updatedAt processedAt cancelledAt closedAt
+  displayFinancialStatus displayFulfillmentStatus paymentGatewayNames note tags email phone currencyCode customerLocale
+  totalPriceSet { shopMoney { amount } } subtotalPriceSet { shopMoney { amount } }
+  totalShippingPriceSet { shopMoney { amount } } totalDiscountsSet { shopMoney { amount } }
+  customer { id }
+  shippingAddress { name phone address1 address2 city province }
+  shippingLine { title }
+  lineItems(first: 50) { nodes { title variantTitle quantity sku originalUnitPriceSet { shopMoney { amount } } discountedTotalSet { shopMoney { amount } } variant { id } image { url } } }`;
+
+const CUSTOMER_FIELDS = `
+  id displayName firstName lastName note tags createdAt updatedAt numberOfOrders amountSpent { amount }
+  defaultEmailAddress { emailAddress } defaultPhoneNumber { phoneNumber }
+  defaultAddress { address1 address2 city province phone }`;
+
+function orderRow(o: any) {
+  return {
+    id: num(o.id),
+    name: o.name,
+    created_at: o.createdAt,
+    updated_at: o.updatedAt,
+    processed_at: o.processedAt,
+    cancelled_at: o.cancelledAt,
+    closed_at: o.closedAt,
+    financial_status: o.displayFinancialStatus,
+    fulfillment_status: o.displayFulfillmentStatus,
+    payment_gateways: o.paymentGatewayNames ?? [],
+    note: o.note,
+    tags: o.tags ?? [],
+    email: o.email,
+    phone: o.phone ?? o.shippingAddress?.phone ?? null,
+    currency: o.currencyCode,
+    locale: o.customerLocale ?? null,
+    total: money(o.totalPriceSet),
+    subtotal: money(o.subtotalPriceSet),
+    shipping: money(o.totalShippingPriceSet),
+    discounts: money(o.totalDiscountsSet),
+    customer_id: o.customer?.id ? num(o.customer.id) : null,
+    shipping_address: o.shippingAddress,
+    shipping_title: o.shippingLine?.title ?? null,
+    line_items: (o.lineItems?.nodes ?? []).map((l: any) => ({
+      title: l.title,
+      variant_title: l.variantTitle,
+      quantity: l.quantity,
+      sku: l.sku,
+      price: money(l.originalUnitPriceSet),
+      total: money(l.discountedTotalSet),
+      shopify_variant_id: l.variant?.id ? num(l.variant.id) : null,
+      image: l.image?.url?.split("?")[0] ?? null,
+    })),
+  };
+}
+
+function customerRow(c: any) {
+  const a = c.defaultAddress;
+  return {
+    id: num(c.id),
+    name: c.displayName,
+    first_name: c.firstName,
+    last_name: c.lastName,
+    email: c.defaultEmailAddress?.emailAddress ?? null,
+    phone: c.defaultPhoneNumber?.phoneNumber ?? a?.phone ?? null,
+    address: a ?? null,
+    city: a?.city ?? null,
+    orders_count: Number(c.numberOfOrders ?? 0),
+    amount_spent: Number(c.amountSpent?.amount ?? 0),
+    note: c.note,
+    tags: c.tags ?? [],
+    created_at: c.createdAt,
+    updated_at: c.updatedAt,
+  };
+}
+
+async function getSetting(key: string) {
+  const { data } = await admin.from("app_settings").select("value").eq("key", key).maybeSingle();
+  return data?.value ?? null;
+}
+async function setSetting(key: string, value: unknown) {
+  await admin.from("app_settings").upsert({ key, value });
+}
+
+/** Imports orders and customers changed since the last run (everything the first time). */
+async function syncOrdersAndCustomers(full = false) {
+  const out: Record<string, number> = {};
+  for (const kind of ["customers", "orders"] as const) {
+    const cursorKey = `${kind}_cursor`;
+    const since = full ? null : ((await getSetting(cursorKey)) as string | null);
+    const query = since ? `updated_at:>='${since}'` : null;
+    let after: string | null = null;
+    let count = 0;
+    let newest = since ?? "";
+    do {
+      const d: any = await gql(
+        `query($after: String, $query: String) {
+          ${kind}(first: ${kind === "orders" ? 50 : 100}, after: $after, query: $query, sortKey: UPDATED_AT) {
+            pageInfo { hasNextPage endCursor }
+            nodes { ${kind === "orders" ? ORDER_FIELDS : CUSTOMER_FIELDS} }
+          }
+        }`,
+        { after, query },
+      );
+      const nodes = d[kind].nodes;
+      if (nodes.length) {
+        const rows = nodes.map(kind === "orders" ? orderRow : customerRow);
+        const { error } = await admin.from(kind).upsert(rows);
+        if (error) throw error;
+        count += rows.length;
+        for (const n of nodes) if (n.updatedAt > newest) newest = n.updatedAt;
+      }
+      after = d[kind].pageInfo.hasNextPage ? d[kind].pageInfo.endCursor : null;
+    } while (after);
+    if (newest) await setSetting(cursorKey, newest);
+    out[kind] = count;
+  }
+  return out;
+}
+
+async function refreshOrder(id: string | number) {
+  const d = await gql(`query($id: ID!) { order(id: $id) { ${ORDER_FIELDS} } }`, { id: gid("Order", id) });
+  if (!d.order) return { ignored: "order not found" };
+  const { error } = await admin.from("orders").upsert(orderRow(d.order));
+  if (error) throw error;
+  if (d.order.customer?.id) await refreshCustomer(num(d.order.customer.id));
+  return { order: d.order.name };
+}
+
+async function refreshCustomer(id: string | number) {
+  const d = await gql(`query($id: ID!) { customer(id: $id) { ${CUSTOMER_FIELDS} } }`, { id: gid("Customer", id) });
+  if (!d.customer) return { ignored: "customer not found" };
+  const { error } = await admin.from("customers").upsert(customerRow(d.customer));
+  if (error) throw error;
+  return { customer: num(d.customer.id) };
+}
+
+// ---------- setup: register webhooks ----------
+
+const TOPICS = ["INVENTORY_LEVELS_UPDATE", "ORDERS_CREATE", "ORDERS_UPDATED", "ORDERS_CANCELLED", "CUSTOMERS_CREATE", "CUSTOMERS_UPDATE"];
 
 async function setup() {
   const uri = `${SUPABASE_URL}/functions/v1/shopify`;
-  const d = await gql(`{ webhookSubscriptions(first: 50) { nodes { id topic uri } } }`);
-  if (d.webhookSubscriptions.nodes.some((w: any) => w.topic === "INVENTORY_LEVELS_UPDATE" && w.uri === uri)) {
-    return { webhook: "already connected" };
+  const d = await gql(`{ webhookSubscriptions(first: 100) { nodes { id topic uri } } }`);
+  const have = new Set(d.webhookSubscriptions.nodes.filter((w: any) => w.uri === uri).map((w: any) => w.topic));
+  const added: string[] = [];
+  for (const topic of TOPICS) {
+    if (have.has(topic)) continue;
+    const r = await gql(
+      `mutation($topic: WebhookSubscriptionTopic!, $uri: String!) {
+        webhookSubscriptionCreate(topic: $topic, webhookSubscription: { uri: $uri, format: JSON }) {
+          webhookSubscription { id } userErrors { message }
+        }
+      }`,
+      { topic, uri },
+    );
+    const ue = r.webhookSubscriptionCreate.userErrors;
+    if (ue?.length) throw new Error(`${topic}: ${ue.map((e: any) => e.message).join("; ")}`);
+    added.push(topic);
   }
-  const r = await gql(
-    `mutation($uri: String!) {
-      webhookSubscriptionCreate(topic: INVENTORY_LEVELS_UPDATE, webhookSubscription: { uri: $uri, format: JSON }) {
-        webhookSubscription { id } userErrors { message }
-      }
-    }`,
-    { uri },
-  );
-  const ue = r.webhookSubscriptionCreate.userErrors;
-  if (ue?.length) throw new Error(ue.map((e: any) => e.message).join("; "));
-  return { webhook: "connected" };
+  return { webhook: added.length ? "connected" : "already connected", added };
+}
+
+// ---------- team: name + password accounts ----------
+
+const TEAM_DOMAIN = "team.shopwithsask.com";
+const usernameToEmail = (u: string) => `${u.trim().toLowerCase()}@${TEAM_DOMAIN}`;
+
+async function teamAction(caller: any, body: any) {
+  if (caller.app_metadata?.role !== "owner") throw new Error("Only the owner can manage the team");
+  if (body.action === "team-list") {
+    const { data, error } = await admin.auth.admin.listUsers({ perPage: 200 });
+    if (error) throw error;
+    return {
+      users: data.users
+        .filter((u) => !u.email?.startsWith("claude-test-"))
+        .map((u) => ({
+          id: u.id,
+          login: u.email?.endsWith(`@${TEAM_DOMAIN}`) ? u.email.split("@")[0] : u.email,
+          name: u.user_metadata?.name ?? null,
+          role: u.app_metadata?.role ?? "staff",
+          last_sign_in_at: u.last_sign_in_at,
+        })),
+    };
+  }
+  if (body.action === "team-create") {
+    const username = String(body.username ?? "").trim().toLowerCase();
+    if (!/^[a-z0-9._-]{2,32}$/.test(username)) throw new Error("Username: 2-32 English letters or numbers, no spaces");
+    if (String(body.password ?? "").length < 6) throw new Error("Password must be at least 6 characters");
+    const { data, error } = await admin.auth.admin.createUser({
+      email: usernameToEmail(username),
+      password: body.password,
+      email_confirm: true,
+      user_metadata: { name: body.name || username },
+      app_metadata: { role: "staff" },
+    });
+    if (error) throw new Error(/already/i.test(error.message) ? "That username is taken" : error.message);
+    return { id: data.user.id };
+  }
+  if (body.action === "team-password") {
+    if (String(body.password ?? "").length < 6) throw new Error("Password must be at least 6 characters");
+    const { error } = await admin.auth.admin.updateUserById(body.id, { password: body.password });
+    if (error) throw error;
+    return { ok: true };
+  }
+  if (body.action === "team-delete") {
+    if (body.id === caller.id) throw new Error("You cannot remove your own account");
+    const { error } = await admin.auth.admin.deleteUser(body.id);
+    if (error) throw error;
+    return { ok: true };
+  }
+  throw new Error("unknown team action");
+}
+
+/** Everything, once a day (scheduled in the database). */
+async function daily() {
+  const result: Record<string, unknown> = {};
+  result.push = await push();
+  result.pull = await pull();
+  result.orders = await syncOrdersAndCustomers();
+  result.webhooks = await setup();
+  await setSetting("last_daily_sync", new Date().toISOString());
+  return result;
 }
 
 // ---------- webhook: Shopify → app ----------
@@ -386,18 +654,32 @@ Deno.serve(async (req) => {
       const raw = await req.text();
       if (!(await verifyHmac(raw, hmac))) return json({ error: "bad signature" }, 401);
       const topic = req.headers.get("x-shopify-topic");
-      if (topic === "inventory_levels/update") return json(await onInventoryLevel(JSON.parse(raw)));
+      const body = JSON.parse(raw);
+      if (topic === "inventory_levels/update") return json(await onInventoryLevel(body));
+      if (topic?.startsWith("orders/")) return json(await refreshOrder(body.id));
+      if (topic?.startsWith("customers/")) return json(await refreshCustomer(body.id));
       return json({ ignored: topic });
+    }
+
+    // the daily schedule in the database sends a shared secret instead of a user token
+    const cron = req.headers.get("x-cron-secret");
+    if (cron) {
+      if (!CRON_SECRET || cron !== CRON_SECRET) return json({ error: "bad cron secret" }, 401);
+      return json(await daily());
     }
 
     const jwt = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
     const { data: user } = await admin.auth.getUser(jwt);
     if (!user?.user) return json({ error: "sign in required" }, 401);
 
-    const { action } = await req.json().catch(() => ({ action: "" }));
+    const body = await req.json().catch(() => ({ action: "" }));
+    const action = body.action;
     if (action === "push") return json(await push());
     if (action === "pull") return json({ push: await push(), pull: await pull() });
+    if (action === "orders") return json(await syncOrdersAndCustomers(!!body.full));
+    if (action === "all") return json({ push: await push(), pull: await pull(), orders: await syncOrdersAndCustomers(), webhooks: await setup() });
     if (action === "setup") return json(await setup());
+    if (typeof action === "string" && action.startsWith("team-")) return json(await teamAction(user.user, body));
     return json({ error: "unknown action" }, 400);
   } catch (e) {
     console.error(e);

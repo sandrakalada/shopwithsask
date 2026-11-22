@@ -36,14 +36,14 @@ async function pushGroup(table: OutboxItem["table"], rows: Record<string, unknow
   const q =
     table === "stock_movements"
       ? supabase!.from(table).upsert(rows, { onConflict: "id", ignoreDuplicates: true })
-      : supabase!.from(table).upsert(rows, { onConflict: "id" });
+      : supabase!.from(table).upsert(rows, { onConflict: table === "app_settings" ? "key" : "id" });
   const { error } = await q;
   if (error) throw error;
 }
 
 /** Calls the "shopify" Edge Function (stock sync with the Shopify store). */
-export async function shopify(action: "push" | "pull" | "setup") {
-  const { data, error } = await supabase!.functions.invoke("shopify", { body: { action } });
+export async function shopify(action: string, extra: Record<string, unknown> = {}) {
+  const { data, error } = await supabase!.functions.invoke("shopify", { body: { action, ...extra } });
   if (error) {
     let msg = error.message;
     try {
@@ -69,7 +69,7 @@ async function push() {
     const rows =
       table === "stock_movements"
         ? group.map((g) => g.row)
-        : [...new Map(group.map((g) => [g.row.id as string, g.row])).values()];
+        : [...new Map(group.map((g) => [(g.row.id ?? g.row.key) as string, g.row])).values()];
     try {
       await pushGroup(table, rows);
     } catch (e) {
@@ -137,7 +137,12 @@ async function pull() {
     if (p.rows.length) await db.products.bulkPut(p.rows);
     if (v.rows.length)
       await db.variants.bulkPut(
-        v.rows.map((r) => ({ ...r, price: r.price == null ? null : Number(r.price), quantity: r.quantity + (pending.get(r.id) ?? 0) })),
+        v.rows.map((r) => ({
+          ...r,
+          price: r.price == null ? null : Number(r.price),
+          cost: r.cost == null ? null : Number(r.cost),
+          quantity: r.quantity + (pending.get(r.id) ?? 0),
+        })),
       );
     if (moves?.length) {
       await db.movements.bulkPut(moves.map(({ synced_at: _s, ...m }) => (void _s, { ...m, pending: 0 })));
@@ -146,6 +151,40 @@ async function pull() {
     await setMeta(p.key, p.cursor);
     await setMeta(v.key, v.cursor);
   });
+  await pullSynced("orders", db.orders);
+  await pullSynced("customers", db.customers);
+  await pullSynced("invoices", db.invoices);
+  await pullSynced("app_settings", db.settings);
+}
+
+/** Download rows changed since the last sync for tables stamped with synced_at. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function pullSynced(table: string, store: any) {
+  const key = `cursor:${table}`;
+  let cursor = (await getMeta(key)) ?? EPOCH;
+  for (;;) {
+    const { data, error } = await supabase!.from(table).select("*").gt("synced_at", cursor).order("synced_at", { ascending: true }).limit(PAGE);
+    if (error) {
+      if (/does not exist|schema cache/i.test(error.message)) return; // table not created yet
+      throw error;
+    }
+    if (!data.length) break;
+    // never overwrite an invoice/setting that is still waiting to upload from this phone
+    const waiting = new Set(
+      (await db.outbox.where("table").equals(table).toArray()).map((o) => (o.row.id ?? o.row.key) as string),
+    );
+    const rows = data
+      .filter((r) => !waiting.has((r.id ?? r.key) as string))
+      .map((r) => {
+        const out = { ...r };
+        for (const k of ["total", "subtotal", "shipping", "discounts", "discount", "amount_spent"]) if (out[k] != null) out[k] = Number(out[k]);
+        return out;
+      });
+    await store.bulkPut(rows);
+    cursor = data[data.length - 1].synced_at;
+    await setMeta(key, cursor);
+    if (data.length < PAGE) break;
+  }
 }
 
 export async function syncNow() {
@@ -211,5 +250,8 @@ export function startSync() {
 
 /** Wipe local data (used on sign-out). Pending changes are lost, so callers confirm first. */
 export async function resetLocal() {
-  await Promise.all([db.products.clear(), db.variants.clear(), db.movements.clear(), db.outbox.clear(), db.meta.clear()]);
+  await Promise.all([
+    db.products.clear(), db.variants.clear(), db.movements.clear(), db.outbox.clear(), db.meta.clear(),
+    db.orders.clear(), db.customers.clear(), db.invoices.clear(), db.settings.clear(),
+  ]);
 }

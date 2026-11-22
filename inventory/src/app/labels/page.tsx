@@ -1,27 +1,98 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import JsBarcode from "jsbarcode";
+import QRCode from "qrcode";
 import { db, type Product, type Variant } from "@/lib/db";
-import { variantLabel } from "@/lib/stock";
+import { stickerLink, variantLabel } from "@/lib/stock";
+import { imagesToPdf, printImages, shareFile } from "@/lib/pdf";
 import { Header } from "@/components/ui";
 import { PrintIcon } from "@/components/Icons";
 
-function Barcode({ value }: { value: string }) {
-  const ref = useRef<SVGSVGElement>(null);
-  useEffect(() => {
-    if (ref.current) JsBarcode(ref.current, value, { format: "CODE128", width: 1.6, height: 38, fontSize: 11, margin: 0, displayValue: true });
-  }, [value]);
-  return <svg ref={ref} className="h-auto max-w-full" />;
+// Sticker: 50 x 30 mm. Drawn at 12 px per mm (600 x 360) for sharp thermal printing.
+const W = 50, H = 30, PX = 12;
+
+function wrap(ctx: CanvasRenderingContext2D, text: string, max: number, lines: number) {
+  const words = text.split(/\s+/);
+  const out: string[] = [];
+  let cur = "";
+  for (const w of words) {
+    const t = cur ? `${cur} ${w}` : w;
+    if (ctx.measureText(t).width <= max) cur = t;
+    else {
+      if (cur) out.push(cur);
+      cur = w;
+    }
+  }
+  if (cur) out.push(cur);
+  if (out.length > lines) {
+    out.length = lines;
+    let last = out[lines - 1];
+    while (ctx.measureText(last + "…").width > max && last.length) last = last.slice(0, -1);
+    out[lines - 1] = last + "…";
+  }
+  return out;
+}
+
+let logoImg: Promise<HTMLImageElement> | null = null;
+function loadLogo() {
+  logoImg ??= new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = rej;
+    i.src = "/brand-wordmark.png";
+  });
+  return logoImg;
+}
+
+async function drawSticker(v: Variant, p: Product) {
+  const c = document.createElement("canvas");
+  c.width = W * PX;
+  c.height = H * PX;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  // 2.5 mm safe margin on every edge in case the printer shifts the sticker
+  const M = 2.5 * PX;
+
+  // QR on the left: opens the product on the website from any phone camera
+  const qrSize = 23 * PX;
+  const qr = document.createElement("canvas");
+  await QRCode.toCanvas(qr, stickerLink(v, p.handle), { margin: 0, width: qrSize, errorCorrectionLevel: "M" });
+  ctx.drawImage(qr, M, (c.height - qrSize) / 2, qrSize, qrSize);
+
+  const x = M + qrSize + 2 * PX, max = c.width - x - M;
+  ctx.fillStyle = "#000";
+  ctx.textBaseline = "top";
+  const font = (w: number, size: number) => `${w} ${size}px -apple-system, "Helvetica Neue", Arial, sans-serif`;
+
+  const logo = await loadLogo();
+  const lh = 3.2 * PX;
+  ctx.drawImage(logo, x, M + 0.4 * PX, Math.min((logo.width / logo.height) * lh, max), lh);
+  ctx.font = font(600, 25);
+  let y = M + 4.8 * PX;
+  for (const line of wrap(ctx, p.title, max, 3)) {
+    ctx.fillText(line, x, y);
+    y += 29;
+  }
+  ctx.font = font(700, 30);
+  ctx.fillText(variantLabel(v.title), x, c.height - M - 7.2 * PX);
+  ctx.font = font(600, 25);
+  ctx.fillText(v.sku ? `SKU ${v.sku}` : v.barcode, x, c.height - M - 3.4 * PX);
+  return c.toDataURL("image/png");
 }
 
 function Labels() {
-  const productId = useSearchParams().get("product");
-  const [scope, setScope] = useState<"product" | "instock" | "all">(productId ? "product" : "instock");
-  const [perStock, setPerStock] = useState(true);
-  const [showPrice, setShowPrice] = useState(true);
+  const params = useSearchParams();
+  const productId = params.get("product");
+  const variantId = params.get("variant");
+  const [scope, setScope] = useState<"one" | "product" | "instock" | "all">(variantId ? "one" : productId ? "product" : "instock");
+  const [perStock, setPerStock] = useState(!variantId);
+  const [busy, setBusy] = useState(false);
+  const [ready, setReady] = useState<{ key: string; images: string[]; pdf: Blob } | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   const data = useLiveQuery(async () => {
     const [products, variants] = await Promise.all([db.products.toArray(), db.variants.toArray()]);
@@ -34,43 +105,71 @@ function Labels() {
     for (const v of data.variants) {
       const p = data.pmap.get(v.product_id);
       if (!p || v.archived || p.archived) continue;
+      if (scope === "one" && v.id !== variantId) continue;
       if (scope === "product" && v.product_id !== productId) continue;
       if (scope === "instock" && v.quantity <= 0) continue;
       const copies = perStock ? Math.max(1, v.quantity) : 1;
       for (let i = 0; i < copies; i++) list.push({ v, p });
     }
-    return list.sort((a, b) => a.p.title.localeCompare(b.p.title));
-  }, [data, scope, perStock, productId]);
+    return list.sort((a, b) => a.p.title.localeCompare(b.p.title) || a.v.title.localeCompare(b.v.title));
+  }, [data, scope, perStock, productId, variantId]);
+
+  const key = `${scope}|${perStock}|${labels.map((l) => l.v.id + l.v.sku).join(",")}`;
+
+  async function prepare() {
+    setBusy(true);
+    const cache = new Map<string, string>();
+    const images: string[] = [];
+    for (const { v, p } of labels.slice(0, 500)) {
+      if (!cache.has(v.id)) cache.set(v.id, await drawSticker(v, p));
+      images.push(cache.get(v.id)!);
+    }
+    const pdf = await imagesToPdf(images.map((url) => ({ url, ratio: H / W })), W, H);
+    setReady({ key, images, pdf });
+    setPreview(images[0] ?? null);
+    setBusy(false);
+  }
+
+  const isReady = ready?.key === key;
 
   return (
     <>
-      <Header title="Barcode labels" back />
-      <main className="no-print space-y-3 p-4">
+      <Header title="Barcode stickers" back />
+      <main className="space-y-3 p-4">
         <div className="flex flex-wrap gap-2">
+          {variantId && <Chip on={scope === "one"} onClick={() => setScope("one")}>This size</Chip>}
           {productId && <Chip on={scope === "product"} onClick={() => setScope("product")}>This item</Chip>}
           <Chip on={scope === "instock"} onClick={() => setScope("instock")}>Everything in stock</Chip>
           <Chip on={scope === "all"} onClick={() => setScope("all")}>All items</Chip>
         </div>
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={perStock} onChange={(e) => setPerStock(e.target.checked)} /> One label per piece in stock</label>
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={showPrice} onChange={(e) => setShowPrice(e.target.checked)} /> Show price</label>
-        <button className="btn-dark w-full" onClick={() => window.print()} disabled={!labels.length}>
-          <PrintIcon className="h-5 w-5" /> Print {labels.length} labels
-        </button>
-        <p className="text-xs text-taupe">On iPhone, Print opens AirPrint, or choose Save to Files for a PDF. Labels are laid out 3 across on A4.</p>
-      </main>
-      <div className="labels grid grid-cols-3 gap-0 bg-white p-2 print:p-0">
-        {labels.slice(0, 600).map(({ v, p }, i) => (
-          <div key={`${v.id}-${i}`} className="flex flex-col items-center justify-center border border-dashed border-line px-2 py-2 text-center print:border-gray-300" style={{ breakInside: "avoid", height: "37mm" }}>
-            <p className="w-full truncate text-[10px] font-semibold leading-tight">{p.title}</p>
-            <p className="text-[10px] leading-tight">
-              {variantLabel(v.title)}
-              {showPrice && v.price != null ? ` · ${v.price} EGP` : ""}
-            </p>
-            <Barcode value={v.barcode} />
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={perStock} onChange={(e) => setPerStock(e.target.checked)} /> One sticker per piece in stock</label>
+
+        {!isReady ? (
+          <button className="btn-dark w-full" onClick={prepare} disabled={busy || !labels.length}>
+            {busy ? "Preparing stickers" : `Prepare ${labels.length} stickers (50 x 30 mm)`}
+          </button>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            <button className="btn-dark" onClick={() => printImages(ready.images, W, H)}>
+              <PrintIcon className="h-5 w-5" /> Print
+            </button>
+            <button className="btn-light" onClick={() => shareFile(ready.pdf, `stickers-${ready.images.length}.pdf`)}>
+              Share PDF
+            </button>
           </div>
-        ))}
-      </div>
-      <style>{`@media print { @page { size: A4; margin: 8mm; } header, nav { display: none !important; } }`}</style>
+        )}
+        {isReady && preview && (
+          <div className="card p-3">
+            <p className="mb-2 text-xs text-taupe">Preview (actual size 50 x 30 mm)</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={preview} alt="Sticker preview" className="w-full rounded border border-line" />
+          </div>
+        )}
+        <p className="text-xs text-taupe">
+          Print opens the print dialog: choose your label printer and 50 x 30 mm paper. Share PDF sends the file to a printer app such as Phomemo.
+          Scanning the QR with any phone camera opens the item on shopwithsask.com; the Scan tab reads the exact size.
+        </p>
+      </main>
     </>
   );
 }
