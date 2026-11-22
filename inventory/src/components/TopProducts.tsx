@@ -10,7 +10,7 @@ import { egp } from "@/lib/pdf";
 import { Thumb } from "./ui";
 
 type Period = 30 | 90 | 365 | 0;
-type Sort = "units" | "revenue" | "profit";
+type Sort = "units" | "revenue" | "profit" | "through";
 
 /** Products ranked by sales from Shopify orders. Real revenue = orders that are fulfilled AND paid. */
 export default function TopProducts() {
@@ -56,8 +56,16 @@ export default function TopProducts() {
       }
     }
     return [...agg.values()]
-      .map((r) => ({ ...r, profit: r.costKnown ? r.revenue - r.cost : null, stock: r.productId ? stockByProduct.get(r.productId) ?? 0 : null }))
-      .sort((a, b) => (sort === "units" ? b.units - a.units : sort === "revenue" ? b.revenue - a.revenue : (b.profit ?? -1e12) - (a.profit ?? -1e12)) || b.revenue - a.revenue);
+      .map((r) => {
+        const stock = r.productId ? stockByProduct.get(r.productId) ?? 0 : null;
+        const through = stock != null && r.units + stock > 0 ? Math.round((r.units / (r.units + stock)) * 100) : null;
+        return { ...r, profit: r.costKnown ? r.revenue - r.cost : null, stock, through };
+      })
+      .sort(
+        (a, b) =>
+          (sort === "units" ? b.units - a.units : sort === "revenue" ? b.revenue - a.revenue : sort === "through" ? (b.through ?? -1) - (a.through ?? -1) || b.units - a.units : (b.profit ?? -1e12) - (a.profit ?? -1e12)) ||
+          b.revenue - a.revenue,
+      );
   }, [data, period, sort, realOnly]);
 
   const totals = rows.reduce((s, r) => ({ units: s.units + r.units, revenue: s.revenue + r.revenue }), { units: 0, revenue: 0 });
@@ -71,8 +79,8 @@ export default function TopProducts() {
           </button>
         ))}
       </div>
-      <div className="flex gap-2">
-        {([["units", "Pieces sold"], ["revenue", "Revenue"], ["profit", "Profit"]] as [Sort, string][]).map(([k, l]) => (
+      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
+        {([["units", "Pieces sold"], ["revenue", "Revenue"], ["profit", "Profit"], ["through", "Sell-through"]] as [Sort, string][]).map(([k, l]) => (
           <button key={k} onClick={() => setSort(k)} className={`chip ${sort === k ? "chip-on" : ""}`}>
             {l}
           </button>
@@ -100,7 +108,7 @@ export default function TopProducts() {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{r.title}</p>
                 <p className="truncate text-xs text-taupe">
-                  {r.units} sold · {r.orders.size} orders{r.stock != null ? ` · ${r.stock} left` : ""}
+                  {r.units} sold · {r.orders.size} orders{r.stock != null ? ` · ${r.stock} left` : ""}{r.through != null ? ` · ${r.through}% sold` : ""}
                 </p>
               </div>
               <div className="text-right">

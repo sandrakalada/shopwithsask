@@ -8,6 +8,7 @@ import { db, supplierLink, type Product, type Reason, type Variant } from "@/lib
 import { newBarcode, reasonLabel, saveProduct, saveVariant, variantLabel } from "@/lib/stock";
 import { pending, pendingDelta, usePending } from "@/lib/pending";
 import CostRow from "@/components/CostRow";
+import ProductStats from "@/components/ProductStats";
 import { AdjustSheet, Header, Labeled, QtyPill, Stepper, Thumb, timeAgo, Toast } from "@/components/ui";
 import { MinusIcon, PlusIcon, PrintIcon } from "@/components/Icons";
 
@@ -95,6 +96,8 @@ function Item() {
           </ul>
           <p className="mt-2 text-xs text-taupe">Tap More to count or record a reason. Tap a size to edit its price or SKU.</p>
         </section>
+
+        <ProductStats product={product} variants={variants} />
 
         <section>
           <div className="mb-2 flex items-center justify-between">
