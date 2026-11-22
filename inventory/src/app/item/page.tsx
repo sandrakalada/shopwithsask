@@ -7,6 +7,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db, supplierLink, type Product, type Reason, type Variant } from "@/lib/db";
 import { newBarcode, reasonLabel, saveProduct, saveVariant, variantLabel } from "@/lib/stock";
 import { pending, pendingDelta, usePending } from "@/lib/pending";
+import CostRow from "@/components/CostRow";
 import { AdjustSheet, Header, Labeled, QtyPill, Stepper, Thumb, timeAgo, Toast } from "@/components/ui";
 import { MinusIcon, PlusIcon, PrintIcon } from "@/components/Icons";
 
@@ -15,6 +16,7 @@ const TYPES = ["Dresses", "Tops", "Bottoms", "Vests", "Jackets", "Matching Set",
 function Item() {
   const id = useSearchParams().get("id") ?? "";
   const product = useLiveQuery(() => db.products.get(id), [id]);
+  const rate = useLiveQuery(async () => Number((await db.settings.get("sar_to_egp"))?.value ?? 13) || 13, [], 13);
   const variants = useLiveQuery(() => db.variants.where("product_id").equals(id).toArray(), [id], []);
   const moves = useLiveQuery(
     async () => {
@@ -92,6 +94,17 @@ function Item() {
             {live.length === 0 && <li className="p-4 text-sm text-taupe">No sizes yet.</li>}
           </ul>
           <p className="mt-2 text-xs text-taupe">Tap More to count or record a reason. Tap a size to edit its price or SKU.</p>
+        </section>
+
+        <section>
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="font-semibold">Purchase price</h2>
+            <span className="text-xs text-taupe">1 SAR = {rate} EGP</span>
+          </div>
+          <div className="card divide-y divide-line">
+            {live.map((v) => <CostRow key={v.id} v={v} rate={rate} />)}
+          </div>
+          <p className="mt-2 text-xs text-taupe">Switch EGP / SAR to see the price in either. Changes wait for Save.</p>
         </section>
 
         <SkuByColour variants={live} />

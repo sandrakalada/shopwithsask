@@ -250,6 +250,12 @@ async function pushStock() {
 
 // ---------- pull: Shopify → app (products + stock) ----------
 
+/** Shein product page from its product number, e.g. https://ar.shein.com/Iridescent-Purple-Bomber-Jacket-p-23061788.html */
+function sheinUrl(title: string, id: string) {
+  const slug = title.replace(/[^A-Za-z0-9]+/g, " ").trim().split(/\s+/).map((w) => w[0].toUpperCase() + w.slice(1).toLowerCase()).join("-");
+  return `https://ar.shein.com/${slug || "item"}-p-${id}.html`;
+}
+
 async function pull() {
   const loc = await location();
   const shopify: any[] = [];
@@ -261,7 +267,7 @@ async function pull() {
           pageInfo { hasNextPage endCursor }
           nodes {
             id title sku price
-            product { id handle title productType status featuredMedia { preview { image { url } } } translations(locale: "ar") { key value } }
+            product { id handle title productType status featuredMedia { preview { image { url } } } translations(locale: "ar") { key value } shein: metafield(namespace: "custom", key: "shein_id") { value } }
             inventoryItem { id tracked unitCost { amount } inventoryLevel(locationId: $loc) { quantities(names: ["available"]) { quantity } } }
           }
         }
@@ -273,7 +279,7 @@ async function pull() {
   } while (after);
 
   const [{ data: products, error: pe }, { data: variants, error: ve }] = await Promise.all([
-    admin.from("products").select("id, handle, title, title_ar, product_type, image_url, archived, shopify_product_id"),
+    admin.from("products").select("id, handle, title, title_ar, product_type, image_url, archived, shopify_product_id, supplier_url"),
     admin.from("variants").select("id, product_id, title, sku, barcode, price, quantity, archived, cost, shopify_dirty, shopify_variant_id, shopify_inventory_item_id"),
   ]);
   if (pe || ve) throw pe ?? ve;
@@ -303,6 +309,9 @@ async function pull() {
         shopify_product_id: spId,
         title_ar: (sp.translations ?? []).find((t: any) => t.key === "title")?.value ?? null,
       };
+      // Shein product number saved on the Shopify product (metafield custom.shein_id) -> link to the Shein page
+      const sheinId = String(sp.shein?.value ?? "").match(/\d{5,}/)?.[0];
+      if (sheinId) (row as Record<string, unknown>).supplier_url = sheinUrl(sp.title, sheinId);
       const changed = !existingP || Object.entries(row).some(([k, v]) => (existingP as any)[k] !== v);
       if (!existingP) newProducts++;
       productRows.set(spId, changed ? row : {});

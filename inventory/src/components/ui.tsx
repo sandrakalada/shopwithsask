@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Product, Reason, Variant } from "@/lib/db";
-import { recordMovement, REASONS, setCount, thumb, variantLabel } from "@/lib/stock";
+import { recordMovement, setCount, thumb, variantLabel } from "@/lib/stock";
 import { BackIcon, MinusIcon, PlusIcon } from "./Icons";
 import { SyncBadge } from "./Shell";
 import SideMenu from "./SideMenu";
@@ -69,6 +69,15 @@ export function VariantRow({ v, p }: { v: Variant; p?: Product }) {
 }
 
 /** Bottom sheet for recording a stock change on one variant. */
+type Mode = "add" | "remove" | "count";
+const MODE_REASONS: Record<Mode, { value: Reason; label: string }[]> = {
+  add: [{ value: "receive", label: "Received" }, { value: "return", label: "Returned" }, { value: "adjust", label: "Correction" }],
+  remove: [{ value: "sale", label: "Sold" }, { value: "damage", label: "Damaged / lost" }, { value: "adjust", label: "Correction" }],
+  count: [],
+};
+const modeOf = (r: Reason): Mode => (r === "count" ? "count" : r === "sale" || r === "damage" ? "remove" : "add");
+
+/** Change stock for one size: add, remove or set the counted amount, with a reason. */
 export function AdjustSheet({
   variant,
   product,
@@ -80,76 +89,100 @@ export function AdjustSheet({
   initialReason?: Reason;
   onClose: (newQty?: number | null) => void;
 }) {
+  const [mode, setMode] = useState<Mode>(modeOf(initialReason));
   const [reason, setReason] = useState<Reason>(initialReason);
-  const [amount, setAmount] = useState(reason === "count" ? variant.quantity : 1);
-  const [sign, setSign] = useState<1 | -1>(1);
+  const [amount, setAmount] = useState(initialReason === "count" ? variant.quantity : 1);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
-  const meta = REASONS.find((r) => r.value === reason)!;
 
-  const delta = reason === "count" ? amount - variant.quantity : meta.sign === 0 ? sign * amount : meta.sign * amount;
+  const delta = mode === "count" ? amount - variant.quantity : mode === "add" ? amount : -amount;
   const after = variant.quantity + delta;
+  const min = mode === "count" ? 0 : 1;
+
+  function pickMode(m: Mode) {
+    setMode(m);
+    setReason(m === "count" ? "count" : MODE_REASONS[m][0].value);
+    setAmount(m === "count" ? variant.quantity : 1);
+  }
 
   async function save() {
     setBusy(true);
-    const q = reason === "count" ? await setCount(variant.id, amount, note) : await recordMovement(variant.id, delta, reason, note);
+    const q = mode === "count" ? await setCount(variant.id, amount, note) : await recordMovement(variant.id, delta, reason, note);
     onClose(q);
   }
 
+  const pcs = (n: number) => `${n} ${n === 1 ? "piece" : "pieces"}`;
+  const action = mode === "count" ? `Set stock to ${amount}` : mode === "add" ? `Add ${pcs(amount)}` : `Remove ${pcs(amount)}`;
+
   return (
     <div className="fixed inset-0 z-40 flex items-end bg-black/40 lg:items-center lg:justify-center" onClick={() => onClose()}>
-      <div className="pb-safe mx-auto w-full max-w-xl rounded-t-[20px] bg-canvas p-5 lg:max-w-md lg:rounded-[20px] lg:shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center gap-3">
-          <Thumb src={product?.image_url} size={44} />
+      <div className="pb-safe mx-auto w-full max-w-xl rounded-t-[22px] bg-canvas lg:max-w-md lg:rounded-[22px] lg:shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="mx-auto mt-2 h-1.5 w-10 rounded-full bg-line lg:hidden" />
+        <div className="flex items-center gap-3 px-5 pt-4">
+          <Thumb src={product?.image_url} size={48} />
           <div className="min-w-0 flex-1">
-            <p className="truncate font-semibold">{product?.title}</p>
-            <p className="text-sm text-taupe">
-              {variantLabel(variant.title)} · in stock {variant.quantity}
+            <p className="truncate text-[16px] font-semibold">{product?.title}</p>
+            <p className="text-[13px] text-taupe">{variantLabel(variant.title)}</p>
+          </div>
+          <button onClick={() => onClose()} className="flex h-8 w-8 items-center justify-center rounded-full bg-sand text-taupe" aria-label="Close">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" aria-hidden><path d="M6 6l12 12M18 6 6 18" /></svg>
+          </button>
+        </div>
+
+        <div className="space-y-4 p-5">
+          <div className="seg grid-cols-3">
+            {(["add", "remove", "count"] as Mode[]).map((m) => (
+              <button key={m} onClick={() => pickMode(m)} className={`seg-btn ${mode === m ? "seg-on" : ""}`}>
+                {m === "add" ? "Add" : m === "remove" ? "Remove" : "Count"}
+              </button>
+            ))}
+          </div>
+
+          {mode !== "count" && (
+            <div className="flex flex-wrap gap-2">
+              {MODE_REASONS[mode].map((r) => (
+                <button key={r.label} onClick={() => setReason(r.value)} className={`chip ${reason === r.value ? "chip-on" : ""}`}>
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="card p-4">
+            <p className="text-center text-[12px] font-medium uppercase tracking-wide text-taupe">
+              {mode === "count" ? "Pieces counted on the shelf" : mode === "add" ? "Pieces to add" : "Pieces to remove"}
             </p>
+            <div className="mt-2 flex items-center justify-between">
+              <button className="flex h-12 w-12 items-center justify-center rounded-full bg-sand active:opacity-70 disabled:opacity-30" disabled={amount <= min} onClick={() => setAmount((a) => Math.max(min, a - 1))} aria-label="Less">
+                <MinusIcon />
+              </button>
+              <input
+                inputMode="numeric"
+                aria-label="Quantity"
+                className="w-24 bg-transparent text-center text-[44px] font-semibold leading-none outline-none"
+                value={amount}
+                onChange={(e) => setAmount(Math.max(0, parseInt(e.target.value.replace(/\D/g, "") || "0", 10)))}
+              />
+              <button className="flex h-12 w-12 items-center justify-center rounded-full bg-ink text-white active:opacity-70" onClick={() => setAmount((a) => a + 1)} aria-label="More">
+                <PlusIcon />
+              </button>
+            </div>
+            <div className="mt-4 grid grid-cols-2 divide-x divide-line border-t border-line pt-3 text-center">
+              <div>
+                <p className="text-[12px] text-taupe">In stock now</p>
+                <p className="text-lg font-semibold">{variant.quantity}</p>
+              </div>
+              <div>
+                <p className="text-[12px] text-taupe">After saving</p>
+                <p className={`text-lg font-semibold ${after < 0 ? "text-danger" : delta > 0 ? "text-success" : delta < 0 ? "text-warn" : ""}`}>{after}</p>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          {REASONS.map((r) => (
-            <button key={r.value} onClick={() => {
-                setReason(r.value);
-                setAmount(r.value === "count" ? variant.quantity : 1);
-              }} className={`chip justify-center rounded-xl px-2 text-[13px] ${reason === r.value ? "chip-on" : ""}`}>
-              {r.label}
-            </button>
-          ))}
-        </div>
-
-        {meta.sign === 0 && reason !== "count" && (
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <button onClick={() => setSign(1)} className={`chip justify-center rounded-xl ${sign === 1 ? "chip-on" : ""}`}>Add</button>
-            <button onClick={() => setSign(-1)} className={`chip justify-center rounded-xl ${sign === -1 ? "chip-on" : ""}`}>Remove</button>
-          </div>
-        )}
-
-        <p className="mt-4 text-center text-xs uppercase tracking-wide text-taupe">{reason === "count" ? "Counted quantity" : "Quantity"}</p>
-        <div className="mt-1 flex items-center justify-center gap-5">
-          <button className="btn-light h-14 w-14 rounded-full p-0" onClick={() => setAmount((a) => Math.max(reason === "count" ? 0 : 1, a - 1))} aria-label="Less">
-            <MinusIcon />
+          <input className="field" placeholder="Note (optional, e.g. order number)" value={note} onChange={(e) => setNote(e.target.value)} />
+          <button className="btn-dark w-full" disabled={busy || delta === 0 || after < 0} onClick={save}>
+            {delta === 0 ? "No change" : after < 0 ? "Not enough stock" : action}
           </button>
-          <input
-            inputMode="numeric"
-            className="w-20 bg-transparent text-center text-4xl font-semibold outline-none"
-            value={amount}
-            onChange={(e) => setAmount(Math.max(0, parseInt(e.target.value.replace(/\D/g, "") || "0", 10)))}
-          />
-          <button className="btn-light h-14 w-14 rounded-full p-0" onClick={() => setAmount((a) => a + 1)} aria-label="More">
-            <PlusIcon />
-          </button>
-        </div>
-        <p className="mt-2 text-center text-sm text-taupe">
-          {variant.quantity} → <span className={`font-semibold ${after < 0 ? "text-red-600" : "text-ink"}`}>{after}</span>
-        </p>
-
-        <input className="field mt-4" placeholder="Note (optional, e.g. order number)" value={note} onChange={(e) => setNote(e.target.value)} />
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <button className="btn-light" onClick={() => onClose()}>Cancel</button>
-          <button className="btn-dark" disabled={busy || delta === 0} onClick={save}>Save</button>
         </div>
       </div>
     </div>
