@@ -3,25 +3,30 @@
 import Link from "next/link";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
-import { reasonLabel, variantLabel } from "@/lib/stock";
+import { costInEgp, reasonLabel, variantLabel } from "@/lib/stock";
 import { Header, timeAgo, VariantRow } from "@/components/ui";
+import { egp } from "@/lib/pdf";
 import { GearIcon, PlusIcon, PrintIcon, ScanIcon } from "@/components/Icons";
 import FaceIdOffer from "@/components/FaceIdOffer";
 
-const egp = (n: number) => `${Math.round(n).toLocaleString("en-US")} EGP`;
 
 export default function Home() {
   const data = useLiveQuery(async () => {
-    const [products, variants, recent] = await Promise.all([
+    const [products, variants, recent, rateRow] = await Promise.all([
       db.products.toArray(),
       db.variants.toArray(),
       db.movements.orderBy("created_at").reverse().limit(6).toArray(),
+      db.settings.get("sar_to_egp"),
     ]);
+    const rate = Number(rateRow?.value ?? 13) || 13;
     const live = variants.filter((v) => !v.archived);
     const pmap = new Map(products.map((p) => [p.id, p]));
     const vmap = new Map(variants.map((v) => [v.id, v]));
     const units = live.reduce((s, v) => s + Math.max(0, v.quantity), 0);
     const value = live.reduce((s, v) => s + Math.max(0, v.quantity) * (v.price ?? 0), 0);
+    const costValue = live.reduce((s, v) => s + Math.max(0, v.quantity) * (costInEgp(v, rate) ?? 0), 0);
+    const noCost = live.filter((v) => v.quantity > 0 && v.cost == null).length;
+    const liveProducts = new Set(live.filter((v) => v.quantity > 0).map((v) => v.product_id));
     const out = live.filter((v) => v.quantity <= 0).length;
     const low = live
       .filter((v) => v.quantity <= v.low_stock_at)
@@ -30,7 +35,7 @@ export default function Home() {
     const todays = await db.movements.where("created_at").aboveOrEqual(today).toArray();
     const soldToday = todays.filter((m) => m.reason === "sale").reduce((s, m) => s - m.delta, 0);
     const receivedToday = todays.filter((m) => m.reason === "receive").reduce((s, m) => s + m.delta, 0);
-    return { pmap, vmap, units, value, out, low, recent, soldToday, receivedToday, count: live.length };
+    return { pmap, vmap, units, value, costValue, noCost, productsInStock: liveProducts.size, out, low, recent, soldToday, receivedToday, count: live.length };
   }, []);
 
   return (
@@ -47,8 +52,10 @@ export default function Home() {
       <main className="space-y-5 p-4">
         <FaceIdOffer />
         <div className="grid grid-cols-2 gap-3">
-          <Stat label="Units in stock" value={data ? data.units.toLocaleString() : "–"} />
-          <Stat label="Stock value" value={data ? egp(data.value) : "–"} />
+          <Stat label="Products in stock" value={data ? data.productsInStock.toLocaleString() : "–"} />
+          <Stat label="Pieces in stock" value={data ? data.units.toLocaleString() : "–"} />
+          <Stat label="Value at selling price" value={data ? egp(data.value) : "–"} />
+          <Stat label="Value at cost price" value={data ? egp(data.costValue) : "–"} note={data && data.noCost ? `${data.noCost} sizes without cost` : undefined} />
           <Stat label="Sold today" value={data ? String(data.soldToday) : "–"} />
           <Stat label="Received today" value={data ? String(data.receivedToday) : "–"} />
         </div>
@@ -113,11 +120,12 @@ export default function Home() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, note }: { label: string; value: string; note?: string }) {
   return (
     <div className="card p-4">
       <p className="text-xs text-taupe">{label}</p>
-      <p className="mt-1 text-2xl font-semibold">{value}</p>
+      <p className="mt-1 text-xl font-semibold">{value}</p>
+      {note && <p className="mt-0.5 text-[11px] text-amber-700">{note}</p>}
     </div>
   );
 }

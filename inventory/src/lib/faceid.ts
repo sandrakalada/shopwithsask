@@ -27,7 +27,8 @@ export async function faceIdAvailable() {
 /** Creates a passkey for the signed-in user. Call it straight from a tap. */
 export async function enableFaceId() {
   const { error } = await supabase!.auth.registerPasskey();
-  if (error && !/already been registered|credential_exists/i.test(error.message)) throw new Error(error.message);
+  // "previously registered" means this phone already has a Face ID passkey for the account
+  if (error && !/already been registered|previously registered|credential_exists|InvalidState/i.test(error.message)) throw new Error(error.message);
   localStorage.setItem(FLAG, "1");
 }
 

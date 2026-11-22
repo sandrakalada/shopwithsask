@@ -54,7 +54,22 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
+      const hadController = !!navigator.serviceWorker.controller;
+      let reloaded = false;
+      // a new version was installed: reload once so it shows straight away
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (hadController && !reloaded) {
+          reloaded = true;
+          location.reload();
+        }
+      });
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((r) => {
+          void r.update();
+          document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && void r.update());
+        })
+        .catch(() => {});
     }
     if (navigator.storage?.persist) void navigator.storage.persist();
     if (!supabase) return;

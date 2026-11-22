@@ -16,7 +16,14 @@ export default function FaceIdOffer() {
       dismissed = localStorage.getItem(DISMISSED) === "1";
     } catch {}
     if (dismissed || faceIdEnabled()) return;
-    faceIdAvailable().then(setShow);
+    faceIdAvailable().then((ok) => {
+      if (!ok) return;
+      setShow(true);
+      // offered once only; afterwards it lives in Settings
+      try {
+        localStorage.setItem(DISMISSED, "1");
+      } catch {}
+    });
   }, []);
 
   if (!show) return null;

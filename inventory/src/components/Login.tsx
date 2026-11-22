@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { faceIdAvailable, faceIdEnabled, signInWithFaceId, unlockWithFaceId } from "@/lib/faceid";
+import { faceIdAvailable, signInWithFaceId, unlockWithFaceId } from "@/lib/faceid";
 
 /**
  * Sign-in screen. With `onUnlock` it is shown to an already signed-in user when the app
@@ -17,7 +17,8 @@ export default function Login({ onUnlock }: { onUnlock?: () => void }) {
   const [faceId, setFaceId] = useState(false);
 
   useEffect(() => {
-    faceIdAvailable().then((ok) => setFaceId(ok && faceIdEnabled()));
+    // passkey sign-in works on any phone that has Face ID / Touch ID, even after a reinstall
+    faceIdAvailable().then(setFaceId);
   }, []);
 
   async function submit(e: React.FormEvent) {
@@ -44,7 +45,14 @@ export default function Login({ onUnlock }: { onUnlock?: () => void }) {
         await signInWithFaceId();
       }
     } catch (e) {
-      setError(navigator.onLine ? (e as Error).message : "You are offline. Sign in once while online.");
+      const m = (e as Error).message;
+      setError(
+        !navigator.onLine
+          ? "You are offline. Sign in once while online."
+          : /not found|credential/i.test(m)
+            ? "Face ID is not set up for this phone yet. Sign in with your password, then turn on Face ID in Settings."
+            : m,
+      );
     }
     setBusy(false);
   }
