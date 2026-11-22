@@ -33,6 +33,13 @@ read locations, orders, fulfillments.
 - Settings → Refresh from Shopify (and automatically every 12 hours): imports new
   products and re-matches every quantity to Shopify.
 
+## Face ID
+
+Passkeys via Supabase Auth (experimental passkey API, RP ID sask-inventory.vercel.app).
+Settings or the Home card turns it on; the sign-in screen then offers Sign in with Face ID.
+When Face ID is on, the app asks for it on opening and after 5 minutes in the background;
+offline it checks the passkey on the phone.
+
 ## Using it
 
 - **Scan** tab modes: Look up, Receive +1, Sell -1, Return +1, Count.

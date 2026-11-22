@@ -10,8 +10,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { BoxIcon, ClockIcon, GearIcon, HomeIcon, ScanIcon } from "./Icons";
 import Login from "./Login";
-import { faceIdEnabled, unlockWithFaceId } from "@/lib/faceid";
-import Image from "next/image";
+import { faceIdEnabled } from "@/lib/faceid";
 
 const tabs = [
   { href: "/", label: "Home", Icon: HomeIcon },
@@ -60,7 +59,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     if (navigator.storage?.persist) void navigator.storage.persist();
     if (!supabase) return;
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+    const { data } = supabase.auth.onAuthStateChange((event, s) => {
+      setSession(s);
+      if (event === "SIGNED_IN") setLocked(false); // just signed in with password or Face ID
+    });
     return () => data.subscription.unsubscribe();
   }, []);
 
@@ -92,7 +94,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   }
   if (session === undefined) return <div className="min-h-dvh" />;
   if (!session) return <Login />;
-  if (locked) return <LockScreen onUnlock={() => setLocked(false)} />;
+  if (locked) return <Login onUnlock={() => setLocked(false)} />;
 
   const isPrint = pathname.startsWith("/labels");
   return (
@@ -124,30 +126,3 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function LockScreen({ onUnlock }: { onUnlock: () => void }) {
-  const [failed, setFailed] = useState(false);
-  async function unlock() {
-    setFailed(false);
-    if (await unlockWithFaceId()) onUnlock();
-    else setFailed(true);
-  }
-  return (
-    <main className="mx-auto flex min-h-dvh max-w-sm flex-col items-center justify-center px-6 text-center">
-      <Image src="/brand-wordmark.png" alt="SASK" width={180} height={64} className="h-auto w-40" priority />
-      <p className="mt-6 text-sm text-taupe">Inventory is locked</p>
-      <button className="btn-dark mt-8 w-full" onClick={unlock}>
-        Unlock with Face ID
-      </button>
-      {failed && <p className="mt-3 text-sm text-red-600">Face ID did not unlock. Try again.</p>}
-      <button
-        className="mt-6 text-sm text-taupe underline"
-        onClick={async () => {
-          await supabase?.auth.signOut({ scope: "local" });
-          onUnlock();
-        }}
-      >
-        Use password instead
-      </button>
-    </main>
-  );
-}

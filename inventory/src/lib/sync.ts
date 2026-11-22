@@ -159,17 +159,18 @@ export async function syncNow() {
   emit({ running: true, error: null, online: true });
   try {
     await push();
+    await pull(); // download first so the phone shows stock straight away
     // hand new stock changes to Shopify, and fully re-match with Shopify twice a day
     const lastPull = await getMeta("shopifyPull");
     const due = !lastPull || Date.now() - new Date(lastPull).getTime() > 12 * 3600_000;
     if (due) {
-      await shopify("pull")
-        .then(() => setMeta("shopifyPull", new Date().toISOString()))
-        .catch((e) => setMeta("shopifyError", String(e.message)));
+      const ok = await shopify("pull")
+        .then(() => setMeta("shopifyPull", new Date().toISOString()).then(() => true))
+        .catch((e) => setMeta("shopifyError", String(e.message)).then(() => false));
+      if (ok) await pull();
     } else if (pushedMovements) {
       await shopify("push").catch((e) => setMeta("shopifyError", String(e.message)));
     }
-    await pull();
     const t = new Date().toISOString();
     await setMeta("lastSync", t);
     emit({ running: false, lastSync: t });

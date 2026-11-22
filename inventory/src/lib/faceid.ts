@@ -1,24 +1,20 @@
 "use client";
 
-// Face ID app lock using the phone's built-in passkey support (WebAuthn).
-// The password sign-in stays the real login; Face ID only unlocks the app on this
-// phone, and works offline because the check happens on the device.
+// Face ID sign-in using passkeys stored in iCloud Keychain and verified by Supabase Auth.
+// Online: a real passwordless sign-in. Offline (already signed in on this phone): the same
+// passkey is checked on the device to open the app.
 
-const KEY = "sask-faceid";
+import { supabase } from "./supabase";
 
-const b64 = (buf: ArrayBuffer) => btoa(String.fromCharCode(...new Uint8Array(buf)));
-const unb64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
-const random = (n: number) => crypto.getRandomValues(new Uint8Array(n));
+const FLAG = "sask-faceid";
 
-function read(): { id: string; email: string } | null {
+export function faceIdEnabled() {
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "null");
+    return localStorage.getItem(FLAG) === "1";
   } catch {
-    return null;
+    return false;
   }
 }
-
-export const faceIdEnabled = () => !!read();
 
 export async function faceIdAvailable() {
   try {
@@ -28,41 +24,43 @@ export async function faceIdAvailable() {
   }
 }
 
-/** Must be called from a tap (iOS requires a user gesture). */
-export async function enableFaceId(email: string) {
-  const cred = (await navigator.credentials.create({
-    publicKey: {
-      challenge: random(32),
-      rp: { name: "Sask Inventory", id: location.hostname },
-      user: { id: random(16), name: email, displayName: email },
-      pubKeyCredParams: [
-        { type: "public-key", alg: -7 },
-        { type: "public-key", alg: -257 },
-      ],
-      authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "preferred" },
-      timeout: 60_000,
-    },
-  })) as PublicKeyCredential | null;
-  if (!cred) throw new Error("Face ID was not set up");
-  localStorage.setItem(KEY, JSON.stringify({ id: b64(cred.rawId), email }));
+/** Creates a passkey for the signed-in user. Call it straight from a tap. */
+export async function enableFaceId() {
+  const { error } = await supabase!.auth.registerPasskey();
+  if (error && !/already been registered|credential_exists/i.test(error.message)) throw new Error(error.message);
+  localStorage.setItem(FLAG, "1");
 }
 
-export function disableFaceId() {
+export async function disableFaceId() {
   try {
-    localStorage.removeItem(KEY);
+    const { data } = await supabase!.auth.passkey.list();
+    for (const p of data ?? []) await supabase!.auth.passkey.delete({ passkeyId: p.id });
   } catch {}
+  localStorage.removeItem(FLAG);
 }
 
-/** Asks for Face ID. Resolves true when the phone confirms it is the owner. */
+/** Passwordless sign-in (needs a connection). */
+export async function signInWithFaceId() {
+  const { error } = await supabase!.auth.signInWithPasskey();
+  if (error) throw new Error(/cancel|abort|NotAllowed/i.test(error.message) ? "Face ID was cancelled" : error.message);
+  localStorage.setItem(FLAG, "1");
+}
+
+/** Opens the app for an already signed-in user; works offline. */
 export async function unlockWithFaceId() {
-  const saved = read();
-  if (!saved) return true;
+  if (navigator.onLine) {
+    try {
+      await signInWithFaceId();
+      return true;
+    } catch {
+      // fall through to the on-device check
+    }
+  }
   try {
     const res = await navigator.credentials.get({
       publicKey: {
-        challenge: random(32),
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
         rpId: location.hostname,
-        allowCredentials: [{ type: "public-key", id: unb64(saved.id) }],
         userVerification: "required",
         timeout: 60_000,
       },

@@ -7,6 +7,6 @@ export const supabaseConfigured = Boolean(url && key);
 
 export const supabase: SupabaseClient | null = supabaseConfigured
   ? createClient(url!, key!, {
-      auth: { persistSession: true, autoRefreshToken: true, storageKey: "sask-inventory-auth" },
+      auth: { persistSession: true, autoRefreshToken: true, storageKey: "sask-inventory-auth", experimental: { passkey: true } },
     })
   : null;

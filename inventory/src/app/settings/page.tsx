@@ -54,8 +54,8 @@ export default function Settings() {
   }, []);
   async function toggleFaceId() {
     try {
-      if (faceId.on) disableFaceId();
-      else await enableFaceId(email ?? "owner");
+      if (faceId.on) await disableFaceId();
+      else await enableFaceId();
       setFaceId((f) => ({ ...f, on: faceIdEnabled(), msg: null }));
     } catch (e) {
       setFaceId((f) => ({ ...f, msg: (e as Error).message || "Face ID was not set up" }));
@@ -114,7 +114,7 @@ export default function Settings() {
           <p className="font-semibold">Face ID</p>
           <p className="text-taupe">
             {faceId.available
-              ? "Open the app with Face ID instead of typing your password. Works offline."
+              ? "Sign in with Face ID instead of typing your password. Also works offline."
               : "Face ID is not available in this browser. Open the app from your Home Screen on iPhone."}
           </p>
           {faceId.msg && <p className="text-red-600">{faceId.msg}</p>}
