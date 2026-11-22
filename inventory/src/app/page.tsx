@@ -37,6 +37,12 @@ export default function Home() {
     const today = new Date().toISOString().slice(0, 10);
     const todays = await db.movements.where("created_at").aboveOrEqual(today).toArray();
     const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+    const yearStart = new Date(new Date().getFullYear(), 0, 1).toISOString();
+    // real revenue = orders that are fulfilled AND paid
+    const real = orders.filter((o) => !o.cancelled_at && o.fulfillment_status === "FULFILLED" && o.financial_status === "PAID");
+    const sum = (list: typeof real) => ({ total: list.reduce((t, o) => t + Number(o.total ?? 0), 0), count: list.length });
+    const mtd = sum(real.filter((o) => o.created_at >= monthStart));
+    const ytd = sum(real.filter((o) => o.created_at >= yearStart));
     return {
       products: new Set(inStock.map((v) => v.product_id)).size,
       pieces: inStock.reduce((s, v) => s + v.quantity, 0),
@@ -47,6 +53,8 @@ export default function Home() {
       // month to date, unfulfilled only
       toShip: orders.filter((o) => !o.cancelled_at && o.fulfillment_status === "UNFULFILLED" && o.created_at >= monthStart).length,
       empty: live.length === 0,
+      mtd,
+      ytd,
     };
   }, []);
 
@@ -68,6 +76,15 @@ export default function Home() {
           <Tile href="/items?view=costs" label="Selling value" value={data ? egp(data.value) : "–"} sub="stock at selling price" />
           <Tile href="/items?view=costs" label="Cost value" value={data ? (data.cost ? egp(data.cost) : "Add costs") : "–"} sub="stock at cost price" />
         </div>
+
+        <section>
+          <h2 className="section-title">Sales</h2>
+          <div className="card divide-y divide-line overflow-hidden">
+            <SalesRow label="Month to date" sub={new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" })} data={data?.mtd} />
+            <SalesRow label="Year to date" sub={String(new Date().getFullYear())} data={data?.ytd} />
+          </div>
+          <p className="mt-1.5 px-1 text-[12px] text-taupe">Delivered and paid orders only.</p>
+        </section>
       </main>
     </>
   );
@@ -79,6 +96,21 @@ function Tile({ href, label, value, sub }: { href: string; label: string; value:
       <p className="text-xs text-taupe">{label}</p>
       <p className="mt-1 text-lg font-semibold leading-tight">{value}</p>
       {sub && <p className="mt-0.5 text-xs text-taupe">{sub}</p>}
+    </Link>
+  );
+}
+
+function SalesRow({ label, sub, data }: { label: string; sub: string; data?: { total: number; count: number } }) {
+  return (
+    <Link href="/items?view=top" className="row justify-between">
+      <div>
+        <p className="text-[15px] font-medium">{label}</p>
+        <p className="text-[12px] text-taupe">{sub}</p>
+      </div>
+      <div className="text-right">
+        <p className="text-[17px] font-semibold">{data ? egp(data.total) : "–"}</p>
+        <p className="text-[12px] text-taupe">{data ? `${data.count} ${data.count === 1 ? "order" : "orders"}` : ""}</p>
+      </div>
     </Link>
   );
 }
