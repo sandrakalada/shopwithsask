@@ -107,6 +107,26 @@ export type Invoice = {
   created_at: string;
 };
 
+export type ShipmentStatus = "ready" | "picked_up" | "delivered" | "returned" | "cancelled";
+
+export type Shipment = {
+  id: string;
+  order_id: string | null;
+  order_name: string | null;
+  courier: string;
+  tracking: string;
+  status: ShipmentStatus;
+  cod_amount: number;
+  pieces: number;
+  recipient: { name?: string; phone?: string; address1?: string; address2?: string; city?: string; province?: string };
+  contents: string | null;
+  note: string | null;
+  shopify_fulfilled: boolean;
+  created_by?: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Setting = { key: string; value: unknown };
 
 export type Reason = "receive" | "sale" | "return" | "adjust" | "count" | "damage" | "shopify";
@@ -126,7 +146,7 @@ export type Movement = {
 /** Writes waiting to be sent to Supabase, replayed in order. */
 export type OutboxItem = {
   seq?: number;
-  table: "products" | "variants" | "stock_movements" | "invoices" | "app_settings";
+  table: "products" | "variants" | "stock_movements" | "invoices" | "app_settings" | "shipments";
   row: Record<string, unknown>;
   created_at: string;
 };
@@ -143,6 +163,7 @@ export const db = new Dexie("sask-inventory") as Dexie & {
   customers: EntityTable<Customer, "id">;
   invoices: EntityTable<Invoice, "id">;
   settings: EntityTable<Setting, "key">;
+  shipments: EntityTable<Shipment, "id">;
 };
 
 db.version(1).stores({
@@ -159,6 +180,10 @@ db.version(2).stores({
   customers: "id, name, phone, updated_at",
   invoices: "id, number, order_id, customer_id, created_at",
   settings: "key",
+});
+
+db.version(3).stores({
+  shipments: "id, order_id, status, created_at",
 });
 
 export async function getMeta(key: string) {

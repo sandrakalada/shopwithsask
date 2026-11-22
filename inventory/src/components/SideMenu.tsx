@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { resetLocal } from "@/lib/sync";
 import { useRole } from "./Shell";
 
-import { BoxIcon, ChartIcon, ClockIcon, GearIcon, HomeIcon, PrintIcon, ReceiptIcon, ScanIcon, UsersIcon } from "./Icons";
+import { BoxIcon, ChartIcon, ClockIcon, GearIcon, HomeIcon, PrintIcon, ReceiptIcon, ScanIcon, TruckIcon, UsersIcon } from "./Icons";
 
 const TagIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -20,6 +20,12 @@ const TagIcon = ({ className }: { className?: string }) => (
 const DocIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5" />
+  </svg>
+);
+
+const PlusBoxIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M21 8.5V16l-9 5-9-5V8l9-5 4.5 2.5" /><path d="M3.3 7.7 12 12.5l3.5-1.9M12 12.5V21" /><path d="M19 2v6M16 5h6" />
   </svg>
 );
 
@@ -40,6 +46,8 @@ const SECTIONS: { title: string; items: { href: string; label: string; Icon: (p:
     title: "Sales",
     items: [
       { href: "/orders", label: "Orders", Icon: ReceiptIcon },
+      { href: "/shipments", label: "Shipments", Icon: TruckIcon },
+      { href: "/shipment?new=1", label: "New shipment", Icon: PlusBoxIcon },
       { href: "/invoice?new=1", label: "New invoice", Icon: DocIcon },
       { href: "/customers", label: "Customers", Icon: UsersIcon },
     ],
@@ -71,7 +79,7 @@ function useNav() {
     role === "shipping" ? [{ title: "", items: SECTIONS.flatMap((x) => x.items).filter((i) => i.href === "/orders") }] : SECTIONS;
   const qs = params.toString();
   const here = pathname + (qs ? `?${qs}` : "");
-  const isActive = (href: string) => href === here || (href === pathname && !here.includes("view=") && !here.includes("new=")) || (href === "/items" && pathname === "/item") || (href === "/orders" && pathname === "/order") || (href === "/customers" && pathname === "/customer");
+  const isActive = (href: string) => href === here || (href === pathname && !here.includes("view=") && !here.includes("new=")) || (href === "/items" && pathname === "/item") || (href === "/orders" && pathname === "/order") || (href === "/customers" && pathname === "/customer") || (href === "/shipments" && pathname === "/shipment" && !here.includes("new="));
   return { sections, who, isActive };
 }
 

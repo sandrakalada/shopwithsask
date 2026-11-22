@@ -2,15 +2,14 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
-import { getSetting } from "@/lib/stock";
-import { addressLines, egp, elementToImage, imagesToPdf, preparePrint, printNow, qrDataUrl, shareFile, waLink } from "@/lib/pdf";
+import { addressLines, egp, printNow, shareFile, waLink } from "@/lib/pdf";
 import { Header, Thumb } from "@/components/ui";
-import { PhoneIcon, PrintIcon, WhatsAppIcon } from "@/components/Icons";
-import ShippingLabel, { shipmentNumber, type LabelStore } from "@/components/ShippingLabel";
-import JsBarcode from "jsbarcode";
+import { PhoneIcon, PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
+import { useShippingLabel } from "@/components/useShippingLabel";
+import { STATUS_LABEL, STATUS_TONE } from "@/lib/shipments";
 import { fmtDate, orderCustomerName, orderPhone, paymentLabel, StatusPills } from "@/components/orderUi";
 import { useRole } from "@/components/Shell";
 
@@ -21,46 +20,12 @@ function OrderView() {
   const customer = useLiveQuery(async () => (order?.customer_id ? db.customers.get(order.customer_id) : undefined), [order?.customer_id]);
   const invoice = useLiveQuery(() => db.invoices.where("order_id").equals(id).first(), [id]);
 
-  // shipping label is prepared as soon as the order opens, so Print is a single tap
-  const labelRef = useRef<HTMLDivElement>(null);
-  const [assets, setAssets] = useState<{ qr: string; barcode: string; store: LabelStore } | null>(null);
-  const [label, setLabel] = useState<{ url: string; pdf: Blob } | null>(null);
-
-  useEffect(() => {
-    if (!order) return;
-    (async () => {
-      const store: LabelStore = {
-        name: "Shop With Sask",
-        phone: await getSetting<string>("store_phone", ""),
-        address: await getSetting<string>("store_address", "Cairo, Egypt"),
-        website: "shopwithsask.com",
-      };
-      // Code 128 shipment barcode, scannable by courier hand scanners
-      const c = document.createElement("canvas");
-      JsBarcode(c, shipmentNumber(order), { format: "CODE128", width: 4, height: 180, displayValue: false, margin: 0 });
-      setAssets({ qr: await qrDataUrl(`${order.name} ${shipmentNumber(order)}`, 300), barcode: c.toDataURL("image/png"), store });
-    })();
-  }, [order]);
-
-  useEffect(() => {
-    if (!assets || !labelRef.current) return;
-    let cancelled = false;
-    (async () => {
-      await document.fonts?.ready;
-      // let the page paint first; drawing the label is heavy on phones
-      await new Promise((r) => setTimeout(r, 400));
-      if (cancelled || !labelRef.current) return;
-      const img = await elementToImage(labelRef.current);
-      const pdf = await imagesToPdf([img], 100, 150);
-      if (!cancelled) {
-        setLabel({ url: img.url, pdf });
-        preparePrint([img.url], 100, 150, pdf); // ready in advance: Print opens instantly on iPhone
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [assets]);
+  const shipment = useLiveQuery(
+    async () => (await db.shipments.where("order_id").equals(id).toArray()).filter((x) => x.status !== "cancelled").sort((a, b) => b.created_at.localeCompare(a.created_at))[0] ?? null,
+    [id],
+  );
+  // the label is drawn as soon as the order opens, so Print is a single tap
+  const { label, offscreen } = useShippingLabel(order, shipment);
 
   if (order === undefined) return <Header title="" back />;
   if (!order) return (<><Header title="Order" back /><p className="p-4 text-sm text-taupe">This order is not on this phone yet.</p></>);
@@ -86,11 +51,7 @@ function OrderView() {
             <div className="mx-auto aspect-[2/3] w-full max-w-sm animate-pulse rounded-xl bg-sand" />
           )}
         </main>
-        {assets && (
-          <div style={{ position: "fixed", left: -10000, top: 0 }} aria-hidden>
-            <ShippingLabel ref={labelRef} order={order} store={assets.store} qr={assets.qr} barcode={assets.barcode} logo="/brand-wordmark.png" />
-          </div>
-        )}
+        {offscreen}
       </>
     );
   }
@@ -112,6 +73,33 @@ function OrderView() {
             </div>
             <StatusPills o={order} />
           </div>
+        </section>
+
+        <section className="card p-4">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs uppercase tracking-wide text-taupe">Shipping</p>
+            {shipment && <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${STATUS_TONE[shipment.status]}`}>{STATUS_LABEL[shipment.status]}</span>}
+          </div>
+          {shipment ? (
+            <Link href={`/shipment?id=${shipment.id}`} className="mt-2 flex items-center gap-3">
+              <TruckIcon className="h-5 w-5 text-taupe" />
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold">{shipment.courier} · <span dir="ltr">{shipment.tracking}</span></p>
+                <p className="text-xs text-taupe">
+                  {shipment.cod_amount > 0 ? `Collect ${egp(shipment.cod_amount)}` : "Nothing to collect"}
+                  {shipment.shopify_fulfilled ? " · Shipped in Shopify" : ""}
+                </p>
+              </div>
+              <span className="text-[13px] font-semibold text-caramel">Open</span>
+            </Link>
+          ) : (
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <p className="text-sm text-taupe">No shipment yet.</p>
+              <Link href={`/shipment?order=${order.id}`} className="btn-dark px-4">
+                <TruckIcon className="h-5 w-5" /> Create shipment
+              </Link>
+            </div>
+          )}
         </section>
 
         <div className="lg:hidden">
@@ -207,13 +195,7 @@ function OrderView() {
           )}
         </aside>
       </main>
-
-      {/* off-screen copy used to draw the label */}
-      {assets && (
-        <div style={{ position: "fixed", left: -10000, top: 0 }} aria-hidden>
-          <ShippingLabel ref={labelRef} order={order} store={assets.store} qr={assets.qr} barcode={assets.barcode} logo="/brand-wordmark.png" />
-        </div>
-      )}
+      {offscreen}
     </>
   );
 }

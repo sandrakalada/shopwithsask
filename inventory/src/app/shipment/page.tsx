@@ -1,0 +1,316 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db, type Shipment, type ShipmentStatus } from "@/lib/db";
+import { egp, printNow, shareFile, waLink } from "@/lib/pdf";
+import { Header } from "@/components/ui";
+import { PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
+import { useShippingLabel } from "@/components/useShippingLabel";
+import {
+  COURIERS, STATUS_LABEL, STATUS_TONE, markPaidInShopify, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder, trackingUrl,
+} from "@/lib/shipments";
+
+const CITIES = ["Cairo", "Giza", "Alexandria", "Qalyubia", "Sharqia", "Dakahlia", "Gharbia", "Monufia", "Beheira", "Kafr El Sheikh", "Damietta", "Port Said", "Ismailia", "Suez", "Fayoum", "Beni Suef", "Minya", "Asyut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "Matrouh", "North Sinai", "South Sinai", "New Valley"];
+
+function ShipmentRouter() {
+  const p = useSearchParams();
+  const id = p.get("id");
+  const orderId = p.get("order");
+  if (id) return <ShipmentView id={id} />;
+  return <ShipmentForm orderId={orderId} />;
+}
+
+/* ---------- create / edit ---------- */
+
+function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; editing?: Shipment; onDone?: () => void }) {
+  const router = useRouter();
+  const order = useLiveQuery(async () => (orderId ? (await db.orders.get(orderId)) ?? null : null), [orderId]);
+  const [s, setS] = useState<Shipment | null>(editing ?? (orderId ? null : newManualShipment()));
+  const [toShopify, setToShopify] = useState(true);
+  const [notify, setNotify] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!s && order) setS(newShipmentForOrder(order));
+  }, [order, s]);
+
+  if (orderId && order === null) return (<><Header title="Shipment" back /><p className="p-4 text-sm text-taupe">This order is not on this device yet.</p></>);
+  if (!s) return <Header title="" back />;
+
+  const set = (patch: Partial<Shipment>) => setS({ ...s, ...patch });
+  const setR = (patch: Partial<Shipment["recipient"]>) => setS({ ...s, recipient: { ...s.recipient, ...patch } });
+  const valid = !!s.recipient.name?.trim() && !!s.recipient.phone?.trim() && !!s.recipient.address1?.trim() && !!s.tracking.trim();
+
+  async function save() {
+    if (!valid || !s) return;
+    setBusy(true);
+    setErr(null);
+    try {
+      const row = await saveShipment({ ...s, tracking: s.tracking.trim(), cod_amount: Math.max(0, Number(s.cod_amount) || 0), pieces: Math.max(1, Number(s.pieces) || 1) });
+      if (!editing && row.order_id && toShopify) {
+        try {
+          await sendToShopify(row, notify);
+        } catch (e) {
+          setErr(`Saved, but Shopify was not updated: ${(e as Error).message}`);
+          setBusy(false);
+          router.replace(`/shipment?id=${row.id}`);
+          return;
+        }
+      }
+      if (onDone) onDone();
+      else router.replace(`/shipment?id=${row.id}`);
+    } catch (e) {
+      setErr((e as Error).message);
+    }
+    setBusy(false);
+  }
+
+  const title = editing ? "Edit shipment" : s.order_name ? `Ship ${s.order_name}` : "New shipment";
+
+  return (
+    <>
+      {!editing && <Header title={title} back />}
+      <main className={editing ? "space-y-4" : "space-y-4 p-4 pb-32 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0"}>
+        <div className="space-y-4">
+          <section className="card space-y-3 p-4">
+            <p className="section-title px-0">Courier</p>
+            <div className="no-scrollbar -mx-1 flex flex-wrap gap-2 px-1">
+              {COURIERS.map((c) => (
+                <button key={c} type="button" onClick={() => set({ courier: c })} className={`chip ${s.courier === c ? "chip-on" : ""}`}>
+                  {c}
+                </button>
+              ))}
+            </div>
+            <label className="block text-sm">
+              <span className="text-taupe">Tracking number</span>
+              <input className="field mt-1" dir="ltr" value={s.tracking} onChange={(e) => set({ tracking: e.target.value })} placeholder="From the courier, or keep ours" />
+            </label>
+            <p className="text-xs text-taupe">Paste the courier&apos;s airway bill number when you have it. Until then our own number is printed on the label.</p>
+          </section>
+
+          <section className="card space-y-3 p-4">
+            <p className="section-title px-0">Deliver to</p>
+            <input className="field" placeholder="Name" value={s.recipient.name ?? ""} onChange={(e) => setR({ name: e.target.value })} />
+            <input className="field" placeholder="Phone" dir="ltr" inputMode="tel" value={s.recipient.phone ?? ""} onChange={(e) => setR({ phone: e.target.value })} />
+            <input className="field" placeholder="Street, building, floor, apartment" value={s.recipient.address1 ?? ""} onChange={(e) => setR({ address1: e.target.value })} />
+            <input className="field" placeholder="Area / landmark" value={s.recipient.address2 ?? ""} onChange={(e) => setR({ address2: e.target.value })} />
+            <div className="grid grid-cols-2 gap-2">
+              <input className="field" placeholder="City" list="cities" value={s.recipient.city ?? ""} onChange={(e) => setR({ city: e.target.value })} />
+              <input className="field" placeholder="Governorate" list="cities" value={s.recipient.province ?? ""} onChange={(e) => setR({ province: e.target.value })} />
+            </div>
+            <datalist id="cities">{CITIES.map((c) => <option key={c} value={c} />)}</datalist>
+          </section>
+        </div>
+
+        <div className="space-y-4">
+          <section className="card space-y-3 p-4">
+            <p className="section-title px-0">Parcel</p>
+            <div className="grid grid-cols-2 gap-2">
+              <label className="block text-sm">
+                <span className="text-taupe">Cash to collect (EGP)</span>
+                <input className="field mt-1" inputMode="decimal" value={String(s.cod_amount)} onChange={(e) => set({ cod_amount: Number(e.target.value.replace(/[^\d.]/g, "")) || 0 })} />
+              </label>
+              <label className="block text-sm">
+                <span className="text-taupe">Parcels</span>
+                <input className="field mt-1" inputMode="numeric" value={String(s.pieces)} onChange={(e) => set({ pieces: Number(e.target.value.replace(/\D/g, "")) || 1 })} />
+              </label>
+            </div>
+            <p className="text-xs text-taupe">Set 0 when the order is already paid (Instapay).</p>
+            <label className="block text-sm">
+              <span className="text-taupe">Contents</span>
+              <textarea className="field mt-1 min-h-20" value={s.contents ?? ""} onChange={(e) => set({ contents: e.target.value })} placeholder="1x Floral Wrap Mini Dress (Medium)" />
+            </label>
+            <label className="block text-sm">
+              <span className="text-taupe">Note for the courier</span>
+              <input className="field mt-1" value={s.note ?? ""} onChange={(e) => set({ note: e.target.value })} placeholder="Call before delivery" />
+            </label>
+          </section>
+
+          {!editing && s.order_id && (
+            <section className="card space-y-3 p-4 text-sm">
+              <label className="flex items-start gap-3">
+                <input type="checkbox" className="mt-1" checked={toShopify} onChange={(e) => setToShopify(e.target.checked)} />
+                <span>
+                  <span className="font-semibold">Mark as shipped in Shopify</span>
+                  <span className="block text-taupe">Adds the courier and tracking number to the order.</span>
+                </span>
+              </label>
+              {toShopify && (
+                <label className="flex items-start gap-3">
+                  <input type="checkbox" className="mt-1" checked={notify} onChange={(e) => setNotify(e.target.checked)} />
+                  <span>
+                    <span className="font-semibold">Email the customer</span>
+                    <span className="block text-taupe">Shopify sends the shipping confirmation with the tracking number.</span>
+                  </span>
+                </label>
+              )}
+            </section>
+          )}
+
+          {err && <p className="card p-4 text-sm text-red-700">{err}</p>}
+          <div className="grid grid-cols-2 gap-2">
+            {editing && <button className="btn-light" onClick={onDone}>Cancel</button>}
+            <button className={`btn-dark ${editing ? "" : "col-span-2"}`} disabled={!valid || busy} onClick={save}>
+              <TruckIcon className="h-5 w-5" /> {busy ? "Saving" : editing ? "Save changes" : "Create shipment"}
+            </button>
+          </div>
+          {!valid && <p className="text-xs text-taupe">Name, phone, address and tracking number are needed.</p>}
+        </div>
+      </main>
+    </>
+  );
+}
+
+/* ---------- view ---------- */
+
+const FLOW: ShipmentStatus[] = ["ready", "picked_up", "delivered", "returned", "cancelled"];
+
+function ShipmentView({ id }: { id: string }) {
+  const s = useLiveQuery(async () => (await db.shipments.get(id)) ?? null, [id]);
+  const order = useLiveQuery(async () => (s?.order_id ? (await db.orders.get(s.order_id)) ?? null : null), [s?.order_id]);
+  const labelOrder = s ? (s.order_id && order === undefined ? undefined : order ?? shipmentAsOrder(s)) : undefined;
+  const { label, offscreen } = useShippingLabel(labelOrder, s);
+  const [edit, setEdit] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [notify, setNotify] = useState(false);
+
+  if (s === undefined) return <Header title="" back />;
+  if (!s) return (<><Header title="Shipment" back /><p className="p-4 text-sm text-taupe">This shipment is not on this device yet.</p></>);
+
+  const unpaid = order && (order.financial_status === "PENDING" || order.financial_status === "PARTIALLY_PAID");
+  const run = async (key: string, fn: () => Promise<unknown>, ok: string) => {
+    setBusy(key);
+    setMsg(null);
+    try {
+      await fn();
+      setMsg({ ok: true, text: ok });
+    } catch (e) {
+      setMsg({ ok: false, text: (e as Error).message });
+    }
+    setBusy(null);
+  };
+  const r = s.recipient;
+  const track = trackingUrl(s.courier, s.tracking);
+  const waText = `Hi ${(r.name ?? "").split(" ")[0]}, your Shop With Sask order${s.order_name ? ` ${s.order_name}` : ""} is on its way with ${s.courier}. Tracking number: ${s.tracking}${track ? `\n${track}` : ""}${s.cod_amount > 0 ? `\nAmount to pay on delivery: ${egp(s.cod_amount)}` : ""}`;
+
+  return (
+    <>
+      <Header title={s.order_name ? `Shipment ${s.order_name}` : "Shipment"} back />
+      <main className="p-4 pb-28 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-6">
+        <div className="space-y-4">
+          {edit ? (
+            <ShipmentForm editing={s} onDone={() => setEdit(false)} />
+          ) : (
+            <>
+              <section className="card p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xl font-semibold">{s.courier}</p>
+                    <p className="text-sm text-taupe" dir="ltr">{s.tracking}</p>
+                  </div>
+                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-[12px] font-semibold ${STATUS_TONE[s.status]}`}>{STATUS_LABEL[s.status]}</span>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-xs text-taupe">Cash to collect</p>
+                    <p className="font-semibold">{s.cod_amount > 0 ? egp(s.cod_amount) : "Nothing"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-taupe">Parcels</p>
+                    <p className="font-semibold">{s.pieces}</p>
+                  </div>
+                </div>
+                {s.order_id && (
+                  <p className="mt-3 text-sm">
+                    <Link href={`/order?id=${s.order_id}`} className="font-semibold underline">Order {s.order_name}</Link>
+                    <span className="text-taupe">{s.shopify_fulfilled ? " · shipped in Shopify" : " · not marked shipped in Shopify"}</span>
+                  </p>
+                )}
+              </section>
+
+              <section className="card p-4">
+                <p className="section-title px-0">Status</p>
+                <div className="flex flex-wrap gap-2">
+                  {FLOW.map((st) => (
+                    <button key={st} className={`chip ${s.status === st ? "chip-on" : ""}`} onClick={() => st !== s.status && saveShipment({ ...s, status: st })}>
+                      {STATUS_LABEL[st]}
+                    </button>
+                  ))}
+                </div>
+                {s.status === "delivered" && unpaid && (
+                  <button className="btn-dark mt-3 w-full" disabled={!!busy} onClick={() => run("paid", () => markPaidInShopify(s.order_id!), "Order marked as paid in Shopify.")}>
+                    {busy === "paid" ? "Updating Shopify" : `Cash collected: mark ${s.order_name} paid in Shopify`}
+                  </button>
+                )}
+              </section>
+
+              <section className="card p-4 text-sm">
+                <div className="flex items-center justify-between">
+                  <p className="section-title px-0">Deliver to</p>
+                  <button className="text-[13px] font-semibold text-caramel" onClick={() => setEdit(true)}>Edit</button>
+                </div>
+                <p className="font-semibold">{r.name}</p>
+                {r.phone && <p dir="ltr">{r.phone}</p>}
+                <p className="mt-1">{[r.address1, r.address2, r.city, r.province].filter(Boolean).join(", ")}</p>
+                {s.contents && <p className="mt-3 text-taupe">Contents: {s.contents}</p>}
+                {s.note && <p className="mt-1 text-taupe">Note: {s.note}</p>}
+                {r.phone && (
+                  <a className="btn-light mt-3 w-full" href={waLink(r.phone, waText)} target="_blank" rel="noreferrer">
+                    <WhatsAppIcon className="h-5 w-5" /> Send tracking on WhatsApp
+                  </a>
+                )}
+              </section>
+
+              {s.order_id && !s.shopify_fulfilled && s.status !== "cancelled" && (
+                <section className="card space-y-3 p-4 text-sm">
+                  <p className="font-semibold">Shopify still shows this order as not shipped.</p>
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} /> Email the customer the tracking number
+                  </label>
+                  <button className="btn-dark w-full" disabled={!!busy} onClick={() => run("ship", () => sendToShopify(s, notify), "Order marked as shipped in Shopify.")}>
+                    {busy === "ship" ? "Updating Shopify" : "Mark as shipped in Shopify"}
+                  </button>
+                </section>
+              )}
+              {msg && <p className={`card p-4 text-sm ${msg.ok ? "text-emerald-700" : "text-red-700"}`}>{msg.text}</p>}
+            </>
+          )}
+        </div>
+
+        <aside className="mt-4 space-y-3 lg:sticky lg:top-24 lg:mt-0">
+          <div className="grid grid-cols-2 gap-2">
+            <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
+              <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
+            </button>
+            <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${s.tracking}.pdf`)}>
+              Share label
+            </button>
+          </div>
+          {label ? (
+            <section className="card p-3">
+              <p className="mb-2 text-xs text-taupe">Shipping label (100 x 150 mm)</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={label.url} alt="Shipping label preview" className="mx-auto w-56 rounded border border-line lg:w-full" />
+            </section>
+          ) : (
+            <div className="mx-auto aspect-[2/3] w-56 animate-pulse rounded-[14px] bg-sand lg:w-full" />
+          )}
+        </aside>
+      </main>
+      {offscreen}
+    </>
+  );
+}
+
+export default function ShipmentPage() {
+  return (
+    <Suspense>
+      <ShipmentRouter />
+    </Suspense>
+  );
+}

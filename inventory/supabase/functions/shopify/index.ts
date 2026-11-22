@@ -708,6 +708,53 @@ const egpMoney = (n: number) => ({ amount: Number(n || 0).toFixed(2), currencyCo
 /** Records an offline sale as a real Shopify order (paid or cash on delivery, delivered now or not).
  * Shopify deducts the stock; the order comes back to the app through the orders webhook.
  * No tax lines are added (the store charges no tax). */
+// ---------- shipping ----------
+
+async function accessScopes() {
+  const d = await gql(`{ currentAppInstallation { accessScopes { handle } } }`);
+  return d.currentAppInstallation.accessScopes.map((x: any) => x.handle);
+}
+
+/** Marks a Shopify order as shipped, with the courier and tracking number (optionally emails the customer). */
+async function fulfillOrder(orderId: string, t: { company?: string; number?: string; url?: string; notify?: boolean }) {
+  if (!/^\d+$/.test(String(orderId))) throw new Error("bad order id");
+  const d = await gql(
+    `query($id: ID!) { order(id: $id) { fulfillmentOrders(first: 10) { nodes { id status supportedActions { action } } } } }`,
+    { id: `gid://shopify/Order/${orderId}` },
+  );
+  const open = (d.order?.fulfillmentOrders?.nodes ?? []).filter((f: any) => f.supportedActions.some((a: any) => a.action === "CREATE_FULFILLMENT"));
+  if (!open.length) {
+    await refreshOrder(orderId);
+    return { fulfilled: false, reason: "Already shipped in Shopify" };
+  }
+  const fulfillment: Record<string, unknown> = {
+    lineItemsByFulfillmentOrder: open.map((f: any) => ({ fulfillmentOrderId: f.id })),
+    notifyCustomer: !!t.notify,
+  };
+  if (t.number) fulfillment.trackingInfo = { number: String(t.number).slice(0, 100), ...(t.company ? { company: String(t.company).slice(0, 100) } : {}), ...(t.url && /^https:\/\//.test(t.url) ? { url: t.url } : {}) };
+  const r = await gql(
+    `mutation($f: FulfillmentInput!) { fulfillmentCreate(fulfillment: $f) { fulfillment { id status } userErrors { field message } } }`,
+    { f: fulfillment },
+  );
+  const errs = r.fulfillmentCreate.userErrors;
+  if (errs?.length) throw new Error(errs.map((e: any) => e.message).join("; "));
+  await refreshOrder(orderId);
+  return { fulfilled: true };
+}
+
+/** Cash collected on delivery: mark the order paid in Shopify. */
+async function markOrderPaid(orderId: string) {
+  if (!/^\d+$/.test(String(orderId))) throw new Error("bad order id");
+  const r = await gql(
+    `mutation($input: OrderMarkAsPaidInput!) { orderMarkAsPaid(input: $input) { order { id displayFinancialStatus } userErrors { field message } } }`,
+    { input: { id: `gid://shopify/Order/${orderId}` } },
+  );
+  const errs = r.orderMarkAsPaid.userErrors;
+  if (errs?.length) throw new Error(errs.map((e: any) => e.message).join("; "));
+  await refreshOrder(orderId);
+  return { paid: true };
+}
+
 async function createOfflineOrder(sale: Sale & { payment?: string }) {
   if (!sale.items?.length) throw new Error("Add at least one item");
   const bag = (n: number) => ({ shopMoney: egpMoney(n) });
@@ -843,6 +890,8 @@ Deno.serve(async (req) => {
     const cron = req.headers.get("x-cron-secret");
     if (cron) {
       if (!CRON_SECRET || !safeEqual(cron, CRON_SECRET)) return json({ error: "bad cron secret" }, 401);
+      const cb = await req.json().catch(() => ({}));
+      if (cb.action === "scopes") return json({ scopes: await accessScopes() }); // read-only health check
       return json(await daily());
     }
 
@@ -861,6 +910,9 @@ Deno.serve(async (req) => {
     if (action === "setup") return json(await setup());
     if (typeof action === "string" && action.startsWith("team-")) return json(await teamAction(user.user, body));
     if (action === "create-order") return json(await createOfflineOrder(body.sale));
+    if (action === "scopes") return json({ scopes: await accessScopes() });
+    if (action === "fulfill-order") return json(await fulfillOrder(String(body.orderId), body.tracking ?? {}));
+    if (action === "mark-paid") return json(await markOrderPaid(String(body.orderId)));
     return json({ error: "unknown action" }, 400);
   } catch (e) {
     console.error(e);

@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
-import type { Order } from "@/lib/db";
+import type { Order, Shipment } from "@/lib/db";
 import { egp } from "@/lib/pdf";
 
 /**
@@ -14,18 +14,21 @@ export type LabelStore = { name: string; phone?: string; address?: string; websi
 
 export const shipmentNumber = (o: Order) => `SWS${o.name.replace(/\D/g, "")}`;
 
-const ShippingLabel = forwardRef<HTMLDivElement, { order: Order; store: LabelStore; qr: string; barcode: string; logo: string }>(function ShippingLabel(
-  { order: o, store, qr, barcode, logo },
+const ShippingLabel = forwardRef<HTMLDivElement, { order: Order; store: LabelStore; qr: string; barcode: string; logo: string; shipment?: Shipment | null }>(function ShippingLabel(
+  { order: o, store, qr, barcode, logo, shipment: sh },
   ref,
 ) {
-  const a = o.shipping_address;
-  const cod = !o.cancelled_at && (o.financial_status === "PENDING" || o.financial_status === "PARTIALLY_PAID");
+  const a = sh ? sh.recipient : o.shipping_address;
+  const cod = sh ? sh.cod_amount > 0 : !o.cancelled_at && (o.financial_status === "PENDING" || o.financial_status === "PARTIALLY_PAID");
+  const amount = sh ? sh.cod_amount : o.total;
+  const tracking = sh?.tracking ?? shipmentNumber(o);
+  const parcels = sh?.pieces ?? 1;
   const pieces = o.line_items.reduce((s, l) => s + l.quantity, 0) || 1;
   const B = "2px solid #000";
   const ar = { fontFamily: "Tahoma, Arial, sans-serif" };
   const cell = { padding: "4px 8px" };
   const small = { fontSize: 9, fontWeight: 700 as const, textTransform: "uppercase" as const };
-  const desc = o.line_items
+  const desc = sh?.contents ?? o.line_items
     .map((l) => `${l.quantity}x ${l.title}${l.variant_title && l.variant_title !== "Default Title" ? ` (${l.variant_title})` : ""}`)
     .join(", ");
 
@@ -53,8 +56,8 @@ const ShippingLabel = forwardRef<HTMLDivElement, { order: Order; store: LabelSto
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={barcode} alt="" style={{ width: "100%", height: 62, objectFit: "fill", display: "block" }} />
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 800, marginTop: 3, letterSpacing: 2 }}>
-          <span>{shipmentNumber(o)}</span>
-          <span>ORDER {o.name}</span>
+          <span>{tracking}</span>
+          <span>{sh && !sh.order_name ? (sh.courier || "").toUpperCase() : `ORDER ${o.name}`}</span>
         </div>
       </div>
 
@@ -66,7 +69,7 @@ const ShippingLabel = forwardRef<HTMLDivElement, { order: Order; store: LabelSto
         </div>
         <div style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.15, marginTop: 2 }}>{a?.name ?? "Customer"}</div>
         <div style={{ fontSize: 20, fontWeight: 800, marginTop: 2 }} dir="ltr">
-          {a?.phone ?? o.phone ?? ""}
+          {a?.phone ?? (sh ? "" : o.phone) ?? ""}
         </div>
         <div style={{ fontSize: 13, lineHeight: 1.3, marginTop: 4 }}>{[a?.address1, a?.address2].filter(Boolean).join(", ")}</div>
       </div>
@@ -81,15 +84,15 @@ const ShippingLabel = forwardRef<HTMLDivElement, { order: Order; store: LabelSto
       <div style={{ display: "flex", borderBottom: B }}>
         <div style={{ ...cell, flex: 1.6, borderRight: B }}>
           <div style={small}>{cod ? "Cash to collect" : "Amount"}</div>
-          <div style={{ fontSize: 22, fontWeight: 900 }}>{cod ? egp(o.total) : "0 EGP"}</div>
+          <div style={{ fontSize: 22, fontWeight: 900 }}>{cod ? egp(amount) : "0 EGP"}</div>
         </div>
         <div style={{ ...cell, flex: 1, borderRight: B }}>
-          <div style={small}>Pieces</div>
-          <div style={{ fontSize: 22, fontWeight: 900 }}>1/1</div>
+          <div style={small}>Parcels</div>
+          <div style={{ fontSize: 22, fontWeight: 900 }}>{parcels}</div>
         </div>
         <div style={{ ...cell, flex: 1 }}>
           <div style={small}>Items</div>
-          <div style={{ fontSize: 22, fontWeight: 900 }}>{pieces}</div>
+          <div style={{ fontSize: 22, fontWeight: 900 }}>{sh && !o.line_items.length ? "-" : pieces}</div>
         </div>
       </div>
 
@@ -110,14 +113,14 @@ const ShippingLabel = forwardRef<HTMLDivElement, { order: Order; store: LabelSto
         <div style={{ width: 112, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 6, gap: 3 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={qr} alt="" style={{ width: 92, height: 92 }} />
-          <div style={{ fontSize: 9, fontWeight: 700 }}>{shipmentNumber(o)}</div>
+          <div style={{ fontSize: 9, fontWeight: 700 }}>{tracking}</div>
         </div>
       </div>
 
       {/* footer */}
       <div style={{ ...cell, display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700 }}>
         <span>{new Date(o.created_at).toLocaleDateString("en-GB")}</span>
-        <span>{o.shipping_title ?? "Standard"}</span>
+        <span>{sh?.courier ?? o.shipping_title ?? "Standard"}</span>
         <span>{cod ? "COLLECT ON DELIVERY" : "DO NOT COLLECT"}</span>
       </div>
     </div>

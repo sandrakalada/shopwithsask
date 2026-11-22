@@ -154,6 +154,7 @@ async function pull() {
   await pullSynced("orders", db.orders);
   await pullSynced("customers", db.customers);
   await pullSynced("invoices", db.invoices);
+  await pullSynced("shipments", db.shipments);
   await pullSynced("app_settings", db.settings);
 }
 
@@ -177,7 +178,7 @@ async function pullSynced(table: string, store: any) {
       .filter((r) => !waiting.has((r.id ?? r.key) as string))
       .map((r) => {
         const out = { ...r };
-        for (const k of ["total", "subtotal", "shipping", "discounts", "discount", "amount_spent"]) if (out[k] != null) out[k] = Number(out[k]);
+        for (const k of ["total", "subtotal", "shipping", "discounts", "discount", "amount_spent", "cod_amount"]) if (out[k] != null) out[k] = Number(out[k]);
         return out;
       });
     await store.bulkPut(rows);
@@ -257,7 +258,7 @@ export function startSync() {
 function listenLive() {
   if (!supabase) return;
   const ch = supabase.channel("live-changes");
-  for (const table of ["orders", "variants", "stock_movements", "products", "customers", "invoices"])
+  for (const table of ["orders", "variants", "stock_movements", "products", "customers", "invoices", "shipments"])
     ch.on("postgres_changes", { event: "*", schema: "public", table }, () => requestSync(800));
   ch.subscribe();
 }
@@ -266,6 +267,6 @@ function listenLive() {
 export async function resetLocal() {
   await Promise.all([
     db.products.clear(), db.variants.clear(), db.movements.clear(), db.outbox.clear(), db.meta.clear(),
-    db.orders.clear(), db.customers.clear(), db.invoices.clear(), db.settings.clear(),
+    db.orders.clear(), db.customers.clear(), db.invoices.clear(), db.settings.clear(), db.shipments.clear(),
   ]);
 }
