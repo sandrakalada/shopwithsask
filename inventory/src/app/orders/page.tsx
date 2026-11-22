@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Suspense, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { egp } from "@/lib/pdf";
@@ -24,6 +24,7 @@ export default function OrdersPage() {
 
 function Orders() {
   const role = useRole();
+  const router = useRouter();
   const params = useSearchParams();
   const [q, setQ] = useState("");
   const [f, setF] = useState<F>((params.get("f") as F) ?? (role === "shipping" ? "open" : "all"));
@@ -79,7 +80,36 @@ function Orders() {
           <input type="checkbox" checked={month} onChange={(e) => setMonth(e.target.checked)} /> This month only
         </label>
         <p className="mt-2 text-xs text-taupe">{rows.length} orders</p>
-        <ul className="card mt-2 divide-y divide-line overflow-hidden">
+        <div className="card mt-2 hidden overflow-hidden lg:block">
+          <table className="w-full text-left text-[14px]">
+            <thead className="border-b border-line text-[12px] tracking-wide text-taupe uppercase">
+              <tr>
+                <th className="px-5 py-3 font-medium">Order</th>
+                <th className="px-3 py-3 font-medium">Customer</th>
+                <th className="px-3 py-3 font-medium">Date</th>
+                <th className="px-3 py-3 font-medium">Status</th>
+                <th className="px-3 py-3 font-medium">Items</th>
+                {role !== "shipping" && <th className="px-5 py-3 text-right font-medium">Total</th>}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {rows.slice(0, count).map((o) => (
+                <tr key={o.id} className="cursor-pointer transition-colors hover:bg-sand/50" onClick={() => router.push(`/order?id=${o.id}`)}>
+                  <td className="px-5 py-3 font-semibold">
+                    <Link href={`/order?id=${o.id}`}>{o.name}</Link>
+                  </td>
+                  <td className="max-w-[220px] truncate px-3 py-3">{orderCustomerName(o)}</td>
+                  <td className="px-3 py-3 whitespace-nowrap text-taupe">{fmtDate(o.created_at)}</td>
+                  <td className="px-3 py-3"><StatusPills o={o} /></td>
+                  <td className="px-3 py-3 text-taupe">{o.line_items.reduce((t, l) => t + l.quantity, 0)}</td>
+                  {role !== "shipping" && <td className="px-5 py-3 text-right font-semibold whitespace-nowrap">{egp(o.total)}</td>}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {rows.length === 0 && <p className="p-5 text-sm text-taupe">{orders.length ? "No orders match." : "Orders download automatically when you are online."}</p>}
+        </div>
+        <ul className="card mt-2 divide-y divide-line overflow-hidden lg:hidden">
           {rows.slice(0, count).map((o) => (
             <li key={o.id}>
               <Link href={`/order?id=${o.id}`} className="block px-4 py-3 active:bg-sand">

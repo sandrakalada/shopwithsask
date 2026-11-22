@@ -92,7 +92,7 @@ export default function Settings() {
   return (
     <>
       <Header title="Settings" />
-      <main className="space-y-5 p-4">
+      <main className="space-y-5 p-4 lg:columns-2 lg:gap-6 lg:space-y-0 lg:[&>*]:mb-5 lg:[&>*]:break-inside-avoid">
         <section className="card divide-y divide-line">
           <Row label="Signed in as" value={email ?? "–"} />
           <Row label="Connection" value={s.online ? "Online" : "Offline"} />

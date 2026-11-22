@@ -70,7 +70,7 @@ export default function Home() {
         </div>
         {data?.empty && <p className="card p-4 text-sm text-taupe">Your products download from Shopify automatically when you are online.</p>}
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
           <Tile href="/items?filter=in" label="In stock" value={data ? `${data.products} products` : "–"} sub={data ? `${data.pieces} pieces` : ""} />
           <Tile href="/orders?f=open&since=month" label="Orders to ship" value={data ? String(data.toShip) : "–"} sub="this month, unfulfilled" />
           <Tile href="/items?view=costs" label="Selling value" value={data ? egp(data.value) : "–"} sub="stock at selling price" />
@@ -79,7 +79,7 @@ export default function Home() {
 
         <section>
           <h2 className="section-title">Sales</h2>
-          <div className="card divide-y divide-line overflow-hidden">
+          <div className="card divide-y divide-line overflow-hidden lg:grid lg:grid-cols-2 lg:divide-x lg:divide-y-0">
             <SalesRow label="Month to date" sub={new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" })} data={data?.mtd} />
             <SalesRow label="Year to date" sub={String(new Date().getFullYear())} data={data?.ytd} />
           </div>
@@ -92,9 +92,9 @@ export default function Home() {
 
 function Tile({ href, label, value, sub }: { href: string; label: string; value: string; sub?: string }) {
   return (
-    <Link href={href} className="card block p-4 active:bg-sand">
+    <Link href={href} className="card block p-4 transition-shadow hover:shadow-[0_2px_12px_rgba(0,0,0,0.06)] active:bg-sand lg:p-5">
       <p className="text-xs text-taupe">{label}</p>
-      <p className="mt-1 text-lg font-semibold leading-tight">{value}</p>
+      <p className="mt-1 text-lg font-semibold leading-tight lg:text-[22px]">{value}</p>
       {sub && <p className="mt-0.5 text-xs text-taupe">{sub}</p>}
     </Link>
   );
@@ -102,7 +102,7 @@ function Tile({ href, label, value, sub }: { href: string; label: string; value:
 
 function SalesRow({ label, sub, data }: { label: string; sub: string; data?: { total: number; count: number } }) {
   return (
-    <Link href="/items?view=top" className="row justify-between">
+    <Link href="/items?view=top" className="row justify-between hover:bg-sand/50 lg:px-5 lg:py-4">
       <div>
         <p className="text-[15px] font-medium">{label}</p>
         <p className="text-[12px] text-taupe">{sub}</p>

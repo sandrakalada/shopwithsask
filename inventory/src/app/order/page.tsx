@@ -54,7 +54,7 @@ function OrderView() {
       const pdf = await imagesToPdf([img], 100, 150);
       if (!cancelled) {
         setLabel({ url: img.url, pdf });
-        preparePrint([img.url], 100, 150); // ready in advance: Print opens instantly on iPhone
+        preparePrint([img.url], 100, 150, pdf); // ready in advance: Print opens instantly on iPhone
       }
     })();
     return () => {
@@ -102,7 +102,8 @@ function OrderView() {
   return (
     <>
       <Header title={order.name} back />
-      <main className="space-y-4 p-4">
+      <main className="p-4 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-6">
+        <div className="space-y-4">
         <section className="card p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -113,18 +114,20 @@ function OrderView() {
           </div>
         </section>
 
+        <div className="lg:hidden">
         <div className="grid grid-cols-2 gap-2">
-          <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
-            <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
-          </button>
-          <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
-            Share label
-          </button>
-          {!shippingOnly && (
-            <Link href={invoice ? `/invoice?id=${invoice.id}` : `/invoice?order=${order.id}`} className="btn-light col-span-2">
-              <WhatsAppIcon className="h-5 w-5" /> Send invoice on WhatsApp
-            </Link>
-          )}
+            <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
+              <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
+            </button>
+            <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
+              Share label
+            </button>
+            {!shippingOnly && (
+              <Link href={invoice ? `/invoice?id=${invoice.id}` : `/invoice?order=${order.id}`} className="btn-light col-span-2">
+                <WhatsAppIcon className="h-5 w-5" /> Send invoice on WhatsApp
+              </Link>
+            )}
+          </div>
         </div>
 
         <section className="card p-4">
@@ -175,14 +178,34 @@ function OrderView() {
           </div>
         </section>
         {order.note && <p className="card p-4 text-sm">Note: {order.note}</p>}
+        </div>
 
-        {label && (
-          <section className="card p-3">
-            <p className="mb-2 text-xs text-taupe">Shipping label (100 x 150 mm)</p>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={label.url} alt="Shipping label preview" className="mx-auto w-48 rounded border border-line" />
-          </section>
-        )}
+        <aside className="mt-4 space-y-4 lg:sticky lg:top-24 lg:mt-0">
+          <div className="hidden lg:block">
+        <div className="grid grid-cols-2 gap-2">
+              <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
+                <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
+              </button>
+              <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
+                Share label
+              </button>
+              {!shippingOnly && (
+                <Link href={invoice ? `/invoice?id=${invoice.id}` : `/invoice?order=${order.id}`} className="btn-light col-span-2">
+                  <WhatsAppIcon className="h-5 w-5" /> Send invoice on WhatsApp
+                </Link>
+              )}
+            </div>
+          </div>
+          {label ? (
+            <section className="card p-3">
+              <p className="mb-2 text-xs text-taupe">Shipping label (100 x 150 mm)</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={label.url} alt="Shipping label preview" className="mx-auto w-48 rounded border border-line lg:w-full" />
+            </section>
+          ) : (
+            <div className="hidden aspect-[2/3] w-full animate-pulse rounded-[14px] bg-sand lg:block" />
+          )}
+        </aside>
       </main>
 
       {/* off-screen copy used to draw the label */}

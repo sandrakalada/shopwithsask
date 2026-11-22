@@ -161,7 +161,7 @@ function Inventory() {
           {rows.length} products · {totals.units} pieces in stock
         </p>
 
-        <ul className="mt-2 space-y-3">
+        <ul className="mt-2 space-y-3 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0 2xl:grid-cols-3">
           {rows.slice(0, count).map(({ p, vs }) => (
             <li key={p.id} className="card overflow-hidden">
               <Link href={assign ? "#" : `/item?id=${p.id}`} onClick={(e) => assign && e.preventDefault()} className="flex items-center gap-3 px-4 pt-3 active:opacity-70">

@@ -11,7 +11,7 @@ export default function SaveBar() {
   if (!n) return null;
   const units = s.stock.reduce((t, e) => t + Math.abs(e.delta), 0);
   return (
-    <div className="no-print fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+68px)] z-40 px-3">
+    <div className="no-print fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+68px)] z-40 px-3 lg:bottom-6 lg:left-64">
       <div className="mx-auto flex max-w-xl items-center gap-2 rounded-2xl bg-ink p-2 pl-4 text-cream shadow-xl">
         <p className="min-w-0 flex-1 text-sm">
           {n} unsaved {n === 1 ? "change" : "changes"}

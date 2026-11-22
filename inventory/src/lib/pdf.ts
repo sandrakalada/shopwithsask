@@ -52,7 +52,8 @@ export const isIOS = () => typeof navigator !== "undefined" && (/iPad|iPhone|iPo
 /** Puts ready images into a hidden print area sized exactly widthMm x heightMm per page.
  * Call it as soon as the images are ready, then call printNow() straight from the tap:
  * iPhone only opens the print screen if window.print() runs immediately on the tap. */
-export function preparePrint(images: string[], widthMm: number, heightMm: number) {
+export function preparePrint(images: string[], widthMm: number, heightMm: number, pdf?: Blob) {
+  preparePdfPrint(pdf);
   let root = document.getElementById("print-root");
   if (!root) {
     root = document.createElement("div");
@@ -71,14 +72,48 @@ export function preparePrint(images: string[], widthMm: number, heightMm: number
     @media screen { #print-root { display: none } }`;
 }
 
+const isDesktopSafari = () =>
+  typeof navigator !== "undefined" && /Safari\//.test(navigator.userAgent) && !/Chrome|Chromium|CriOS|Edg|Firefox|FxiOS/.test(navigator.userAgent);
+
+let pdfFrame: HTMLIFrameElement | null = null;
+let pdfUrl: string | null = null;
+
+/** Desktop: loads the exact-size PDF into a hidden frame so Print prints the file itself,
+ * with no browser header or footer (date, page title, link, page numbers). */
+export function preparePdfPrint(pdf?: Blob) {
+  pdfFrame?.remove();
+  pdfFrame = null;
+  if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+  pdfUrl = null;
+  if (!pdf || isIOS() || isDesktopSafari()) return;
+  pdfUrl = URL.createObjectURL(pdf);
+  const f = document.createElement("iframe");
+  f.setAttribute("aria-hidden", "true");
+  f.tabIndex = -1;
+  f.style.cssText = "position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none";
+  f.src = pdfUrl;
+  document.body.appendChild(f);
+  pdfFrame = f;
+}
+
 export function printNow() {
+  const w = pdfFrame?.contentWindow;
+  if (w) {
+    try {
+      w.focus();
+      w.print();
+      return;
+    } catch {
+      /* fall back to the page print below */
+    }
+  }
   window.print();
 }
 
 /** Prepares and prints in one go (use preparePrint ahead of time for large batches on iPhone). */
 export function printImages(images: string[], widthMm: number, heightMm: number) {
   preparePrint(images, widthMm, heightMm);
-  window.print();
+  printNow();
 }
 
 export async function printFile(images: string[], pdf: Blob, filename: string, widthMm: number, heightMm: number) {

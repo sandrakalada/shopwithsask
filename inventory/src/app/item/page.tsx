@@ -44,7 +44,8 @@ function Item() {
   return (
     <>
       <Header title={product.title} back />
-      <main className="space-y-5 p-4">
+      <main className="space-y-5 p-4 lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-6 lg:space-y-0">
+        <div className="space-y-5">
         <div className="flex gap-4">
           <Thumb src={product.image_url} size={96} />
           <div className="min-w-0 flex-1">
@@ -87,8 +88,9 @@ function Item() {
         </section>
 
         <SkuByColour variants={live} />
+        </div>
 
-        <section>
+        <section className="lg:sticky lg:top-24">
           <h2 className="mb-2 font-semibold">History</h2>
           <ul className="card divide-y divide-line">
             {moves.map((m) => {
@@ -149,8 +151,8 @@ function SkuByColour({ variants }: { variants: Variant[] }) {
 
 function Sheet({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-40 flex items-end bg-black/40" onClick={onClose}>
-      <div className="pb-safe mx-auto max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-t-[20px] bg-canvas p-5" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-40 flex items-end bg-black/40 lg:items-center lg:justify-center" onClick={onClose}>
+      <div className="pb-safe mx-auto max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-t-[20px] bg-canvas p-5 lg:max-w-md lg:rounded-[20px] lg:shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <h2 className="mb-4 text-lg font-semibold">{title}</h2>
         {children}
       </div>

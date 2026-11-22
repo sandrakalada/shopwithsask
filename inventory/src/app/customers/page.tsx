@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
@@ -12,6 +13,7 @@ import { useIncremental } from "@/components/useIncremental";
 type Sort = "recent" | "spent" | "orders";
 
 export default function Customers() {
+  const router = useRouter();
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<Sort>("recent");
   const customers = useLiveQuery(() => db.customers.toArray(), [], []);
@@ -52,7 +54,36 @@ export default function Customers() {
           ))}
         </div>
         <p className="mt-3 text-xs text-taupe">{rows.length} customers</p>
-        <ul className="card mt-2 divide-y divide-line overflow-hidden">
+        <div className="card mt-2 hidden overflow-hidden lg:block">
+          <table className="w-full text-left text-[14px]">
+            <thead className="border-b border-line text-[12px] tracking-wide text-taupe uppercase">
+              <tr>
+                <th className="px-5 py-3 font-medium">Customer</th>
+                <th className="px-3 py-3 font-medium">Phone</th>
+                <th className="px-3 py-3 font-medium">Email</th>
+                <th className="px-3 py-3 font-medium">City</th>
+                <th className="px-3 py-3 text-right font-medium">Orders</th>
+                <th className="px-5 py-3 text-right font-medium">Spent</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {rows.slice(0, count).map((c) => (
+                <tr key={c.id} className="cursor-pointer transition-colors hover:bg-sand/50" onClick={() => router.push(`/customer?id=${c.id}`)}>
+                  <td className="max-w-[220px] truncate px-5 py-3 font-semibold">
+                    <Link href={`/customer?id=${c.id}`}>{c.name ?? "Customer"}</Link>
+                  </td>
+                  <td className="px-3 py-3 whitespace-nowrap text-taupe" dir="ltr">{c.phone ?? ""}</td>
+                  <td className="max-w-[220px] truncate px-3 py-3 text-taupe">{c.email ?? ""}</td>
+                  <td className="px-3 py-3 text-taupe">{c.city ?? ""}</td>
+                  <td className="px-3 py-3 text-right">{c.orders_count}</td>
+                  <td className="px-5 py-3 text-right font-semibold whitespace-nowrap">{egp(c.amount_spent)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {rows.length === 0 && <p className="p-5 text-sm text-taupe">No customers match.</p>}
+        </div>
+        <ul className="card mt-2 divide-y divide-line overflow-hidden lg:hidden">
           {rows.slice(0, count).map((c) => (
             <li key={c.id}>
               <Link href={`/customer?id=${c.id}`} className="flex items-center gap-3 px-4 py-3 active:bg-sand">

@@ -14,7 +14,7 @@ export function Header({ title, back, right, logo }: { title: string; back?: boo
   return (
     <header className="no-print sticky top-0 z-20 border-b border-line bg-canvas/85 backdrop-blur-xl backdrop-saturate-150">
       <div className="pt-safe" />
-      <div className="mx-auto flex h-12 max-w-xl items-center gap-1 px-2">
+      <div className="mx-auto flex h-12 max-w-xl items-center gap-1 px-2 lg:h-16 lg:max-w-6xl lg:px-8">
         {back ? (
           <button onClick={() => router.back()} className="flex h-11 min-w-11 items-center justify-center rounded-full text-ink active:bg-sand" aria-label="Back">
             <BackIcon />
@@ -25,10 +25,11 @@ export function Header({ title, back, right, logo }: { title: string; back?: boo
         {logo ? (
           <h1 className="flex min-w-0 flex-1 items-center pl-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand-wordmark.png" alt={title} className="h-[22px] w-auto" />
+            <img src="/brand-wordmark.png" alt={title} className="h-[22px] w-auto lg:hidden" />
+            <span className="hidden text-[20px] font-semibold tracking-tight lg:inline">Overview</span>
           </h1>
         ) : (
-          <h1 className="min-w-0 flex-1 truncate pl-1 text-[17px] font-semibold tracking-tight">{title}</h1>
+          <h1 className="min-w-0 flex-1 truncate pl-1 text-[17px] font-semibold tracking-tight lg:text-[20px]">{title}</h1>
         )}
         {right}
         <SyncBadge />
@@ -96,8 +97,8 @@ export function AdjustSheet({
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-end bg-black/40" onClick={() => onClose()}>
-      <div className="pb-safe mx-auto w-full max-w-xl rounded-t-[20px] bg-canvas p-5" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-40 flex items-end bg-black/40 lg:items-center lg:justify-center" onClick={() => onClose()}>
+      <div className="pb-safe mx-auto w-full max-w-xl rounded-t-[20px] bg-canvas p-5 lg:max-w-md lg:rounded-[20px] lg:shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-3">
           <Thumb src={product?.image_url} size={44} />
           <div className="min-w-0 flex-1">

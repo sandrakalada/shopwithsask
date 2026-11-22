@@ -11,6 +11,8 @@ import { db } from "@/lib/db";
 import { BoxIcon, HomeIcon, ReceiptIcon, ScanIcon, UsersIcon } from "./Icons";
 import Login from "./Login";
 import SaveBar from "./SaveBar";
+import { DesktopSidebar } from "./SideMenu";
+import { Suspense } from "react";
 import PullToRefresh from "./PullToRefresh";
 import { checkForUpdate } from "@/lib/version";
 
@@ -131,11 +133,14 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const isPrint = pathname.startsWith("/labels");
   return (
     <RoleContext.Provider value={role}>
-    <div className="mx-auto min-h-dvh max-w-xl">
-      <div className="pb-[calc(env(safe-area-inset-bottom)+76px)]">{children}</div>
+    <div className="min-h-dvh">
+      <Suspense>
+        <DesktopSidebar />
+      </Suspense>
+      <div className="mx-auto max-w-xl pb-[calc(env(safe-area-inset-bottom)+76px)] lg:ml-64 lg:max-w-none lg:pb-10">{children}</div>
       {!shippingOnly && <SaveBar />}
       <PullToRefresh />
-      <nav className="no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/85 backdrop-blur-xl backdrop-saturate-150 pb-safe" aria-label="Tabs">
+      <nav className="no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/85 backdrop-blur-xl backdrop-saturate-150 pb-safe lg:hidden" aria-label="Tabs">
         <ul className={`mx-auto grid max-w-xl ${shippingOnly ? "grid-cols-1" : "grid-cols-5"}`}>
           {visibleTabs.map(({ href, label, Icon, match }) => {
             const active = (href === "/" ? pathname === "/" : pathname.startsWith(href)) || match.some((m) => pathname.startsWith(m));

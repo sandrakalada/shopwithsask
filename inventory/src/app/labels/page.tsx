@@ -6,7 +6,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import QRCode from "qrcode";
 import { db, type Product, type Variant } from "@/lib/db";
 import { stickerLink, variantLabel } from "@/lib/stock";
-import { imagesToPdf, preparePrint, printNow, shareFile } from "@/lib/pdf";
+import { imagesToPdf, isIOS, preparePdfPrint, preparePrint, printNow, shareFile } from "@/lib/pdf";
 import { Header, Stepper, Thumb } from "@/components/ui";
 import { PrintIcon } from "@/components/Icons";
 
@@ -154,7 +154,10 @@ function Labels() {
       setProgress([0, images.length]);
       try {
         const pdf = await imagesToPdf(images.map((url) => ({ url, ratio: H / W })), W, H, (d, n) => !cancelled && setProgress([d, n]), () => cancelled);
-        if (!cancelled) setFile({ sig, pdf });
+        if (!cancelled) {
+          setFile({ sig, pdf });
+          preparePdfPrint(pdf);
+        }
       } catch {
         /* selection changed while building */
       }
@@ -172,7 +175,9 @@ function Labels() {
   const term = q.trim().toLowerCase();
   const visible = term ? rows.filter((r) => r.p.title.toLowerCase().includes(term) || (r.v.sku ?? "").toLowerCase().includes(term)) : rows;
   const set = (key: string, patch: Partial<Row>) => setRows((list) => list.map((r) => (r.key === key ? { ...r, ...patch } : r)));
-  const ready = !!images.length && !waitingImages;
+  const fileReady = !!file && file.sig === sig && !busy;
+  // desktop prints the finished PDF (clean, no browser header/footer); iPhone prints the prepared sheet
+  const ready = !!images.length && !waitingImages && (isIOS() || fileReady);
 
   return (
     <>
@@ -195,9 +200,9 @@ function Labels() {
           </span>
         </div>
 
-        <ul className="card divide-y divide-line overflow-hidden">
+        <ul className="card divide-y divide-line overflow-hidden lg:grid lg:grid-cols-2 lg:divide-y-0 lg:gap-px lg:bg-line">
           {visible.slice(0, 300).map((r) => (
-            <li key={r.key} className="flex items-center gap-3 px-3 py-2.5">
+            <li key={r.key} className="flex items-center gap-3 bg-surface px-3 py-2.5">
               <button
                 onClick={() => set(r.key, { selected: !r.selected })}
                 className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ring-2 ring-inset ${r.selected ? "bg-ink ring-ink text-white" : "ring-line"}`}
@@ -227,7 +232,7 @@ function Labels() {
         <p className="px-1 text-[12px] text-taupe">Photos are only shown here, they are not printed. Stickers are 50 x 30 mm.</p>
       </main>
 
-      <div className="no-print fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+60px)] z-30 px-3">
+      <div className="no-print fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+60px)] z-30 px-3 lg:bottom-6 lg:left-64">
         <div className="mx-auto grid max-w-xl grid-cols-2 gap-2 rounded-2xl bg-canvas/90 p-2 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] backdrop-blur-xl">
           <button className="btn-dark" disabled={!ready} onClick={printNow}>
             <PrintIcon className="h-5 w-5" /> {ready ? `Print ${images.length}` : chosen.length ? "Preparing" : "Select stickers"}

@@ -113,7 +113,7 @@ function InvoiceView({ id }: { id: string }) {
       const pdf = await imagesToPdf([img], 210);
       if (!cancelled) {
         setReady({ img, pdf });
-        preparePrint([img.url], 210, Math.round(210 * img.ratio));
+        preparePrint([img.url], 210, Math.round(210 * img.ratio), pdf);
       }
     })();
     return () => {
