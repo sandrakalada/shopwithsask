@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, type Product, type Reason, type Variant } from "@/lib/db";
 import { newBarcode, reasonLabel, saveProduct, saveVariant, variantLabel } from "@/lib/stock";
 import { pending, pendingDelta, usePending } from "@/lib/pending";
-import { AdjustSheet, Header, Labeled, QtyPill, Thumb, timeAgo, Toast } from "@/components/ui";
+import { AdjustSheet, Header, Labeled, QtyPill, Stepper, Thumb, timeAgo, Toast } from "@/components/ui";
 import { MinusIcon, PlusIcon, PrintIcon } from "@/components/Icons";
 
 const TYPES = ["Dresses", "Tops", "Bottoms", "Vests", "Jackets", "Matching Set", "Beach Set", "Accessories", "Bags"];
@@ -50,7 +50,7 @@ function Item() {
           <div className="min-w-0 flex-1">
             <p className="text-sm text-taupe">{product.product_type ?? "No type"}</p>
             <p className="mt-1 text-3xl font-semibold">{total}</p>
-            <p className="text-sm text-taupe">units in stock</p>
+            <p className="text-sm text-taupe">{total === 1 ? "piece" : "pieces"} in stock</p>
             <div className="mt-3 flex gap-2">
               <button className="btn-light px-3 py-2" onClick={() => setEdit("product")}>Edit</button>
               <Link className="btn-light px-3 py-2" href={`/labels?product=${product.id}`}>
@@ -75,20 +75,15 @@ function Item() {
                     {v.price != null && ` · ${v.price} EGP`}
                   </p>
                 </button>
-                <button className="btn-light h-10 w-10 rounded-full p-0" onClick={() => quick(v, -1)} aria-label="Remove one">
-                  <MinusIcon className="h-5 w-5" />
-                </button>
-                <button onClick={() => setSheet({ v, r: "count" })} className={pendingDelta(pend, v.id) ? "rounded-full ring-2 ring-amber-400" : ""}>
-                  <QtyPill qty={v.quantity + pendingDelta(pend, v.id)} low={v.low_stock_at} />
-                </button>
-                <button className="btn-light h-10 w-10 rounded-full p-0" onClick={() => quick(v, 1)} aria-label="Add one">
-                  <PlusIcon className="h-5 w-5" />
+                <Stepper value={v.quantity + pendingDelta(pend, v.id)} highlight={!!pendingDelta(pend, v.id)} label={variantLabel(v.title)} onChange={(d) => quick(v, d)} />
+                <button onClick={() => setSheet({ v, r: "count" })} className="text-[13px] font-medium text-caramel" aria-label={`Count or record a reason for ${variantLabel(v.title)}`}>
+                  More
                 </button>
               </li>
             ))}
             {live.length === 0 && <li className="p-4 text-sm text-taupe">No sizes yet.</li>}
           </ul>
-          <p className="mt-2 text-xs text-taupe">Tap the number to count or record a reason. Tap a size to edit it.</p>
+          <p className="mt-2 text-xs text-taupe">Tap More to count or record a reason. Tap a size to edit its price or SKU.</p>
         </section>
 
         <SkuByColour variants={live} />
@@ -123,8 +118,14 @@ function Item() {
 
 /** One SKU per product, shared by every size and colour; stickers print the size / colour. */
 function SkuByColour({ variants }: { variants: Variant[] }) {
-  const [sku, setSku] = useState(() => variants.find((v) => v.sku)?.sku ?? "");
+  const current = variants.find((v) => v.sku)?.sku ?? "";
+  const [sku, setSku] = useState(current);
+  const [touched, setTouched] = useState(false);
   const [saved, setSaved] = useState(false);
+  // sizes load after the first render: show the saved SKU unless the user is typing
+  useEffect(() => {
+    if (!touched) setSku(current);
+  }, [current, touched]);
   if (!variants.length) return null;
   async function save() {
     const next = sku.trim().toUpperCase() || null;
@@ -139,7 +140,7 @@ function SkuByColour({ variants }: { variants: Variant[] }) {
         <p className="text-xs text-taupe">One SKU for the whole product. Stickers add the size and colour.</p>
       </div>
       <div className="flex gap-2">
-        <input className="field py-2" value={sku} onChange={(e) => setSku(e.target.value)} autoCapitalize="characters" placeholder="e.g. D-104" />
+        <input className="field py-2" value={sku} onChange={(e) => { setSku(e.target.value); setTouched(true); }} autoCapitalize="characters" placeholder="e.g. D-104" />
         <button className="btn-dark px-5" onClick={save}>{saved ? "Saved" : "Save"}</button>
       </div>
     </section>
@@ -148,8 +149,8 @@ function SkuByColour({ variants }: { variants: Variant[] }) {
 
 function Sheet({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-40 flex items-end bg-black/30" onClick={onClose}>
-      <div className="pb-safe mx-auto max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-t-3xl bg-cream p-5" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-40 flex items-end bg-black/40" onClick={onClose}>
+      <div className="pb-safe mx-auto max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-t-[20px] bg-canvas p-5" onClick={(e) => e.stopPropagation()}>
         <h2 className="mb-4 text-lg font-semibold">{title}</h2>
         {children}
       </div>

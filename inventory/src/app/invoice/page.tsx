@@ -133,11 +133,11 @@ function InvoiceView({ id }: { id: string }) {
           <p className="text-sm text-taupe" dir="ltr">{inv.customer_phone}</p>
           <p className="mt-2 text-2xl font-semibold">{egp(inv.total)}</p>
         </div>
-        <div className="grid grid-cols-2 rounded-xl border border-line bg-white p-1 text-sm font-semibold">
+        <div className="seg grid-cols-2">
           {(["en", "ar"] as const).map((l) => (
             <button
               key={l}
-              className={`rounded-lg py-2 ${(inv.language ?? "en") === l ? "bg-ink text-cream" : "text-taupe"}`}
+              className={`seg-btn ${(inv.language ?? "en") === l ? "seg-on" : ""}`}
               onClick={() => (inv.language ?? "en") !== l && saveInvoice({ ...inv, language: l })}
             >
               {l === "en" ? "English" : "العربية"}
@@ -316,7 +316,7 @@ function InvoiceBuilder({ customerId }: { customerId: string | null }) {
           <p className="font-semibold">Delivery and payment</p>
           <div className="grid grid-cols-2 gap-2">
             {DELIVERY.map((d) => (
-              <button key={d.label} onClick={() => setFee(d.fee)} className={`rounded-xl border px-3 py-2 text-sm ${fee === d.fee ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
+              <button key={d.label} onClick={() => setFee(d.fee)} className={`chip justify-center rounded-xl ${fee === d.fee ? "chip-on" : ""}`}>
                 {d.label} {d.fee ? `· ${d.fee}` : ""}
               </button>
             ))}
@@ -324,7 +324,7 @@ function InvoiceBuilder({ customerId }: { customerId: string | null }) {
           {subtotal > 1999 && fee === 75 && <p className="text-xs text-taupe">Orders over 1,999 EGP in Cairo / Giza ship free.</p>}
           <div className="grid grid-cols-2 gap-2">
             {["Cash on delivery", "Instapay"].map((m) => (
-              <button key={m} onClick={() => setPayment(m)} className={`rounded-xl border px-3 py-2 text-sm ${payment === m ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
+              <button key={m} onClick={() => setPayment(m)} className={`chip justify-center rounded-xl ${payment === m ? "chip-on" : ""}`}>
                 {m}
               </button>
             ))}
@@ -333,7 +333,7 @@ function InvoiceBuilder({ customerId }: { customerId: string | null }) {
           <Labeled label="Note on invoice (optional)"><input className="field" value={note} onChange={(e) => setNote(e.target.value)} dir="auto" /></Labeled>
           <div className="grid grid-cols-2 gap-2">
             {(["en", "ar"] as const).map((l) => (
-              <button key={l} onClick={() => setLang(l)} className={`rounded-xl border px-3 py-2 text-sm ${lang === l ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
+              <button key={l} onClick={() => setLang(l)} className={`chip justify-center rounded-xl ${lang === l ? "chip-on" : ""}`}>
                 {l === "en" ? "Invoice in English" : "فاتورة بالعربي"}
               </button>
             ))}

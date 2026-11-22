@@ -12,24 +12,27 @@ import SideMenu from "./SideMenu";
 export function Header({ title, back, right, logo }: { title: string; back?: boolean; right?: React.ReactNode; logo?: boolean }) {
   const router = useRouter();
   return (
-    <header className="no-print sticky top-0 z-20 flex items-center gap-2 border-b border-line bg-cream/95 px-4 py-3 backdrop-blur">
-      {back ? (
-        <button onClick={() => router.back()} className="-ml-2 p-1" aria-label="Back">
-          <BackIcon />
-        </button>
-      ) : (
-        <SideMenu />
-      )}
-      {logo ? (
-        <h1 className="flex min-w-0 flex-1 items-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand-wordmark.png" alt={title} className="h-6 w-auto" />
-        </h1>
-      ) : (
-        <h1 className="min-w-0 flex-1 truncate text-lg font-semibold">{title}</h1>
-      )}
-      {right}
-      <SyncBadge />
+    <header className="no-print sticky top-0 z-20 border-b border-line bg-canvas/85 backdrop-blur-xl backdrop-saturate-150">
+      <div className="pt-safe" />
+      <div className="mx-auto flex h-12 max-w-xl items-center gap-1 px-2">
+        {back ? (
+          <button onClick={() => router.back()} className="flex h-11 min-w-11 items-center justify-center rounded-full text-ink active:bg-sand" aria-label="Back">
+            <BackIcon />
+          </button>
+        ) : (
+          <SideMenu />
+        )}
+        {logo ? (
+          <h1 className="flex min-w-0 flex-1 items-center pl-1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand-wordmark.png" alt={title} className="h-[22px] w-auto" />
+          </h1>
+        ) : (
+          <h1 className="min-w-0 flex-1 truncate pl-1 text-[17px] font-semibold tracking-tight">{title}</h1>
+        )}
+        {right}
+        <SyncBadge />
+      </div>
     </header>
   );
 }
@@ -38,15 +41,15 @@ export function Thumb({ src, size = 48 }: { src: string | null | undefined; size
   const t = thumb(src, size * 3);
   return t ? (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={t} alt="" width={size} height={size * (4 / 3)} className="shrink-0 rounded-lg bg-sand object-cover" style={{ width: size, height: size * (4 / 3) }} loading="lazy" />
+    <img src={t} alt="" width={size} height={size * (4 / 3)} className="shrink-0 rounded-[8px] bg-sand object-cover" style={{ width: size, height: size * (4 / 3) }} loading="lazy" />
   ) : (
-    <div className="shrink-0 rounded-lg bg-sand" style={{ width: size, height: size * (4 / 3) }} />
+    <div className="shrink-0 rounded-[8px] bg-sand" style={{ width: size, height: size * (4 / 3) }} />
   );
 }
 
 export function QtyPill({ qty, low = 1 }: { qty: number; low?: number }) {
-  const cls = qty <= 0 ? "bg-red-50 text-red-700" : qty <= low ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700";
-  return <span className={`inline-flex min-w-9 justify-center rounded-full px-2 py-0.5 text-sm font-semibold ${cls}`}>{qty}</span>;
+  const cls = qty <= 0 ? "bg-[#fbe9e6] text-danger" : qty <= low ? "bg-[#fbf0dc] text-warn" : "bg-[#e5f2ea] text-success";
+  return <span className={`inline-flex h-6 min-w-8 items-center justify-center rounded-md px-1.5 text-[13px] font-semibold ${cls}`}>{qty}</span>;
 }
 
 export function VariantRow({ v, p }: { v: Variant; p?: Product }) {
@@ -93,8 +96,8 @@ export function AdjustSheet({
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-end bg-black/30" onClick={() => onClose()}>
-      <div className="pb-safe mx-auto w-full max-w-xl rounded-t-3xl bg-cream p-5" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-40 flex items-end bg-black/40" onClick={() => onClose()}>
+      <div className="pb-safe mx-auto w-full max-w-xl rounded-t-[20px] bg-canvas p-5" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-3">
           <Thumb src={product?.image_url} size={44} />
           <div className="min-w-0 flex-1">
@@ -110,7 +113,7 @@ export function AdjustSheet({
             <button key={r.value} onClick={() => {
                 setReason(r.value);
                 setAmount(r.value === "count" ? variant.quantity : 1);
-              }} className={`rounded-xl border px-2 py-2 text-xs font-medium ${reason === r.value ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
+              }} className={`chip justify-center rounded-xl px-2 text-[13px] ${reason === r.value ? "chip-on" : ""}`}>
               {r.label}
             </button>
           ))}
@@ -118,8 +121,8 @@ export function AdjustSheet({
 
         {meta.sign === 0 && reason !== "count" && (
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <button onClick={() => setSign(1)} className={`rounded-xl border py-2 text-sm ${sign === 1 ? "border-ink font-semibold" : "border-line"}`}>Add</button>
-            <button onClick={() => setSign(-1)} className={`rounded-xl border py-2 text-sm ${sign === -1 ? "border-ink font-semibold" : "border-line"}`}>Remove</button>
+            <button onClick={() => setSign(1)} className={`chip justify-center rounded-xl ${sign === 1 ? "chip-on" : ""}`}>Add</button>
+            <button onClick={() => setSign(-1)} className={`chip justify-center rounded-xl ${sign === -1 ? "chip-on" : ""}`}>Remove</button>
           </div>
         )}
 
@@ -178,3 +181,20 @@ export function Labeled({ label, children }: { label: string; children: React.Re
   );
 }
 
+
+/** iOS-style stepper: one pill with minus, value and plus (44pt tall hit areas). */
+export function Stepper({ value, onChange, highlight, label }: { value: number; onChange: (delta: number) => void; highlight?: boolean; label?: string }) {
+  return (
+    <div className={`flex h-9 shrink-0 items-center rounded-full ${highlight ? "bg-[#fbf0dc]" : "bg-sand"}`} role="group" aria-label={label ? `Stock for ${label}` : "Stock"}>
+      <button className="flex h-11 w-10 items-center justify-center rounded-full text-ink active:opacity-50" onClick={() => onChange(-1)} aria-label="Remove one">
+        <MinusIcon className="h-[18px] w-[18px]" />
+      </button>
+      <span className={`min-w-6 text-center text-[15px] font-semibold ${highlight ? "text-warn" : value <= 0 ? "text-danger" : ""}`} aria-live="polite">
+        {value}
+      </span>
+      <button className="flex h-11 w-10 items-center justify-center rounded-full text-ink active:opacity-50" onClick={() => onChange(1)} aria-label="Add one">
+        <PlusIcon className="h-[18px] w-[18px]" />
+      </button>
+    </div>
+  );
+}

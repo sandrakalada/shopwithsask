@@ -61,14 +61,14 @@ export default function TopProducts() {
     <div className="space-y-3">
       <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
         {([[30, "30 days"], [90, "90 days"], [365, "12 months"], [0, "All time"]] as [Period, string][]).map(([p, l]) => (
-          <button key={p} onClick={() => setPeriod(p)} className={`shrink-0 rounded-full border px-3 py-1.5 text-sm ${period === p ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
+          <button key={p} onClick={() => setPeriod(p)} className={`chip ${period === p ? "chip-on" : ""}`}>
             {l}
           </button>
         ))}
       </div>
       <div className="flex gap-2">
         {([["units", "Pieces sold"], ["revenue", "Revenue"], ["profit", "Profit"]] as [Sort, string][]).map(([k, l]) => (
-          <button key={k} onClick={() => setSort(k)} className={`rounded-full border px-3 py-1.5 text-sm ${sort === k ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
+          <button key={k} onClick={() => setSort(k)} className={`chip ${sort === k ? "chip-on" : ""}`}>
             {l}
           </button>
         ))}

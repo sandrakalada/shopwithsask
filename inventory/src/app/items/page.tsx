@@ -9,7 +9,7 @@ import { costInEgp, saveVariant, setSetting, variantLabel } from "@/lib/stock";
 void saveVariant;
 import { pending, pendingDelta, usePending } from "@/lib/pending";
 import { egp } from "@/lib/pdf";
-import { Header, QtyPill, Thumb, Toast } from "@/components/ui";
+import { Header, QtyPill, Stepper, Thumb, Toast } from "@/components/ui";
 import TopProducts from "@/components/TopProducts";
 import { useIncremental } from "@/components/useIncremental";
 import { MinusIcon, PlusIcon, PrintIcon, SearchIcon } from "@/components/Icons";
@@ -127,9 +127,9 @@ function Inventory() {
         {assign ? (
           <p className="card mb-3 p-3 text-sm">Tap the size that barcode <b>{assign}</b> belongs to.</p>
         ) : (
-          <div className="mb-3 grid grid-cols-3 rounded-xl border border-line bg-white p-1 text-sm font-semibold">
+          <div className="mb-3 seg grid-cols-3">
             {(["stock", "costs", "top"] as View[]).map((v) => (
-              <button key={v} onClick={() => { setView(v); setFilter("all"); }} className={`rounded-lg py-2 ${view === v ? "bg-ink text-cream" : "text-taupe"}`}>
+              <button key={v} onClick={() => { setView(v); setFilter("all"); }} className={`seg-btn ${view === v ? "seg-on" : ""}`}>
                 {v === "stock" ? "Stock" : v === "costs" ? "Cost prices" : "Top sellers"}
               </button>
             ))}
@@ -148,7 +148,7 @@ function Inventory() {
         </label>
         <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4">
           {filters.map(([f, l]) => (
-            <button key={f} onClick={() => setFilter(f)} className={`shrink-0 rounded-full border px-3 py-1.5 text-sm ${filter === f ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
+            <button key={f} onClick={() => setFilter(f)} className={`chip ${filter === f ? "chip-on" : ""}`}>
               {l}
             </button>
           ))}
@@ -164,15 +164,15 @@ function Inventory() {
         <ul className="mt-2 space-y-3">
           {rows.slice(0, count).map(({ p, vs }) => (
             <li key={p.id} className="card overflow-hidden">
-              <Link href={assign ? "#" : `/item?id=${p.id}`} onClick={(e) => assign && e.preventDefault()} className="flex items-center gap-3 px-4 pt-3">
+              <Link href={assign ? "#" : `/item?id=${p.id}`} onClick={(e) => assign && e.preventDefault()} className="flex items-center gap-3 px-4 pt-3 active:opacity-70">
                 <Thumb src={p.image_url} size={40} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold">{p.title}</p>
-                  <p className="truncate text-xs text-taupe">{p.product_type ?? ""}</p>
+                  <p className="truncate text-[15px] font-semibold">{p.title}</p>
+                  <p className="truncate text-[13px] text-taupe">{p.product_type ?? ""}</p>
                 </div>
                 <QtyPill qty={vs.reduce((s, v) => s + v.quantity, 0)} low={0} />
               </Link>
-              <div className="mt-2 divide-y divide-line border-t border-line">
+              <div className="mt-2 divide-y divide-line border-t border-line [&>*]:border-line">
                 {vs.map((v) =>
                   assign ? (
                     <button key={v.id} onClick={() => link(v)} className="flex w-full items-center justify-between px-4 py-2.5 text-left text-sm active:bg-sand">
@@ -180,20 +180,12 @@ function Inventory() {
                       <span className="text-xs text-taupe">{v.sku ?? v.barcode}</span>
                     </button>
                   ) : view === "stock" ? (
-                    <div key={v.id} className="flex items-center gap-2 px-4 py-2">
+                    <div key={v.id} className="flex min-h-12 items-center gap-3 py-1.5 pr-3 pl-[68px]">
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm">{variantLabel(v.title)}</p>
-                        <p className={`truncate text-xs ${v.sku ? "text-taupe" : "text-amber-700"}`}>{v.sku ? `SKU ${v.sku}` : "No SKU yet"}</p>
+                        <p className="text-[15px]">{variantLabel(v.title)}</p>
+                        <p className={`truncate text-[12px] ${v.sku ? "text-taupe" : "text-warn"}`}>{v.sku ?? "No SKU yet"}</p>
                       </div>
-                      <button className="btn-light h-9 w-9 rounded-full p-0" onClick={() => quick(v, p, -1)} aria-label="Remove one">
-                        <MinusIcon className="h-4 w-4" />
-                      </button>
-                      <span className={`w-8 text-center text-sm font-semibold ${pendingDelta(pend, v.id) ? "rounded bg-amber-100 text-amber-800" : ""}`}>
-                        {v.quantity + pendingDelta(pend, v.id)}
-                      </span>
-                      <button className="btn-light h-9 w-9 rounded-full p-0" onClick={() => quick(v, p, 1)} aria-label="Add one">
-                        <PlusIcon className="h-4 w-4" />
-                      </button>
+                      <Stepper value={v.quantity + pendingDelta(pend, v.id)} highlight={!!pendingDelta(pend, v.id)} label={variantLabel(v.title)} onChange={(d) => quick(v, p, d)} />
                     </div>
                   ) : (
                     <CostRow key={v.id} v={v} rate={data!.rate} />

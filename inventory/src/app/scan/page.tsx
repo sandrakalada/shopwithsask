@@ -131,7 +131,7 @@ export default function ScanPage() {
                 setMode(m.value);
                 setSession({ n: 0, units: 0 });
               }}
-              className={`shrink-0 rounded-full border px-4 py-2 text-sm font-medium ${mode === m.value ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}
+              className={`chip ${mode === m.value ? "chip-on" : ""}`}
             >
               {m.label}
             </button>

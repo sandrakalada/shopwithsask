@@ -193,7 +193,7 @@ function Labels() {
 
 function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} className={`rounded-full border px-3 py-1.5 text-sm ${on ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
+    <button onClick={onClick} className={`chip ${on ? "chip-on" : ""}`}>
       {children}
     </button>
   );

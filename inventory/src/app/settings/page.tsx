@@ -279,7 +279,7 @@ function Team() {
       <input className="field" placeholder="Password (at least 8 characters)" type="password" autoComplete="new-password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
       <div className="grid grid-cols-2 gap-2">
         {[["staff", "Full access"], ["shipping", "Shipping labels only"]].map(([r, l]) => (
-          <button key={r} onClick={() => setForm({ ...form, role: r })} className={`rounded-xl border px-3 py-2 ${form.role === r ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
+          <button key={r} onClick={() => setForm({ ...form, role: r })} className={`chip justify-center rounded-xl ${form.role === r ? "chip-on" : ""}`}>
             {l}
           </button>
         ))}

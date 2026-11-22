@@ -46,7 +46,7 @@ export default function Customers() {
         </label>
         <div className="mt-3 flex gap-2">
           {([["recent", "Recent"], ["spent", "Top spenders"], ["orders", "Most orders"]] as [Sort, string][]).map(([k, l]) => (
-            <button key={k} onClick={() => setSort(k)} className={`rounded-full border px-3 py-1.5 text-sm ${sort === k ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
+            <button key={k} onClick={() => setSort(k)} className={`chip ${sort === k ? "chip-on" : ""}`}>
               {l}
             </button>
           ))}

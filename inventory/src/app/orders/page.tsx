@@ -70,7 +70,7 @@ function Orders() {
         </label>
         <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4">
           {(role === "shipping" ? ([["open", "To ship"], ["all", "All"]] as [F, string][]) : ([["all", "All"], ["open", "To ship"], ["unpaid", "Unpaid"], ["fulfilled", "Fulfilled"], ["cancelled", "Cancelled"]] as [F, string][])).map(([k, l]) => (
-            <button key={k} onClick={() => setF(k)} className={`shrink-0 rounded-full border px-3 py-1.5 text-sm ${f === k ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
+            <button key={k} onClick={() => setF(k)} className={`chip ${f === k ? "chip-on" : ""}`}>
               {l}
             </button>
           ))}

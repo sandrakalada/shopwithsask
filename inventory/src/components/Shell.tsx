@@ -34,22 +34,19 @@ export function useSync() {
 export function SyncBadge() {
   const s = useSync();
   const pending = useLiveQuery(() => db.outbox.count(), [], 0);
-  const label = s.running
-    ? "Syncing"
-    : !s.online
-      ? pending
-        ? `Offline · ${pending} waiting`
-        : "Offline"
-      : s.error
-        ? "Sync error"
-        : pending
-          ? `${pending} waiting`
-          : "Synced";
-  const dot = !s.online ? "bg-amber-500" : s.error ? "bg-red-500" : pending || s.running ? "bg-sky-500" : "bg-emerald-500";
+  const label = s.running ? "Syncing" : !s.online ? (pending ? `Offline, ${pending} changes waiting` : "Offline") : s.error ? "Sync problem, tap to retry" : pending ? `${pending} changes waiting` : "Up to date";
+  const color = !s.online ? "text-warn" : s.error ? "text-danger" : pending || s.running ? "text-caramel" : "text-success";
   return (
-    <button onClick={() => void syncNow()} className="flex items-center gap-1.5 rounded-full border border-line bg-white px-2.5 py-1 text-xs text-taupe">
-      <span className={`h-2 w-2 rounded-full ${dot} ${s.running ? "animate-pulse" : ""}`} />
-      {label}
+    <button onClick={() => void syncNow()} className={`flex h-11 min-w-11 items-center justify-center rounded-full active:bg-sand ${color}`} aria-label={label} title={label}>
+      <svg viewBox="0 0 24 24" className={`h-[22px] w-[22px] ${s.running ? "animate-spin" : ""}`} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        {s.running ? (
+          <path d="M20 11a8 8 0 0 0-14.9-3M4 13a8 8 0 0 0 14.9 3M4 4v4h4M20 20v-4h-4" />
+        ) : !s.online ? (
+          <><path d="M7 18a4.5 4.5 0 0 1-.5-9 6 6 0 0 1 11.6 1.5A3.8 3.8 0 0 1 17 18H7Z" /><path d="m4 4 16 16" /></>
+        ) : (
+          <><path d="M7 18a4.5 4.5 0 0 1-.5-9 6 6 0 0 1 11.6 1.5A3.8 3.8 0 0 1 17 18H7Z" />{!pending && !s.error && <path d="m9.5 13 1.8 1.8 3.4-3.6" />}{!!pending && <path d="M12 11v4" />}</>
+        )}
+      </svg>
     </button>
   );
 }
@@ -145,25 +142,22 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   return (
     <RoleContext.Provider value={role}>
     <div className="mx-auto min-h-dvh max-w-xl">
-      <div className="pt-safe pb-28">{children}</div>
+      <div className="pb-[calc(env(safe-area-inset-bottom)+76px)]">{children}</div>
       {!shippingOnly && <SaveBar />}
       <PullToRefresh />
-      <nav className={`no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream/95 backdrop-blur pb-safe ${isPrint ? "" : ""}`}>
+      <nav className="no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/85 backdrop-blur-xl backdrop-saturate-150 pb-safe" aria-label="Tabs">
         <ul className={`mx-auto grid max-w-xl ${shippingOnly ? "grid-cols-1" : "grid-cols-5"}`}>
           {visibleTabs.map(({ href, label, Icon, match }) => {
             const active = (href === "/" ? pathname === "/" : pathname.startsWith(href)) || match.some((m) => pathname.startsWith(m));
-            const scan = href === "/scan" && !shippingOnly;
             return (
               <li key={href}>
-                <Link href={href} className={`flex flex-col items-center gap-0.5 py-2 text-[11px] ${active ? "text-caramel" : "text-taupe"}`}>
-                  {scan ? (
-                    <span className="-mt-6 flex h-14 w-14 items-center justify-center rounded-full bg-ink text-cream shadow-lg">
-                      <Icon className="h-7 w-7" />
-                    </span>
-                  ) : (
-                    <Icon />
-                  )}
-                  <span className={active ? "font-semibold" : ""}>{label}</span>
+                <Link
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  className={`flex h-[52px] flex-col items-center justify-center gap-0.5 text-[10.5px] font-medium transition-colors ${active ? "text-ink" : "text-faint"}`}
+                >
+                  <Icon className={`h-[25px] w-[25px] ${active ? "stroke-[2.1]" : ""}`} />
+                  <span>{label}</span>
                 </Link>
               </li>
             );

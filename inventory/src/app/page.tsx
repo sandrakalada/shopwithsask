@@ -54,7 +54,12 @@ export default function Home() {
     <>
       <Header title="Shop With Sask" logo />
       <main className="space-y-5 p-4">
-        <h1 className="pt-1 text-2xl font-semibold text-espresso">{firstName ? `Hi ${firstName}` : "Hi"}</h1>
+        <div className="pt-1">
+          <p className="text-[13px] font-medium tracking-wide text-taupe uppercase">
+            {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
+          </p>
+          <h1 className="text-[30px] font-bold tracking-tight">{firstName ? `Hi ${firstName}` : "Hi"}</h1>
+        </div>
         {data?.empty && <p className="card p-4 text-sm text-taupe">Your products download from Shopify automatically when you are online.</p>}
 
         <div className="grid grid-cols-2 gap-3">

@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Raleway } from "next/font/google";
 import Shell from "@/components/Shell";
 import "./globals.css";
-
-const raleway = Raleway({ subsets: ["latin"], variable: "--font-raleway" });
 
 export const metadata: Metadata = {
   title: "Sask Inventory",
@@ -14,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fffdf6",
+  themeColor: "#f3f0eb",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -23,7 +20,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={raleway.variable}>
+    <html lang="en">
       <body className="font-sans antialiased">
         <Shell>{children}</Shell>
       </body>
