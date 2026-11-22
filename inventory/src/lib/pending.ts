@@ -6,7 +6,8 @@ import { recordMovement, saveVariant } from "./stock";
 
 /** Inventory edits waiting for the Save button (nothing touches stock or Shopify before that). */
 type StockEdit = { variantId: string; reason: Reason; delta: number };
-type CostEdit = { variantId: string; cost: number | null; currency: "EGP" | "SAR" };
+/** cost is always kept in EGP; costSar is the exact SAR amount when it was typed in SAR */
+type CostEdit = { variantId: string; cost: number | null; costSar: number | null };
 type State = { stock: StockEdit[]; costs: Record<string, CostEdit> };
 
 let state: State = { stock: [], costs: {} };
@@ -26,8 +27,8 @@ export const pending = {
     state = { ...state, stock: stock.filter((e) => e.delta !== 0) };
     emit();
   },
-  setCost(variantId: string, cost: number | null, currency: "EGP" | "SAR") {
-    state = { ...state, costs: { ...state.costs, [variantId]: { variantId, cost, currency } } };
+  setCost(variantId: string, cost: number | null, costSar: number | null) {
+    state = { ...state, costs: { ...state.costs, [variantId]: { variantId, cost, costSar } } };
     emit();
   },
   discard() {
@@ -40,7 +41,7 @@ export const pending = {
     for (const e of stock) await recordMovement(e.variantId, e.delta, e.reason);
     for (const c of Object.values(costs)) {
       const v = await db.variants.get(c.variantId);
-      if (v) await saveVariant({ ...v, cost: c.cost, cost_currency: c.currency });
+      if (v) await saveVariant({ ...v, cost: c.cost, cost_currency: "EGP", cost_sar: c.costSar });
     }
     state = { stock: [], costs: {} };
     emit();

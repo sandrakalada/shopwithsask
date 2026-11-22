@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, newestFirst, type Product, type Variant } from "@/lib/db";
-import { costInEgp, saveVariant, setSetting, variantLabel } from "@/lib/stock";
+import { costIn, costInEgp, saveVariant, setSetting, variantLabel } from "@/lib/stock";
 void saveVariant;
 import { pending, pendingDelta, usePending } from "@/lib/pending";
 import { egp } from "@/lib/pdf";
@@ -238,23 +238,27 @@ function CostSummary({ totals, rate }: { totals: { units: number; retail: number
   );
 }
 
-function CostRow({ v, rate }: { v: Variant; rate: number }) {
-  const [cost, setCost] = useState(v.cost != null ? String(v.cost) : "");
-  const [cur, setCur] = useState<"EGP" | "SAR">(v.cost_currency ?? "EGP");
-  useEffect(() => {
-    setCost(v.cost != null ? String(v.cost) : "");
-    setCur(v.cost_currency ?? "EGP");
-  }, [v.cost, v.cost_currency]);
+const fmtCost = (n: number | null) => (n == null ? "" : String(Math.round(n * 100) / 100));
 
-  function save(nextCost = cost, nextCur = cur) {
-    const n = nextCost.trim() === "" ? null : Number(nextCost);
-    if (n != null && !(n >= 0)) return;
-    if (n === (v.cost ?? null) && nextCur === (v.cost_currency ?? "EGP")) return;
-    // waits for the Save bar
-    pending.setCost(v.id, n, nextCur);
+function CostRow({ v, rate }: { v: Variant; rate: number }) {
+  const pend = usePending().costs[v.id];
+  // what is saved (or waiting for Save), in both currencies
+  const cur0 = pend ? { cost: pend.cost, cost_currency: "EGP" as const, cost_sar: pend.costSar } : v;
+  const [cur, setCur] = useState<"EGP" | "SAR">("EGP");
+  const shown = costIn(cur0, cur, rate);
+  const [text, setText] = useState(fmtCost(shown));
+  useEffect(() => setText(fmtCost(shown)), [shown, cur]); // switching EGP / SAR only changes what is shown
+
+  function commit() {
+    const n = text.trim() === "" ? null : Number(text);
+    if (n != null && !(n >= 0)) return setText(fmtCost(shown));
+    if (n === shown) return;
+    // typed in SAR: keep the exact SAR amount and its EGP value at today's rate
+    if (cur === "SAR") pending.setCost(v.id, n == null ? null : Math.round(n * rate * 100) / 100, n);
+    else pending.setCost(v.id, n, null);
   }
 
-  const inEgp = costInEgp({ cost: cost === "" ? null : Number(cost), cost_currency: cur }, rate);
+  const inEgp = costIn(cur0, "EGP", rate);
   const margin = inEgp != null && v.price ? Math.round(((v.price - inEgp) / v.price) * 100) : null;
   return (
     <div className="flex items-center gap-2 px-4 py-2">
@@ -268,16 +272,8 @@ function CostRow({ v, rate }: { v: Variant; rate: number }) {
           {margin != null ? ` · ${margin}% margin` : ""}
         </p>
       </div>
-      <input className="field w-20 px-2 py-2 text-right" inputMode="decimal" placeholder="Cost" value={cost} onChange={(e) => setCost(e.target.value)} onBlur={() => save()} />
-      <select
-        className="rounded-xl border border-line bg-white px-2 py-2 text-sm"
-        value={cur}
-        onChange={(e) => {
-          const c = e.target.value as "EGP" | "SAR";
-          setCur(c);
-          save(cost, c);
-        }}
-      >
+      <input className="field w-24 px-2 py-2 text-right" inputMode="decimal" placeholder="Cost" value={text} onChange={(e) => setText(e.target.value)} onBlur={commit} aria-label={`Cost of ${variantLabel(v.title)} in ${cur}`} />
+      <select className="rounded-xl border border-line bg-white px-2 py-2 text-sm" value={cur} onChange={(e) => setCur(e.target.value as "EGP" | "SAR")} aria-label="Show cost in">
         <option>EGP</option>
         <option>SAR</option>
       </select>

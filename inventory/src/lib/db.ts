@@ -35,6 +35,8 @@ export type Variant = {
   updated_at: string;
   cost?: number | null;
   cost_currency?: "EGP" | "SAR";
+  /** exact amount paid in SAR, when the cost was entered in SAR */
+  cost_sar?: number | null;
   shopify_variant_id?: string | null;
 };
 

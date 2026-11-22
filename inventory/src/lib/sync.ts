@@ -141,6 +141,7 @@ async function pull() {
           ...r,
           price: r.price == null ? null : Number(r.price),
           cost: r.cost == null ? null : Number(r.cost),
+          cost_sar: r.cost_sar == null ? null : Number(r.cost_sar),
           quantity: r.quantity + (pending.get(r.id) ?? 0),
         })),
       );

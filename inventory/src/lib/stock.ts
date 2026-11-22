@@ -81,13 +81,16 @@ export async function saveVariant(
     quantity: existing?.quantity ?? 0,
     updated_at: now(),
   };
+  // cost changed somewhere without a SAR amount: the old SAR figure no longer applies
+  if (existing && (row.cost !== existing.cost || row.cost_currency !== existing.cost_currency) && row.cost_sar === existing.cost_sar)
+    row.cost_sar = row.cost_currency === "SAR" ? row.cost ?? null : null;
   await db.transaction("rw", db.variants, db.outbox, async () => {
     await db.variants.put(row);
     // only columns the server knows about; quantity changes go through movements
     const { quantity: _q, updated_at: _u, ...rest } = row;
     void _q;
     void _u;
-    const allowed = ["id", "product_id", "title", "sku", "barcode", "price", "low_stock_at", "archived", "cost", "cost_currency", "shopify_variant_id"];
+    const allowed = ["id", "product_id", "title", "sku", "barcode", "price", "low_stock_at", "archived", "cost", "cost_currency", "cost_sar", "shopify_variant_id"];
     const send = Object.fromEntries(Object.entries(rest).filter(([k]) => allowed.includes(k)));
     await db.outbox.add({ table: "variants", row: send, created_at: row.updated_at });
   });
@@ -153,6 +156,17 @@ export async function setSetting(key: string, value: unknown) {
 export function costInEgp(v: { cost?: number | null; cost_currency?: string }, sarRate: number) {
   if (v.cost == null) return null;
   return v.cost * (v.cost_currency === "SAR" ? sarRate : 1);
+}
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+/** The cost shown in either currency. SAR uses the exact amount paid when it is known. */
+export function costIn(v: { cost?: number | null; cost_currency?: string; cost_sar?: number | null }, cur: "EGP" | "SAR", sarRate: number) {
+  const egpVal = costInEgp(v, sarRate);
+  if (cur === "EGP") return egpVal == null ? null : round2(egpVal);
+  if (v.cost_sar != null) return v.cost_sar;
+  if (v.cost_currency === "SAR" && v.cost != null) return v.cost;
+  return egpVal == null ? null : round2(egpVal / sarRate);
 }
 
 export function thumb(url: string | null | undefined, width = 200) {
