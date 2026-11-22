@@ -136,7 +136,7 @@ async function sarRate() {
   return n > 0 ? n : 13;
 }
 
-/** SKU, price and cost edited in the app → Shopify (cost always sent in EGP). */
+/** SKU and price edited in the app → Shopify. Cost prices stay in the app only (the owner does not want them in Shopify). */
 async function pushVariantDetails() {
   const { data: rows, error } = await admin
     .from("variants")
@@ -146,7 +146,6 @@ async function pushVariantDetails() {
     .limit(250);
   if (error) throw error;
   if (!rows?.length) return { updated: 0 };
-  const rate = await sarRate();
   const byProduct = new Map<string, any[]>();
   for (const r of rows as any[]) {
     const pid = r.products?.shopify_product_id;
@@ -159,10 +158,7 @@ async function pushVariantDetails() {
     const variants = list.map((r) => ({
       id: gid("ProductVariant", r.shopify_variant_id),
       ...(r.price != null ? { price: String(r.price) } : {}),
-      inventoryItem: {
-        sku: r.sku ?? "",
-        ...(r.cost != null ? { cost: (Number(r.cost) * (r.cost_currency === "SAR" ? rate : 1)).toFixed(2) } : {}),
-      },
+      inventoryItem: { sku: r.sku ?? "" },
     }));
     try {
       const d = await gql(
