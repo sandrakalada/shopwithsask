@@ -116,7 +116,7 @@ export default function Settings() {
           <p className="font-semibold">Face ID</p>
           <p className="text-taupe">
             {faceId.available
-              ? "Sign in with Face ID instead of typing your password. Also works offline."
+              ? "Use Face ID on the sign-in screen instead of typing your password. You stay signed in on this phone until you sign out."
               : "Face ID is not available in this browser. Open the app from your Home Screen on iPhone."}
           </p>
           {faceId.msg && <p className="text-red-600">{faceId.msg}</p>}

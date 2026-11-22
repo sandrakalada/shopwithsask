@@ -12,7 +12,6 @@ import { BoxIcon, HomeIcon, ReceiptIcon, ScanIcon, UsersIcon } from "./Icons";
 import Login from "./Login";
 import SaveBar from "./SaveBar";
 import PullToRefresh from "./PullToRefresh";
-import { faceIdEnabled } from "@/lib/faceid";
 
 const tabs = [
   { href: "/", label: "Home", Icon: HomeIcon, match: ["/history", "/settings"] },
@@ -55,7 +54,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
-  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
@@ -85,7 +83,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     });
     const { data } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);
-      if (event === "SIGNED_IN") setLocked(false); // just signed in with password or Face ID
     });
     return () => data.subscription.unsubscribe();
   }, []);
@@ -103,18 +100,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     startSync();
   }, [session]);
 
-  // Face ID lock: on opening the app, and after 5 minutes in the background
-  useEffect(() => {
-    if (faceIdEnabled()) setLocked(true);
-    let hiddenAt = 0;
-    const onVis = () => {
-      if (document.visibilityState === "hidden") hiddenAt = Date.now();
-      else if (faceIdEnabled() && hiddenAt && Date.now() - hiddenAt > 5 * 60_000) setLocked(true);
-    };
-    document.addEventListener("visibilitychange", onVis);
-    return () => document.removeEventListener("visibilitychange", onVis);
-  }, []);
-
   if (!supabaseConfigured) {
     return (
       <main className="mx-auto max-w-md p-6 pt-16">
@@ -127,7 +112,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   }
   if (session === undefined) return <div className="min-h-dvh" />;
   if (!session) return <Login />;
-  if (locked) return <Login onUnlock={() => setLocked(false)} />;
 
   const role = (session.user.app_metadata?.role as string) ?? "staff";
   const shippingOnly = role === "shipping";

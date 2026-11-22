@@ -37,8 +37,8 @@ read locations, orders, fulfillments.
 
 Passkeys via Supabase Auth (experimental passkey API, RP ID sask-inventory.vercel.app).
 Settings or the Home card turns it on; the sign-in screen then offers Sign in with Face ID.
-When Face ID is on, the app asks for it on opening and after 5 minutes in the background;
-offline it checks the passkey on the phone.
+Once signed in, the phone stays signed in (no prompt on every open); Face ID is used on the
+sign-in screen after signing out.
 
 ## Using it
 
