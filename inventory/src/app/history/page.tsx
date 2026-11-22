@@ -1,13 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { REASONS, reasonLabel, variantLabel } from "@/lib/stock";
 import { Header, timeAgo } from "@/components/ui";
 
-export default function History() {
-  const [reason, setReason] = useState("all");
+export default function HistoryPage() {
+  return (
+    <Suspense>
+      <History />
+    </Suspense>
+  );
+}
+
+function History() {
+  const [reason, setReason] = useState(useSearchParams().get("reason") ?? "all");
   const data = useLiveQuery(async () => {
     const [products, variants, moves] = await Promise.all([
       db.products.toArray(),
@@ -31,7 +40,7 @@ export default function History() {
 
   return (
     <>
-      <Header title="History" />
+      <Header title="History" back />
       <main className="p-4">
         <select className="field" value={reason} onChange={(e) => setReason(e.target.value)}>
           <option value="all">All changes</option>

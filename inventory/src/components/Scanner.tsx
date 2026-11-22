@@ -1,13 +1,35 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BrowserMultiFormatReader, type IScannerControls } from "@zxing/browser";
-import { BarcodeFormat, DecodeHintType } from "@zxing/library";
 
 /**
- * Live camera barcode scanner (Code 128, EAN, UPC, Code 39, QR).
- * Works in Safari and in the installed home-screen app on iPhone, fully offline.
+ * Live camera scanner for QR codes (stickers, shipping labels) and barcodes (Code 128, EAN, UPC).
+ * Uses the phone's built-in detector when available, otherwise ZXing-C++ compiled to WebAssembly
+ * (served from this app, so it also works offline). Much better than the old JavaScript decoder at
+ * small, dense QR codes on iPhone.
  */
+type Detector = { detect: (src: CanvasImageSource) => Promise<{ rawValue: string }[]> };
+const FORMATS = ["qr_code", "code_128", "ean_13", "ean_8", "upc_a", "upc_e", "code_39"];
+
+let detectorPromise: Promise<Detector> | null = null;
+function getDetector() {
+  detectorPromise ??= (async () => {
+    const Native = (window as unknown as { BarcodeDetector?: { new (o: object): Detector; getSupportedFormats(): Promise<string[]> } }).BarcodeDetector;
+    if (Native) {
+      try {
+        const supported = await Native.getSupportedFormats();
+        if (supported.includes("qr_code")) return new Native({ formats: FORMATS.filter((f) => supported.includes(f)) });
+      } catch {}
+    }
+    const { BarcodeDetector, prepareZXingModule } = await import("barcode-detector/ponyfill");
+    prepareZXingModule({
+      overrides: { locateFile: (path: string, prefix: string) => (path.endsWith(".wasm") ? "/zxing_reader.wasm" : prefix + path) },
+    });
+    return new BarcodeDetector({ formats: FORMATS as never }) as unknown as Detector;
+  })();
+  return detectorPromise;
+}
+
 export default function Scanner({ onCode, paused }: { onCode: (code: string) => void; paused?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const cb = useRef(onCode);
@@ -20,44 +42,52 @@ export default function Scanner({ onCode, paused }: { onCode: (code: string) => 
   }, [onCode, paused]);
 
   useEffect(() => {
-    let controls: IScannerControls | null = null;
-    let cancelled = false;
-    const hints = new Map();
-    hints.set(DecodeHintType.POSSIBLE_FORMATS, [
-      BarcodeFormat.CODE_128,
-      BarcodeFormat.EAN_13,
-      BarcodeFormat.EAN_8,
-      BarcodeFormat.UPC_A,
-      BarcodeFormat.UPC_E,
-      BarcodeFormat.CODE_39,
-      BarcodeFormat.QR_CODE,
-    ]);
-    hints.set(DecodeHintType.TRY_HARDER, true);
-    const reader = new BrowserMultiFormatReader(hints, { delayBetweenScanAttempts: 120, delayBetweenScanSuccess: 600 });
+    let stream: MediaStream | null = null;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout>;
 
-    reader
-      .decodeFromConstraints(
-        { audio: false, video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } } },
-        videoRef.current!,
-        (result) => {
-          if (result && !pausedRef.current) cb.current(result.getText());
-        },
-      )
-      .then((c) => {
-        if (cancelled) c.stop();
-        else controls = c;
-      })
-      .catch((e: Error) => {
+    (async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        });
+        if (stopped) return stream.getTracks().forEach((t) => t.stop());
+        const video = videoRef.current!;
+        video.srcObject = stream;
+        await video.play().catch(() => {});
+        // continuous autofocus where the camera allows it (helps with small stickers)
+        const track = stream.getVideoTracks()[0];
+        try {
+          await track.applyConstraints({ advanced: [{ focusMode: "continuous" } as MediaTrackConstraintSet] });
+        } catch {}
+
+        const detector = await getDetector();
+        const tick = async () => {
+          if (stopped) return;
+          if (!pausedRef.current && video.readyState >= 2) {
+            try {
+              const found = await detector.detect(video);
+              if (found[0]?.rawValue && !pausedRef.current) cb.current(found[0].rawValue);
+            } catch {}
+          }
+          timer = setTimeout(tick, 120);
+        };
+        void tick();
+      } catch (e) {
+        const name = (e as Error)?.name;
         setError(
-          e?.name === "NotAllowedError"
+          name === "NotAllowedError"
             ? "Camera access is blocked. Allow it in Settings → Safari → Camera (or for this app), then reopen."
             : "Could not start the camera.",
         );
-      });
+      }
+    })();
 
     return () => {
-      cancelled = true;
-      controls?.stop();
+      stopped = true;
+      clearTimeout(timer);
+      stream?.getTracks().forEach((t) => t.stop());
     };
   }, []);
 
@@ -65,9 +95,8 @@ export default function Scanner({ onCode, paused }: { onCode: (code: string) => 
     <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-black">
       <video ref={videoRef} className="h-full w-full object-cover" playsInline muted autoPlay />
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className={`h-1/3 w-4/5 rounded-xl border-2 ${paused ? "border-white/30" : "border-white/90"}`} />
+        <div className={`h-3/5 w-3/5 rounded-xl border-2 ${paused ? "border-white/30" : "border-white/90"}`} />
       </div>
-      {!paused && <div className="pointer-events-none absolute inset-x-[10%] top-1/2 h-0.5 animate-pulse bg-red-500/80" />}
       {error && <div className="absolute inset-0 flex items-center justify-center bg-black/80 p-6 text-center text-sm text-white">{error}</div>}
     </div>
   );

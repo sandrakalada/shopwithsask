@@ -62,7 +62,7 @@ function Item() {
         <section>
           <div className="mb-2 flex items-center justify-between">
             <h2 className="font-semibold">Sizes</h2>
-            <button className="text-sm font-semibold underline" onClick={() => setEdit("new")}>Add size</button>
+            <span className="text-xs text-taupe">New sizes come from Shopify</span>
           </div>
           <ul className="card divide-y divide-line">
             {live.map((v) => (

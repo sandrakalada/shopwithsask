@@ -6,8 +6,8 @@ import { useLiveQuery } from "dexie-react-hooks";
 import QRCode from "qrcode";
 import { db, type Product, type Variant } from "@/lib/db";
 import { stickerLink, variantLabel } from "@/lib/stock";
-import { imagesToPdf, printImages, shareFile } from "@/lib/pdf";
-import { Header } from "@/components/ui";
+import { imagesToPdf, printFile, shareFile } from "@/lib/pdf";
+import { Header, Thumb } from "@/components/ui";
 import { PrintIcon } from "@/components/Icons";
 
 // Sticker: 50 x 30 mm. Drawn at 12 px per mm (600 x 360) for sharp thermal printing.
@@ -92,7 +92,7 @@ function Labels() {
   const [perStock, setPerStock] = useState(!variantId);
   const [busy, setBusy] = useState(false);
   const [ready, setReady] = useState<{ key: string; images: string[]; pdf: Blob } | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [previews, setPreviews] = useState<{ img: string; v: Variant; p: Product; copies: number }[]>([]);
 
   const data = useLiveQuery(async () => {
     const [products, variants] = await Promise.all([db.products.toArray(), db.variants.toArray()]);
@@ -126,7 +126,14 @@ function Labels() {
     }
     const pdf = await imagesToPdf(images.map((url) => ({ url, ratio: H / W })), W, H);
     setReady({ key, images, pdf });
-    setPreview(images[0] ?? null);
+    // one preview row per size, with the product photo (shown in the app only, not printed)
+    const rows = new Map<string, { img: string; v: Variant; p: Product; copies: number }>();
+    for (const { v, p } of labels.slice(0, 500)) {
+      const r = rows.get(v.id);
+      if (r) r.copies++;
+      else rows.set(v.id, { img: cache.get(v.id)!, v, p, copies: 1 });
+    }
+    setPreviews([...rows.values()]);
     setBusy(false);
   }
 
@@ -150,7 +157,7 @@ function Labels() {
           </button>
         ) : (
           <div className="grid grid-cols-2 gap-2">
-            <button className="btn-dark" onClick={() => printImages(ready.images, W, H)}>
+            <button className="btn-dark" onClick={() => printFile(ready.images, ready.pdf, `stickers-${ready.images.length}.pdf`, W, H)}>
               <PrintIcon className="h-5 w-5" /> Print
             </button>
             <button className="btn-light" onClick={() => shareFile(ready.pdf, `stickers-${ready.images.length}.pdf`)}>
@@ -158,12 +165,22 @@ function Labels() {
             </button>
           </div>
         )}
-        {isReady && preview && (
-          <div className="card p-3">
-            <p className="mb-2 text-xs text-taupe">Preview (actual size 50 x 30 mm)</p>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={preview} alt="Sticker preview" className="w-full rounded border border-line" />
-          </div>
+        {isReady && previews.length > 0 && (
+          <section className="space-y-2">
+            <p className="text-xs text-taupe">
+              {ready.images.length} stickers · {previews.length} sizes. Photos are only shown here, they are not printed.
+            </p>
+            <ul className="card divide-y divide-line overflow-hidden">
+              {previews.slice(0, 200).map(({ img, v, p, copies }) => (
+                <li key={v.id} className="flex items-center gap-3 p-3">
+                  <Thumb src={p.image_url} size={44} />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img} alt={`Sticker for ${p.title}`} className="min-w-0 flex-1 rounded border border-line" />
+                  <span className="w-8 shrink-0 text-center text-sm font-semibold">x{copies}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
         <p className="text-xs text-taupe">
           Print opens the print dialog: choose your label printer and 50 x 30 mm paper. Share PDF sends the file to a printer app such as Phomemo.

@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
 import { SearchIcon } from "@/components/Icons";
+import { useIncremental } from "@/components/useIncremental";
 
 type Sort = "recent" | "spent" | "orders";
 
@@ -33,6 +34,8 @@ export default function Customers() {
       );
   }, [customers, q, sort]);
 
+  const { count, Sentinel } = useIncremental(rows.length, 40, `${q}|${sort}`);
+
   return (
     <>
       <Header title="Customers" />
@@ -50,7 +53,7 @@ export default function Customers() {
         </div>
         <p className="mt-3 text-xs text-taupe">{rows.length} customers</p>
         <ul className="card mt-2 divide-y divide-line overflow-hidden">
-          {rows.slice(0, 400).map((c) => (
+          {rows.slice(0, count).map((c) => (
             <li key={c.id}>
               <Link href={`/customer?id=${c.id}`} className="flex items-center gap-3 px-4 py-3 active:bg-sand">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sand text-sm font-semibold text-espresso">
@@ -71,6 +74,7 @@ export default function Customers() {
           ))}
           {rows.length === 0 && <li className="p-4 text-sm text-taupe">{customers.length ? "No customers match." : "Customers download automatically when you are online."}</li>}
         </ul>
+        {Sentinel}
       </main>
     </>
   );

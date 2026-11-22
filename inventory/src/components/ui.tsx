@@ -7,15 +7,18 @@ import type { Product, Reason, Variant } from "@/lib/db";
 import { recordMovement, REASONS, setCount, thumb, variantLabel } from "@/lib/stock";
 import { BackIcon, MinusIcon, PlusIcon } from "./Icons";
 import { SyncBadge } from "./Shell";
+import SideMenu from "./SideMenu";
 
 export function Header({ title, back, right, logo }: { title: string; back?: boolean; right?: React.ReactNode; logo?: boolean }) {
   const router = useRouter();
   return (
     <header className="no-print sticky top-0 z-20 flex items-center gap-2 border-b border-line bg-cream/95 px-4 py-3 backdrop-blur">
-      {back && (
+      {back ? (
         <button onClick={() => router.back()} className="-ml-2 p-1" aria-label="Back">
           <BackIcon />
         </button>
+      ) : (
+        <SideMenu />
       )}
       {logo ? (
         <h1 className="flex min-w-0 flex-1 items-center">

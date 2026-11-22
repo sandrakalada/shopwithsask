@@ -14,7 +14,7 @@ import { faceIdEnabled } from "@/lib/faceid";
 
 const tabs = [
   { href: "/", label: "Home", Icon: HomeIcon, match: ["/history", "/settings"] },
-  { href: "/items", label: "Inventory", Icon: BoxIcon, match: ["/item", "/labels", "/new"] },
+  { href: "/items", label: "Inventory", Icon: BoxIcon, match: ["/item", "/labels"] },
   { href: "/scan", label: "Scan", Icon: ScanIcon, match: [] },
   { href: "/orders", label: "Orders", Icon: ReceiptIcon, match: ["/order", "/invoice", "/ship"] },
   { href: "/customers", label: "Customers", Icon: UsersIcon, match: ["/customer"] },

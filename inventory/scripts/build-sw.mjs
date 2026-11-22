@@ -70,19 +70,29 @@ self.addEventListener("fetch", (e) => {
   e.respondWith(
     (async () => {
       const cache = await caches.open(APP);
-      if (req.mode === "navigate") {
-        const hit = await cache.match(pageKey(url.pathname));
-        if (hit) return hit;
+      // pages and page data: network first (latest version as soon as you are online),
+      // the saved copy only when offline or the network is very slow
+      const isPage = req.mode === "navigate" || url.pathname.endsWith(".txt") || url.searchParams.has("_rsc");
+      if (isPage) {
+        const key = req.mode === "navigate" ? pageKey(url.pathname) : url.pathname;
         try {
-          return await fetch(req);
+          const res = await Promise.race([
+            fetch(req, { cache: "no-store" }),
+            new Promise((_, rej) => setTimeout(() => rej(new Error("slow")), 4000)),
+          ]);
+          if (res.ok && req.mode === "navigate") cache.put(key, res.clone());
+          return res;
         } catch {
-          return (await cache.match("/index.html")) || Response.error();
+          return (await cache.match(key)) || (await cache.match(url.pathname)) || (await cache.match("/index.html")) || Response.error();
         }
       }
+      // scripts, styles, images: file names change with every version, so the saved copy is always right
       const hit = (await cache.match(url.pathname)) || (await cache.match(req, { ignoreSearch: true }));
       if (hit) return hit;
       try {
-        return await fetch(req);
+        const res = await fetch(req);
+        if (res.ok && url.pathname.startsWith("/_next/")) cache.put(url.pathname, res.clone());
+        return res;
       } catch {
         return Response.error();
       }

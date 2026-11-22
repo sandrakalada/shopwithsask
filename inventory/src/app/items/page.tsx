@@ -9,6 +9,7 @@ import { costInEgp, recordMovement, saveVariant, setSetting, variantLabel } from
 import { egp } from "@/lib/pdf";
 import { Header, QtyPill, Thumb, Toast } from "@/components/ui";
 import TopProducts from "@/components/TopProducts";
+import { useIncremental } from "@/components/useIncremental";
 import { MinusIcon, PlusIcon, PrintIcon, SearchIcon } from "@/components/Icons";
 
 type Filter = "all" | "in" | "low" | "out" | "nosku" | "nocost";
@@ -23,6 +24,11 @@ function Inventory() {
   const [filter, setFilter] = useState<Filter>((params.get("filter") as Filter) ?? "all");
   const [type, setType] = useState("all");
   const [toast, setToast] = useState<string | null>(null);
+  // menu links such as /items?view=top switch the view even when already on this page
+  useEffect(() => {
+    setView((params.get("view") as View) ?? "stock");
+    setFilter((params.get("filter") as Filter) ?? "all");
+  }, [params]);
 
   const data = useLiveQuery(async () => {
     const [products, variants, rate] = await Promise.all([db.products.toArray(), db.variants.toArray(), db.settings.get("sar_to_egp")]);
@@ -61,6 +67,8 @@ function Inventory() {
       );
     });
   }, [data, q, filter, type]);
+
+  const { count, Sentinel } = useIncremental(rows.length, 40, `${q}|${filter}|${type}|${view}`);
 
   const totals = useMemo(() => {
     let units = 0, retail = 0, cost = 0, missing = 0;
@@ -108,9 +116,6 @@ function Inventory() {
               <Link href="/labels" className="p-1" aria-label="Print stickers">
                 <PrintIcon />
               </Link>
-              <Link href="/new" className="p-1" aria-label="Add item">
-                <PlusIcon />
-              </Link>
             </div>
           )
         }
@@ -154,7 +159,7 @@ function Inventory() {
         </p>
 
         <ul className="mt-2 space-y-3">
-          {rows.slice(0, 300).map(({ p, vs }) => (
+          {rows.slice(0, count).map(({ p, vs }) => (
             <li key={p.id} className="card overflow-hidden">
               <Link href={assign ? "#" : `/item?id=${p.id}`} onClick={(e) => assign && e.preventDefault()} className="flex items-center gap-3 px-4 pt-3">
                 <Thumb src={p.image_url} size={40} />
@@ -195,6 +200,7 @@ function Inventory() {
           ))}
           {data && rows.length === 0 && <li className="card p-4 text-sm text-taupe">No items match.</li>}
         </ul>
+        {Sentinel}
         </>
         )}
       </main>

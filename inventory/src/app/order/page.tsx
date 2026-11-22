@@ -6,9 +6,9 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { getSetting } from "@/lib/stock";
-import { addressLines, egp, elementToImage, imagesToPdf, printImages, qrDataUrl, shareFile, waLink } from "@/lib/pdf";
+import { addressLines, egp, elementToImage, imagesToPdf, printFile, qrDataUrl, shareFile, waLink } from "@/lib/pdf";
 import { Header, Thumb } from "@/components/ui";
-import { PhoneIcon, PrintIcon, ReceiptIcon, WhatsAppIcon } from "@/components/Icons";
+import { PhoneIcon, PrintIcon, WhatsAppIcon } from "@/components/Icons";
 import ShippingLabel, { shipmentNumber, type LabelStore } from "@/components/ShippingLabel";
 import JsBarcode from "jsbarcode";
 import { fmtDate, orderCustomerName, orderPhone, paymentLabel, StatusPills } from "@/components/orderUi";
@@ -47,7 +47,10 @@ function OrderView() {
     let cancelled = false;
     (async () => {
       await document.fonts?.ready;
-      const img = await elementToImage(labelRef.current!);
+      // let the page paint first; drawing the label is heavy on phones
+      await new Promise((r) => setTimeout(r, 400));
+      if (cancelled || !labelRef.current) return;
+      const img = await elementToImage(labelRef.current);
       const pdf = await imagesToPdf([img], 100, 150);
       if (!cancelled) setLabel({ url: img.url, pdf });
     })();
@@ -66,7 +69,7 @@ function OrderView() {
         <Header title={order.name} back />
         <main className="space-y-4 p-4">
           <div className="grid grid-cols-2 gap-2">
-            <button className="btn-dark py-4" disabled={!label} onClick={() => label && printImages([label.url], 100, 150)}>
+            <button className="btn-dark py-4" disabled={!label} onClick={() => label && printFile([label.url], label.pdf, `label-${order.name.replace("#", "")}.pdf`, 100, 150)}>
               <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
             </button>
             <button className="btn-light py-4" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
@@ -108,7 +111,7 @@ function OrderView() {
         </section>
 
         <div className="grid grid-cols-2 gap-2">
-          <button className="btn-dark" disabled={!label} onClick={() => label && printImages([label.url], 100, 150)}>
+          <button className="btn-dark" disabled={!label} onClick={() => label && printFile([label.url], label.pdf, `label-${order.name.replace("#", "")}.pdf`, 100, 150)}>
             <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
           </button>
           <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
@@ -116,7 +119,7 @@ function OrderView() {
           </button>
           {!shippingOnly && (
             <Link href={invoice ? `/invoice?id=${invoice.id}` : `/invoice?order=${order.id}`} className="btn-light col-span-2">
-              <ReceiptIcon className="h-5 w-5" /> {invoice ? `Invoice ${invoice.number}` : "Create invoice"}
+              <WhatsAppIcon className="h-5 w-5" /> Send invoice on WhatsApp
             </Link>
           )}
         </div>

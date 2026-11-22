@@ -379,7 +379,7 @@ async function pull() {
   const gone = variants!.filter((v) => v.shopify_variant_id && !live.has(v.shopify_variant_id) && !v.archived).map((v) => v.id);
   if (gone.length) await admin.from("variants").update({ archived: true }).in("id", gone);
 
-  await admin.from("variants").update({ shopify_synced_at: now }).not("shopify_variant_id", "is", null);
+  // (no blanket "synced at" stamp here: touching every row made all phones re-download the catalogue)
   await setSetting("last_pull", new Date().toISOString());
   return { shopifyVariants: shopify.length, newProducts, newVariants, stockChanged: moves.length, hidden: gone.length, skusAssigned: skuResult };
 }

@@ -29,29 +29,37 @@ export async function elementToPdf(el: HTMLElement, widthMm: number, heightMm?: 
   return imagesToPdf([await elementToImage(el)], widthMm, heightMm);
 }
 
-/** One-tap print: prints ready images at an exact paper size through the system print
- * dialog (pick the printer there). Works on iPhone (AirPrint) and on computers. */
+export const isIOS = () => typeof navigator !== "undefined" && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+
+/** One-tap print on computers: prints ready images at an exact paper size through the browser's
+ * print dialog. (iPhone uses printFile instead.) The print area stays in the page until the next
+ * print, because some browsers render the preview after window.print() has returned. */
 export function printImages(images: string[], widthMm: number, heightMm: number) {
-  const root = document.createElement("div");
-  root.id = "print-root";
+  let root = document.getElementById("print-root");
+  if (!root) {
+    root = document.createElement("div");
+    root.id = "print-root";
+    document.body.appendChild(root);
+  }
   root.innerHTML = images.map((u) => `<img src="${u}" style="display:block;width:${widthMm}mm;height:${heightMm}mm;page-break-after:always;break-after:page">`).join("");
-  const style = document.createElement("style");
+  let style = document.getElementById("print-style") as HTMLStyleElement | null;
+  if (!style) {
+    style = document.createElement("style");
+    style.id = "print-style";
+    document.head.appendChild(style);
+  }
   style.textContent = `@page { size: ${widthMm}mm ${heightMm}mm; margin: 0 }
-    @media print { body > *:not(#print-root) { display: none !important } #print-root { display: block !important } html, body { margin: 0; background: #fff } }
-    #print-root { display: none }`;
-  document.head.appendChild(style);
-  document.body.appendChild(root);
-  const cleanup = () => {
-    root.remove();
-    style.remove();
-    window.removeEventListener("afterprint", cleanup);
-  };
-  window.addEventListener("afterprint", cleanup);
+    @media print { body > *:not(#print-root) { display: none !important } #print-root { display: block !important } html, body { margin: 0 !important; padding: 0 !important; background: #fff } }
+    @media screen { #print-root { display: none } }`;
   const imgs = [...root.querySelectorAll("img")];
-  Promise.all(imgs.map((i) => (i.complete ? null : new Promise((r) => (i.onload = r))))).then(() => {
-    window.print();
-    setTimeout(cleanup, 60_000);
-  });
+  Promise.all(imgs.map((i) => (i.complete ? null : new Promise((r) => (i.onload = r))))).then(() => window.print());
+}
+
+/** Print button: on iPhone opens the share sheet with the exact-size PDF (Print / Phomemo / Files);
+ * on computers opens the print dialog at the exact paper size. */
+export async function printFile(images: string[], pdf: Blob, filename: string, widthMm: number, heightMm: number) {
+  if (isIOS()) return shareFile(pdf, filename);
+  printImages(images, widthMm, heightMm);
 }
 
 export const qrDataUrl = (text: string, size = 300) => QRCode.toDataURL(text, { margin: 0, width: size, errorCorrectionLevel: "M" });

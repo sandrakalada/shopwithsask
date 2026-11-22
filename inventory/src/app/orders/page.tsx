@@ -9,8 +9,8 @@ import { Header } from "@/components/ui";
 import { PlusIcon, SearchIcon } from "@/components/Icons";
 import { fmtDate, orderCustomerName, orderPhone, StatusPills } from "@/components/orderUi";
 import { useRole } from "@/components/Shell";
-import { supabase } from "@/lib/supabase";
-import { resetLocal } from "@/lib/sync";
+import { useIncremental } from "@/components/useIncremental";
+import { signOut } from "@/components/SideMenu";
 
 type F = "all" | "open" | "unpaid" | "fulfilled" | "cancelled";
 
@@ -37,20 +37,15 @@ export default function Orders() {
     });
   }, [orders, q, f]);
 
+  const { count, Sentinel } = useIncremental(rows.length, 40, `${q}|${f}`);
+
   return (
     <>
       <Header
         title="Orders"
         right={
           role === "shipping" ? (
-            <button
-              className="text-sm underline"
-              onClick={async () => {
-                await resetLocal();
-                await supabase?.auth.signOut();
-                location.href = "/";
-              }}
-            >
+            <button className="text-sm underline" onClick={signOut}>
               Sign out
             </button>
           ) : (
@@ -74,7 +69,7 @@ export default function Orders() {
         </div>
         <p className="mt-3 text-xs text-taupe">{rows.length} orders</p>
         <ul className="card mt-2 divide-y divide-line overflow-hidden">
-          {rows.slice(0, 400).map((o) => (
+          {rows.slice(0, count).map((o) => (
             <li key={o.id}>
               <Link href={`/order?id=${o.id}`} className="block px-4 py-3 active:bg-sand">
                 <div className="flex items-baseline justify-between gap-3">
@@ -93,6 +88,7 @@ export default function Orders() {
           ))}
           {rows.length === 0 && <li className="p-4 text-sm text-taupe">{orders.length ? "No orders match." : "Orders download automatically when you are online."}</li>}
         </ul>
+        {Sentinel}
       </main>
     </>
   );

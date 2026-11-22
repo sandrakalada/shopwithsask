@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { db, type Product, type Reason, type Variant } from "@/lib/db";
 import { findAllByCode, recordMovement, variantLabel } from "@/lib/stock";
 import Scanner from "@/components/Scanner";
@@ -32,6 +33,7 @@ function beep(ok: boolean) {
 }
 
 export default function ScanPage() {
+  const router = useRouter();
   const [mode, setMode] = useState<Mode>("lookup");
   const [found, setFound] = useState<{ v: Variant; p?: Product } | null>(null);
   const [sheet, setSheet] = useState<Reason | null>(null);
@@ -57,6 +59,17 @@ export default function ScanPage() {
       if (code === last.current.code && now - last.current.t < 2000) return;
       last.current = { code, t: now };
 
+      // shipping label: barcode "SWS1397" (order number, up to 6 digits) or QR "#1397 SWS1397"
+      const orderNo = /#(\d{3,7})/.exec(code)?.[1] ?? /^SWS(\d{3,6})$/i.exec(code)?.[1];
+      if (orderNo) {
+        const o = await db.orders.where("name").equals(`#${orderNo}`).first();
+        if (o) {
+          beep(true);
+          router.push(`/order?id=${o.id}`);
+          return;
+        }
+      }
+
       const matches = await findAllByCode(code);
       if (!matches.length) {
         beep(false);
@@ -74,7 +87,7 @@ export default function ScanPage() {
       await apply(matches[0]);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [mode],
+    [mode, router],
   );
 
   const apply = useCallback(
@@ -123,7 +136,7 @@ export default function ScanPage() {
           ))}
         </div>
         <p className="-mt-1 text-sm text-taupe">
-          {MODES.find((m) => m.value === mode)!.hint}
+          {MODES.find((m) => m.value === mode)!.hint}. Shipping labels open their order.
           {session.n > 0 && ` · ${session.n} scans this session`}
         </p>
 
@@ -180,14 +193,10 @@ export default function ScanPage() {
           <div className="card p-4">
             <p className="font-semibold">Unknown barcode</p>
             <p className="mt-1 break-all text-sm text-taupe">{unknown}</p>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <Link href={`/items?assign=${encodeURIComponent(unknown)}`} className="btn-light">
-                Link to item
-              </Link>
-              <Link href={`/new?barcode=${encodeURIComponent(unknown)}`} className="btn-dark">
-                New item
-              </Link>
-            </div>
+            <p className="mt-2 text-xs text-taupe">New products are added in Shopify and appear here automatically.</p>
+            <Link href={`/items?assign=${encodeURIComponent(unknown)}`} className="btn-light mt-3 w-full">
+              Link this code to an item
+            </Link>
           </div>
         )}
       </main>
