@@ -708,6 +708,47 @@ const egpMoney = (n: number) => ({ amount: Number(n || 0).toFixed(2), currencyCo
 /** Records an offline sale as a real Shopify order (paid or cash on delivery, delivered now or not).
  * Shopify deducts the stock; the order comes back to the app through the orders webhook.
  * No tax lines are added (the store charges no tax). */
+/** Read-only check: app stock against Shopify, variant by variant. */
+async function stockCheck() {
+  const loc = await location();
+  const shop: any[] = [];
+  let after: string | null = null;
+  do {
+    const d: any = await gql(
+      `query($after: String, $loc: ID!) { productVariants(first: 100, after: $after) { pageInfo { hasNextPage endCursor }
+        nodes { id title sku product { title status } inventoryItem { tracked inventoryLevel(locationId: $loc) { quantities(names: ["available"]) { quantity } } } } } }`,
+      { after, loc },
+    );
+    shop.push(...d.productVariants.nodes);
+    after = d.productVariants.pageInfo.hasNextPage ? d.productVariants.pageInfo.endCursor : null;
+  } while (after);
+  const { data: vs, error } = await admin.from("variants").select("id, sku, title, quantity, archived, shopify_variant_id, products!inner(title, archived)");
+  if (error) throw error;
+  const byShop = new Map(shop.map((x) => [num(x.id), x]));
+  const pending = await unpushedByVariant(vs!.map((v: any) => v.id));
+  const mismatch: unknown[] = [], missing: unknown[] = [], draft: unknown[] = [], untracked: unknown[] = [];
+  let appPieces = 0, shopPieces = 0;
+  for (const v of vs as any[]) {
+    if (v.archived || v.products.archived) continue;
+    const sv = v.shopify_variant_id ? byShop.get(v.shopify_variant_id) : null;
+    if (v.quantity > 0) appPieces += v.quantity;
+    if (!sv) {
+      if (v.quantity !== 0) missing.push({ sku: v.sku, title: v.products.title, size: v.title, app: v.quantity });
+      continue;
+    }
+    const q = sv.inventoryItem.inventoryLevel?.quantities?.[0]?.quantity ?? 0;
+    if (!sv.inventoryItem.tracked) untracked.push({ sku: v.sku, title: v.products.title, size: v.title, app: v.quantity });
+    if (sv.product.status === "DRAFT" && v.quantity > 0) draft.push({ sku: v.sku, title: v.products.title, size: v.title, app: v.quantity });
+    if (q !== v.quantity) mismatch.push({ sku: v.sku, title: v.products.title, size: v.title, app: v.quantity, shopify: q, unsent: pending.get(v.id) ?? 0 });
+  }
+  for (const sv of shop) {
+    if (sv.product.status === "ARCHIVED") continue;
+    const q = sv.inventoryItem.inventoryLevel?.quantities?.[0]?.quantity ?? 0;
+    if (q > 0) shopPieces += q;
+  }
+  return { appPieces, shopPieces, shopVariants: shop.length, mismatch, missing, draft, untracked };
+}
+
 // ---------- shipping ----------
 
 async function accessScopes() {
@@ -892,6 +933,7 @@ Deno.serve(async (req) => {
       if (!CRON_SECRET || !safeEqual(cron, CRON_SECRET)) return json({ error: "bad cron secret" }, 401);
       const cb = await req.json().catch(() => ({}));
       if (cb.action === "scopes") return json({ scopes: await accessScopes() }); // read-only health check
+      if (cb.action === "stock-check") return json(await stockCheck()); // read-only stock audit
       return json(await daily());
     }
 
@@ -911,6 +953,7 @@ Deno.serve(async (req) => {
     if (typeof action === "string" && action.startsWith("team-")) return json(await teamAction(user.user, body));
     if (action === "create-order") return json(await createOfflineOrder(body.sale));
     if (action === "scopes") return json({ scopes: await accessScopes() });
+    if (action === "stock-check") return json(await stockCheck());
     if (action === "fulfill-order") return json(await fulfillOrder(String(body.orderId), body.tracking ?? {}));
     if (action === "mark-paid") return json(await markOrderPaid(String(body.orderId)));
     return json({ error: "unknown action" }, 400);
