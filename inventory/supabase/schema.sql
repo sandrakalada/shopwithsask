@@ -36,7 +36,7 @@ create table if not exists public.stock_movements (
   id uuid primary key,                       -- generated on the phone, makes retries safe
   variant_id uuid not null references public.variants(id) on delete cascade,
   delta integer not null,
-  reason text not null check (reason in ('receive','sale','return','adjust','count','damage')),
+  reason text not null check (reason in ('receive','sale','return','adjust','count','damage','shopify')),
   note text,
   created_at timestamptz not null default now(), -- time on the phone
   synced_at timestamptz not null default now(),
@@ -89,3 +89,23 @@ drop policy if exists "staff read" on public.stock_movements;
 create policy "staff read" on public.stock_movements for select to authenticated using (true);
 drop policy if exists "staff insert" on public.stock_movements;
 create policy "staff insert" on public.stock_movements for insert to authenticated with check (true);
+
+-- ---------------------------------------------------------------------------
+-- Shopify stock sync (used by the "shopify" Edge Function)
+-- ---------------------------------------------------------------------------
+alter table public.products add column if not exists shopify_product_id text;
+alter table public.variants add column if not exists shopify_inventory_item_id text;
+alter table public.variants add column if not exists shopify_synced_at timestamptz;
+alter table public.stock_movements add column if not exists source text not null default 'app';
+alter table public.stock_movements add column if not exists shopify_pushed_at timestamptz;
+alter table public.stock_movements add column if not exists shopify_error text;
+
+-- databases created before the 'shopify' reason existed
+alter table public.stock_movements drop constraint if exists stock_movements_reason_check;
+alter table public.stock_movements add constraint stock_movements_reason_check
+  check (reason in ('receive','sale','return','adjust','count','damage','shopify'));
+
+create unique index if not exists variants_shopify_variant_idx on public.variants(shopify_variant_id) where shopify_variant_id is not null;
+create index if not exists variants_shopify_item_idx on public.variants(shopify_inventory_item_id);
+create index if not exists movements_unpushed_idx on public.stock_movements(created_at)
+  where source = 'app' and shopify_pushed_at is null;

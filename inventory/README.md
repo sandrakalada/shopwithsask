@@ -18,6 +18,21 @@ when the phone is back online.
 3. **iPhone** – open the Vercel link in Safari → Share → Add to Home Screen.
    Sign in once while online; after that it opens and works with no connection.
 
+## Shopify stock sync
+
+Edge Function `supabase/functions/shopify/index.ts` (deploy as `shopify`, JWT
+verification off). Secrets: `SHOPIFY_SHOP` (wfud64-tq), `SHOPIFY_CLIENT_ID`,
+`SHOPIFY_CLIENT_SECRET` from a Dev Dashboard app installed on the store.
+App scopes: read/write products, inventory, files, publications, translations;
+read locations, orders, fulfillments.
+
+- App → Shopify: each stock change is sent with `inventoryAdjustQuantities`
+  (idempotency key = movement id, so retries never double count).
+- Shopify → App: `inventory_levels/update` webhook (Settings → Connect Shopify
+  order updates) matches app stock to Shopify after orders or admin edits.
+- Settings → Refresh from Shopify (and automatically every 12 hours): imports new
+  products and re-matches every quantity to Shopify.
+
 ## Using it
 
 - **Scan** tab modes: Look up, Receive +1, Sell -1, Return +1, Count.
@@ -44,4 +59,3 @@ npm run build                # static export to out/ + service worker
 npm run seed                 # rebuild supabase/seed.sql from the live store
 ```
 
-Stock in Shopify is not changed by this app yet (planned next step).

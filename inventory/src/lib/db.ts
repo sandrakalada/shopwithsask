@@ -24,7 +24,7 @@ export type Variant = {
   updated_at: string;
 };
 
-export type Reason = "receive" | "sale" | "return" | "adjust" | "count" | "damage";
+export type Reason = "receive" | "sale" | "return" | "adjust" | "count" | "damage" | "shopify";
 
 export type Movement = {
   id: string;

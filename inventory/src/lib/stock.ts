@@ -12,7 +12,7 @@ export const REASONS: { value: Reason; label: string; sign: 1 | -1 | 0 }[] = [
   { value: "count", label: "Stock count", sign: 0 },
 ];
 
-export const reasonLabel = (r: string) => REASONS.find((x) => x.value === r)?.label ?? r;
+export const reasonLabel = (r: string) => (r === "shopify" ? "Shopify" : (REASONS.find((x) => x.value === r)?.label ?? r));
 
 /** Record a stock change locally (works offline) and queue it for Supabase. */
 export async function recordMovement(variantId: string, delta: number, reason: Reason, note?: string) {

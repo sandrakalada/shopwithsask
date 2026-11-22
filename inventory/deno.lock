@@ -1,0 +1,32 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@supabase/supabase-js@2": "2.119.2"
+  },
+  "jsr": {
+    "@supabase/supabase-js@2.119.2": {
+      "integrity": "e692a57e2e5ae408136cc32da9bebf50155cb73bfa014a28c16efb7b1c154eba"
+    }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@supabase/supabase-js@^2.119.2",
+        "npm:@tailwindcss/postcss@^4.3.5",
+        "npm:@types/node@^20.19.43",
+        "npm:@types/react-dom@^19.3.0",
+        "npm:@types/react@^19.3.0",
+        "npm:@zxing/browser@~0.2.1",
+        "npm:@zxing/library@0.23",
+        "npm:dexie-react-hooks@^4.4.0",
+        "npm:dexie@^4.4.7",
+        "npm:jsbarcode@^3.12.3",
+        "npm:next@^16.2.11",
+        "npm:react-dom@^19.2.4",
+        "npm:react@^19.2.4",
+        "npm:tailwindcss@^4.3.5",
+        "npm:typescript@^5.9.3"
+      ]
+    }
+  }
+}

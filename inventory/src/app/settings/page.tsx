@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, getMeta } from "@/lib/db";
+import { db, getMeta, setMeta } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
-import { resetLocal, syncNow } from "@/lib/sync";
+import { resetLocal, shopify, syncNow } from "@/lib/sync";
 import { variantLabel } from "@/lib/stock";
 import { Header, timeAgo } from "@/components/ui";
 import { useSync } from "@/components/Shell";
@@ -23,6 +23,26 @@ function download(name: string, rows: (string | number | null)[][]) {
 export default function Settings() {
   const s = useSync();
   const [email, setEmail] = useState<string | null>(null);
+  const [shop, setShop] = useState<{ busy: boolean; msg: string | null }>({ busy: false, msg: null });
+  const shopErr = useLiveQuery(() => getMeta("shopifyError"), [], null);
+  const shopPull = useLiveQuery(() => getMeta("shopifyPull"), [], null);
+
+  async function runShopify(action: "pull" | "setup") {
+    setShop({ busy: true, msg: null });
+    try {
+      await syncNow();
+      const r = await shopify(action);
+      if (action === "pull") {
+        const p = r.pull as Record<string, number>;
+        await setMeta("shopifyPull", new Date().toISOString());
+        await setMeta("shopifyError", "");
+        setShop({ busy: false, msg: `Done. ${p.stockChanged} stock changes, ${p.newProducts} new items from Shopify.` });
+        await syncNow();
+      } else setShop({ busy: false, msg: `Shopify updates: ${r.webhook}.` });
+    } catch (e) {
+      setShop({ busy: false, msg: (e as Error).message });
+    }
+  }
   const pending = useLiveQuery(() => db.outbox.count(), [], 0);
   const counts = useLiveQuery(async () => ({ p: await db.products.count(), v: await db.variants.count() }), []);
   const failed = useLiveQuery(async () => JSON.parse((await getMeta("failed")) ?? "[]") as { error: string }[], [], []);
@@ -74,6 +94,22 @@ export default function Settings() {
             <p className="mt-1 text-taupe">{failed[failed.length - 1].error}</p>
           </section>
         )}
+
+        <section className="card space-y-3 p-4 text-sm">
+          <p className="font-semibold">Shopify</p>
+          <p className="text-taupe">
+            Stock changes here go to Shopify automatically, and online orders come back here.
+            Last full match: {shopPull ? timeAgo(shopPull) : "never"}.
+          </p>
+          {shopErr && <p className="text-red-600">{shopErr}</p>}
+          {shop.msg && <p>{shop.msg}</p>}
+          <button className="btn-dark w-full" disabled={shop.busy || !s.online} onClick={() => runShopify("pull")}>
+            {shop.busy ? "Working" : "Refresh from Shopify"}
+          </button>
+          <button className="btn-light w-full" disabled={shop.busy || !s.online} onClick={() => runShopify("setup")}>
+            Connect Shopify order updates (once)
+          </button>
+        </section>
 
         <section className="space-y-2">
           <button className="btn-light w-full" onClick={exportStock}>Export stock list (CSV)</button>

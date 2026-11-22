@@ -36,6 +36,7 @@ export default function History() {
         <select className="field" value={reason} onChange={(e) => setReason(e.target.value)}>
           <option value="all">All changes</option>
           {REASONS.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+          <option value="shopify">Shopify</option>
         </select>
         {days.map(([day, ms]) => {
           const net = ms.reduce((s, m) => s + m.delta, 0);

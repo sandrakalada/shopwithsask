@@ -41,8 +41,24 @@ async function pushGroup(table: OutboxItem["table"], rows: Record<string, unknow
   if (error) throw error;
 }
 
+/** Calls the "shopify" Edge Function (stock sync with the Shopify store). */
+export async function shopify(action: "push" | "pull" | "setup") {
+  const { data, error } = await supabase!.functions.invoke("shopify", { body: { action } });
+  if (error) {
+    let msg = error.message;
+    try {
+      msg = (await (error as { context?: Response }).context?.json())?.error ?? msg;
+    } catch {}
+    throw new Error(msg);
+  }
+  return data as Record<string, unknown>;
+}
+
+let pushedMovements = false;
+
 async function push() {
   const items = await db.outbox.orderBy("seq").toArray();
+  pushedMovements = items.some((i) => i.table === "stock_movements");
   let i = 0;
   while (i < items.length) {
     // send consecutive writes to the same table together, keeping the order
@@ -143,6 +159,16 @@ export async function syncNow() {
   emit({ running: true, error: null, online: true });
   try {
     await push();
+    // hand new stock changes to Shopify, and fully re-match with Shopify twice a day
+    const lastPull = await getMeta("shopifyPull");
+    const due = !lastPull || Date.now() - new Date(lastPull).getTime() > 12 * 3600_000;
+    if (due) {
+      await shopify("pull")
+        .then(() => setMeta("shopifyPull", new Date().toISOString()))
+        .catch((e) => setMeta("shopifyError", String(e.message)));
+    } else if (pushedMovements) {
+      await shopify("push").catch((e) => setMeta("shopifyError", String(e.message)));
+    }
     await pull();
     const t = new Date().toISOString();
     await setMeta("lastSync", t);
