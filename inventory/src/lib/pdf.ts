@@ -58,7 +58,9 @@ export function printImages(images: string[], widthMm: number, heightMm: number)
 /** Print button: on iPhone opens the share sheet with the exact-size PDF (Print / Phomemo / Files);
  * on computers opens the print dialog at the exact paper size. */
 export async function printFile(images: string[], pdf: Blob, filename: string, widthMm: number, heightMm: number) {
-  if (isIOS()) return shareFile(pdf, filename);
+  void pdf;
+  void filename;
+  // opens the system print screen on iPhone and computers; Share is the route to printer apps (Phomemo)
   printImages(images, widthMm, heightMm);
 }
 
