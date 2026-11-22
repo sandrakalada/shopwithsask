@@ -8,12 +8,16 @@ import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
 import { PlusIcon, SearchIcon } from "@/components/Icons";
 import { fmtDate, orderCustomerName, orderPhone, StatusPills } from "@/components/orderUi";
+import { useRole } from "@/components/Shell";
+import { supabase } from "@/lib/supabase";
+import { resetLocal } from "@/lib/sync";
 
 type F = "all" | "open" | "unpaid" | "fulfilled" | "cancelled";
 
 export default function Orders() {
+  const role = useRole();
   const [q, setQ] = useState("");
-  const [f, setF] = useState<F>("all");
+  const [f, setF] = useState<F>(role === "shipping" ? "open" : "all");
   const orders = useLiveQuery(() => db.orders.orderBy("created_at").reverse().toArray(), [], []);
 
   const rows = useMemo(() => {
@@ -38,9 +42,22 @@ export default function Orders() {
       <Header
         title="Orders"
         right={
-          <Link href="/invoice?new=1" className="p-1" aria-label="New invoice">
-            <PlusIcon />
-          </Link>
+          role === "shipping" ? (
+            <button
+              className="text-sm underline"
+              onClick={async () => {
+                await resetLocal();
+                await supabase?.auth.signOut();
+                location.href = "/";
+              }}
+            >
+              Sign out
+            </button>
+          ) : (
+            <Link href="/invoice?new=1" className="p-1" aria-label="New invoice">
+              <PlusIcon />
+            </Link>
+          )
         }
       />
       <main className="p-4">

@@ -199,10 +199,13 @@ export async function syncNow() {
   try {
     await push();
     await pull(); // download first so the phone shows stock straight away
+    const shippingOnly = data.session.user.app_metadata?.role === "shipping";
     // hand new stock changes to Shopify, and fully re-match with Shopify twice a day
     const lastPull = await getMeta("shopifyPull");
     const due = !lastPull || Date.now() - new Date(lastPull).getTime() > 12 * 3600_000;
-    if (due) {
+    if (shippingOnly) {
+      // labels-only accounts never run Shopify syncs
+    } else if (due) {
       const ok = await shopify("pull")
         .then(() => setMeta("shopifyPull", new Date().toISOString()).then(() => true))
         .catch((e) => setMeta("shopifyError", String(e.message)).then(() => false));

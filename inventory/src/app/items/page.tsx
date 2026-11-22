@@ -8,10 +8,11 @@ import { db, type Product, type Variant } from "@/lib/db";
 import { costInEgp, recordMovement, saveVariant, setSetting, variantLabel } from "@/lib/stock";
 import { egp } from "@/lib/pdf";
 import { Header, QtyPill, Thumb, Toast } from "@/components/ui";
+import TopProducts from "@/components/TopProducts";
 import { MinusIcon, PlusIcon, PrintIcon, SearchIcon } from "@/components/Icons";
 
 type Filter = "all" | "in" | "low" | "out" | "nosku" | "nocost";
-type View = "stock" | "costs";
+type View = "stock" | "costs" | "top";
 
 function Inventory() {
   const params = useSearchParams();
@@ -118,15 +119,19 @@ function Inventory() {
         {assign ? (
           <p className="card mb-3 p-3 text-sm">Tap the size that barcode <b>{assign}</b> belongs to.</p>
         ) : (
-          <div className="mb-3 grid grid-cols-2 rounded-xl border border-line bg-white p-1 text-sm font-semibold">
-            {(["stock", "costs"] as View[]).map((v) => (
+          <div className="mb-3 grid grid-cols-3 rounded-xl border border-line bg-white p-1 text-sm font-semibold">
+            {(["stock", "costs", "top"] as View[]).map((v) => (
               <button key={v} onClick={() => { setView(v); setFilter("all"); }} className={`rounded-lg py-2 ${view === v ? "bg-ink text-cream" : "text-taupe"}`}>
-                {v === "stock" ? "Stock" : "Cost prices"}
+                {v === "stock" ? "Stock" : v === "costs" ? "Cost prices" : "Top sellers"}
               </button>
             ))}
           </div>
         )}
 
+        {view === "top" && !assign ? (
+          <TopProducts />
+        ) : (
+        <>
         {view === "costs" && !assign && data && <CostSummary totals={totals} rate={data.rate} />}
 
         <label className="relative block">
@@ -190,6 +195,8 @@ function Inventory() {
           ))}
           {data && rows.length === 0 && <li className="card p-4 text-sm text-taupe">No items match.</li>}
         </ul>
+        </>
+        )}
       </main>
       <Toast msg={toast} />
     </>

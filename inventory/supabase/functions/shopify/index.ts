@@ -339,6 +339,9 @@ async function pull() {
     });
   }
 
+  // new products without a SKU get the next one for their type (one SKU per product)
+  const skuResult = await assignMissingSkus(shopify, variantRows, variants!);
+
   const pRows = [...productRows.values()].filter((r) => Object.keys(r).length);
   for (let i = 0; i < pRows.length; i += 500) {
     const { error } = await admin.from("products").upsert(pRows.slice(i, i + 500));
@@ -377,7 +380,56 @@ async function pull() {
   if (gone.length) await admin.from("variants").update({ archived: true }).in("id", gone);
 
   await admin.from("variants").update({ shopify_synced_at: now }).not("shopify_variant_id", "is", null);
-  return { shopifyVariants: shopify.length, newProducts, newVariants, stockChanged: moves.length, hidden: gone.length };
+  await setSetting("last_pull", new Date().toISOString());
+  return { shopifyVariants: shopify.length, newProducts, newVariants, stockChanged: moves.length, hidden: gone.length, skusAssigned: skuResult };
+}
+
+// ---------- automatic SKUs for new products ----------
+
+const SKU_PREFIX: Record<string, string> = {
+  Dresses: "D", Tops: "T", Bottoms: "B", Vests: "V", Jackets: "J",
+  "Matching Set": "MS", "Beach Set": "BS", Accessories: "A", Bags: "BG",
+};
+
+async function assignMissingSkus(shopify: any[], variantRows: Record<string, unknown>[], appVariants: any[]) {
+  // highest number used so far per prefix, from Shopify and the app
+  const max: Record<string, number> = {};
+  const seen = (sku: string | null | undefined) => {
+    const m = /^([A-Z]+)-(\d+)$/.exec(sku ?? "");
+    if (m) max[m[1]] = Math.max(max[m[1]] ?? 100, Number(m[2]));
+  };
+  shopify.forEach((sv) => seen(sv.sku));
+  appVariants.forEach((v) => seen(v.sku));
+  const dirty = new Set(appVariants.filter((v) => v.shopify_dirty).map((v) => v.shopify_variant_id));
+
+  const byProduct = new Map<string, any[]>();
+  for (const sv of shopify) byProduct.set(sv.product.id, [...(byProduct.get(sv.product.id) ?? []), sv]);
+  let assigned = 0;
+  for (const [productId, list] of byProduct) {
+    if (list.some((sv) => sv.sku || dirty.has(num(sv.id)))) continue; // already has a SKU
+    const prefix = SKU_PREFIX[list[0].product.productType] ?? "P";
+    max[prefix] = (max[prefix] ?? 100) + 1;
+    const sku = `${prefix}-${max[prefix]}`;
+    const d = await gql(
+      `mutation($p: ID!, $v: [ProductVariantsBulkInput!]!) { productVariantsBulkUpdate(productId: $p, variants: $v) { userErrors { message } } }`,
+      { p: productId, v: list.map((sv) => ({ id: sv.id, inventoryItem: { sku } })) },
+    );
+    if (d.productVariantsBulkUpdate.userErrors?.length) continue;
+    for (const sv of list) {
+      sv.sku = sku;
+      const row = variantRows.find((r) => r.shopify_variant_id === num(sv.id));
+      if (row) row.sku = sku;
+      else variantRows.push({ ...rowForSku(sv, appVariants), sku });
+    }
+    assigned += list.length;
+  }
+  return assigned;
+}
+
+/** Existing app row for a variant whose other fields did not change (so it only needs the SKU). */
+function rowForSku(sv: any, appVariants: any[]) {
+  const v = appVariants.find((x) => x.shopify_variant_id === num(sv.id));
+  return { id: v.id, product_id: v.product_id, title: v.title, barcode: v.barcode, price: Number(v.price), shopify_variant_id: v.shopify_variant_id, shopify_inventory_item_id: v.shopify_inventory_item_id, archived: v.archived };
 }
 
 // ---------- orders & customers: Shopify → app ----------
@@ -520,7 +572,10 @@ async function refreshCustomer(id: string | number) {
 
 // ---------- setup: register webhooks ----------
 
-const TOPICS = ["INVENTORY_LEVELS_UPDATE", "ORDERS_CREATE", "ORDERS_UPDATED", "ORDERS_CANCELLED", "CUSTOMERS_CREATE", "CUSTOMERS_UPDATE"];
+const TOPICS = [
+  "INVENTORY_LEVELS_UPDATE", "ORDERS_CREATE", "ORDERS_UPDATED", "ORDERS_CANCELLED",
+  "CUSTOMERS_CREATE", "CUSTOMERS_UPDATE", "PRODUCTS_CREATE", "PRODUCTS_UPDATE", "PRODUCTS_DELETE",
+];
 
 async function setup() {
   const uri = `${SUPABASE_URL}/functions/v1/shopify`;
@@ -569,22 +624,27 @@ async function teamAction(caller: any, body: any) {
   if (body.action === "team-create") {
     const username = String(body.username ?? "").trim().toLowerCase();
     if (!/^[a-z0-9._-]{2,32}$/.test(username)) throw new Error("Username: 2-32 English letters or numbers, no spaces");
-    if (String(body.password ?? "").length < 6) throw new Error("Password must be at least 6 characters");
+    if (String(body.password ?? "").length < 8) throw new Error("Password must be at least 8 characters");
     const { data, error } = await admin.auth.admin.createUser({
       email: usernameToEmail(username),
       password: body.password,
       email_confirm: true,
       user_metadata: { name: body.name || username },
-      app_metadata: { role: "staff" },
+      app_metadata: { role: body.role === "shipping" ? "shipping" : "staff" },
     });
     if (error) throw new Error(/already/i.test(error.message) ? "That username is taken" : error.message);
     return { id: data.user.id };
   }
   if (body.action === "team-password") {
-    if (String(body.password ?? "").length < 6) throw new Error("Password must be at least 6 characters");
+    if (String(body.password ?? "").length < 8) throw new Error("Password must be at least 8 characters");
     const { error } = await admin.auth.admin.updateUserById(body.id, { password: body.password });
     if (error) throw error;
     return { ok: true };
+  }
+  if (body.action === "team-delete" || body.action === "team-password") {
+    const { data: target } = await admin.auth.admin.getUserById(String(body.id ?? ""));
+    if (!target?.user) throw new Error("User not found");
+    if (target.user.app_metadata?.role === "owner") throw new Error("The owner account cannot be changed here");
   }
   if (body.action === "team-delete") {
     if (body.id === caller.id) throw new Error("You cannot remove your own account");
@@ -607,6 +667,14 @@ async function daily() {
 }
 
 // ---------- webhook: Shopify → app ----------
+
+/** Constant-time string compare (secrets, signatures). */
+function safeEqual(a: string, b: string) {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
 
 async function verifyHmac(raw: string, header: string | null) {
   if (!header) return false;
@@ -658,13 +726,19 @@ Deno.serve(async (req) => {
       if (topic === "inventory_levels/update") return json(await onInventoryLevel(body));
       if (topic?.startsWith("orders/")) return json(await refreshOrder(body.id));
       if (topic?.startsWith("customers/")) return json(await refreshCustomer(body.id));
+      if (topic?.startsWith("products/")) {
+        // new or edited product: re-read the catalogue (adds it, gives it a SKU); at most once a minute
+        const last = (await getSetting("last_pull")) as string | null;
+        if (topic !== "products/create" && last && Date.now() - new Date(last).getTime() < 60_000) return json({ skipped: "recent pull" });
+        return json(await pull());
+      }
       return json({ ignored: topic });
     }
 
     // the daily schedule in the database sends a shared secret instead of a user token
     const cron = req.headers.get("x-cron-secret");
     if (cron) {
-      if (!CRON_SECRET || cron !== CRON_SECRET) return json({ error: "bad cron secret" }, 401);
+      if (!CRON_SECRET || !safeEqual(cron, CRON_SECRET)) return json({ error: "bad cron secret" }, 401);
       return json(await daily());
     }
 
@@ -674,6 +748,8 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({ action: "" }));
     const action = body.action;
+    // shipping-only accounts just print labels; they cannot run syncs or manage anything
+    if (user.user.app_metadata?.role === "shipping") return json({ error: "not allowed for this account" }, 403);
     if (action === "push") return json(await push());
     if (action === "pull") return json({ push: await push(), pull: await pull() });
     if (action === "orders") return json(await syncOrdersAndCustomers(!!body.full));

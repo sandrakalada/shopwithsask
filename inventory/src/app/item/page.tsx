@@ -120,57 +120,27 @@ function Item() {
   );
 }
 
-const SIZE_WORDS = /^(xxs|xs|s|m|l|xl|xxl|xxxl|x-small|small|medium|large|x-large|xx-large|one size|default title|free size|\d{2})$/i;
-
-/** Colour part of a size title: "Small / Green" -> "Green", "Medium" -> "" */
-function colourOf(title: string) {
-  return title
-    .split("/")
-    .map((x) => x.trim())
-    .filter((x) => !SIZE_WORDS.test(x))
-    .join(" / ");
-}
-
-/** One SKU per colour, shared by all its sizes. */
+/** One SKU per product, shared by every size and colour; stickers print the size / colour. */
 function SkuByColour({ variants }: { variants: Variant[] }) {
-  const groups = new Map<string, Variant[]>();
-  for (const v of variants) groups.set(colourOf(v.title), [...(groups.get(colourOf(v.title)) ?? []), v]);
-  const [values, setValues] = useState<Record<string, string>>(() =>
-    Object.fromEntries([...groups].map(([c, vs]) => [c, vs.find((v) => v.sku)?.sku ?? ""])),
-  );
+  const [sku, setSku] = useState(() => variants.find((v) => v.sku)?.sku ?? "");
   const [saved, setSaved] = useState(false);
   if (!variants.length) return null;
-
   async function save() {
-    for (const [c, vs] of groups) {
-      const sku = (values[c] ?? "").trim().toUpperCase() || null;
-      for (const v of vs) if ((v.sku ?? null) !== sku) await saveVariant({ ...v, sku });
-    }
+    const next = sku.trim().toUpperCase() || null;
+    for (const v of variants) if ((v.sku ?? null) !== next) await saveVariant({ ...v, sku: next });
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
   }
-
   return (
     <section className="card space-y-3 p-4">
       <div>
         <h2 className="font-semibold">SKU</h2>
-        <p className="text-xs text-taupe">One SKU per colour. All sizes share it; the sticker adds the size.</p>
+        <p className="text-xs text-taupe">One SKU for the whole product. Stickers add the size and colour.</p>
       </div>
-      {[...groups.keys()].map((c) => (
-        <label key={c} className="flex items-center gap-3">
-          <span className="w-24 shrink-0 truncate text-sm">{c || "All sizes"}</span>
-          <input
-            className="field py-2"
-            value={values[c] ?? ""}
-            onChange={(e) => setValues((x) => ({ ...x, [c]: e.target.value }))}
-            autoCapitalize="characters"
-            placeholder="e.g. D-104"
-          />
-        </label>
-      ))}
-      <button className="btn-dark w-full" onClick={save}>
-        {saved ? "Saved" : "Save SKU"}
-      </button>
+      <div className="flex gap-2">
+        <input className="field py-2" value={sku} onChange={(e) => setSku(e.target.value)} autoCapitalize="characters" placeholder="e.g. D-104" />
+        <button className="btn-dark px-5" onClick={save}>{saved ? "Saved" : "Save"}</button>
+      </div>
     </section>
   );
 }

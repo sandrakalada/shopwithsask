@@ -12,9 +12,11 @@ import { PhoneIcon, PrintIcon, ReceiptIcon, WhatsAppIcon } from "@/components/Ic
 import ShippingLabel, { shipmentNumber, type LabelStore } from "@/components/ShippingLabel";
 import JsBarcode from "jsbarcode";
 import { fmtDate, orderCustomerName, orderPhone, paymentLabel, StatusPills } from "@/components/orderUi";
+import { useRole } from "@/components/Shell";
 
 function OrderView() {
   const id = useSearchParams().get("id") ?? "";
+  const shippingOnly = useRole() === "shipping";
   const order = useLiveQuery(() => db.orders.get(id), [id]);
   const customer = useLiveQuery(async () => (order?.customer_id ? db.customers.get(order.customer_id) : undefined), [order?.customer_id]);
   const invoice = useLiveQuery(() => db.invoices.where("order_id").equals(id).first(), [id]);
@@ -82,14 +84,16 @@ function OrderView() {
           <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
             Share label
           </button>
-          <Link href={invoice ? `/invoice?id=${invoice.id}` : `/invoice?order=${order.id}`} className="btn-light col-span-2">
-            <ReceiptIcon className="h-5 w-5" /> {invoice ? `Invoice ${invoice.number}` : "Create invoice"}
-          </Link>
+          {!shippingOnly && (
+            <Link href={invoice ? `/invoice?id=${invoice.id}` : `/invoice?order=${order.id}`} className="btn-light col-span-2">
+              <ReceiptIcon className="h-5 w-5" /> {invoice ? `Invoice ${invoice.number}` : "Create invoice"}
+            </Link>
+          )}
         </div>
 
         <section className="card p-4">
           <p className="text-xs uppercase tracking-wide text-taupe">Customer</p>
-          {customer ? (
+          {customer && !shippingOnly ? (
             <Link href={`/customer?id=${customer.id}`} className="mt-1 block font-semibold underline">
               {name}
             </Link>

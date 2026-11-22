@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { costInEgp, reasonLabel, variantLabel } from "@/lib/stock";
 import { Header, timeAgo, VariantRow } from "@/components/ui";
 import { egp } from "@/lib/pdf";
-import { GearIcon, PlusIcon, PrintIcon, ScanIcon } from "@/components/Icons";
+import { ChartIcon, GearIcon, PlusIcon, ScanIcon } from "@/components/Icons";
 import FaceIdOffer from "@/components/FaceIdOffer";
 
 
@@ -67,8 +67,8 @@ export default function Home() {
           <Link href="/new" className="btn-light flex-col py-4">
             <PlusIcon /> Add item
           </Link>
-          <Link href="/labels" className="btn-light flex-col py-4">
-            <PrintIcon /> Labels
+          <Link href="/items?view=top" className="btn-light flex-col py-4">
+            <ChartIcon /> Top sellers
           </Link>
         </div>
 

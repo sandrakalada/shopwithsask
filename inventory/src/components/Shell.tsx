@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { createContext, useContext, useEffect, useState, useSyncExternalStore } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured } from "@/lib/supabase";
 import { startSync, syncNow, syncStore } from "@/lib/sync";
@@ -19,6 +19,11 @@ const tabs = [
   { href: "/orders", label: "Orders", Icon: ReceiptIcon, match: ["/order", "/invoice", "/ship"] },
   { href: "/customers", label: "Customers", Icon: UsersIcon, match: ["/customer"] },
 ];
+
+const RoleContext = createContext<string>("staff");
+/** "owner", "staff" or "shipping" (labels only) */
+export const useRole = () => useContext(RoleContext);
+const SHIPPING_PATHS = ["/orders", "/order"];
 
 export function useSync() {
   return useSyncExternalStore(syncStore.subscribe, syncStore.get, syncStore.get);
@@ -49,6 +54,7 @@ export function SyncBadge() {
 
 export default function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [locked, setLocked] = useState(false);
 
@@ -111,15 +117,25 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   if (!session) return <Login />;
   if (locked) return <Login onUnlock={() => setLocked(false)} />;
 
+  const role = (session.user.app_metadata?.role as string) ?? "staff";
+  const shippingOnly = role === "shipping";
+  if (shippingOnly && !SHIPPING_PATHS.some((p) => pathname.startsWith(p))) {
+    // labels-only account: everything else is off limits (the database enforces it too)
+    if (typeof window !== "undefined") setTimeout(() => router.replace("/orders"), 0);
+    return <div className="min-h-dvh" />;
+  }
+  const visibleTabs = shippingOnly ? tabs.filter((t) => t.href === "/orders") : tabs;
+
   const isPrint = pathname.startsWith("/labels");
   return (
+    <RoleContext.Provider value={role}>
     <div className="mx-auto min-h-dvh max-w-xl">
       <div className="pt-safe pb-28">{children}</div>
       <nav className={`no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream/95 backdrop-blur pb-safe ${isPrint ? "" : ""}`}>
-        <ul className="mx-auto grid max-w-xl grid-cols-5">
-          {tabs.map(({ href, label, Icon, match }) => {
+        <ul className={`mx-auto grid max-w-xl ${shippingOnly ? "grid-cols-1" : "grid-cols-5"}`}>
+          {visibleTabs.map(({ href, label, Icon, match }) => {
             const active = (href === "/" ? pathname === "/" : pathname.startsWith(href)) || match.some((m) => pathname.startsWith(m));
-            const scan = href === "/scan";
+            const scan = href === "/scan" && !shippingOnly;
             return (
               <li key={href}>
                 <Link href={href} className={`flex flex-col items-center gap-0.5 py-2 text-[11px] ${active ? "text-caramel" : "text-taupe"}`}>
@@ -138,6 +154,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </ul>
       </nav>
     </div>
+    </RoleContext.Provider>
   );
 }
 

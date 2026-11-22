@@ -207,7 +207,7 @@ type TeamUser = { id: string; login: string; name: string | null; role: string; 
 function Team() {
   const [isOwner, setIsOwner] = useState(false);
   const [users, setUsers] = useState<TeamUser[] | null>(null);
-  const [form, setForm] = useState({ username: "", name: "", password: "" });
+  const [form, setForm] = useState({ username: "", name: "", password: "", role: "staff" });
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -253,7 +253,7 @@ function Team() {
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{u.name ?? u.login}</p>
               <p className="truncate text-xs text-taupe">
-                {u.login} · {u.role === "owner" ? "Owner" : "Staff"}
+                {u.login} · {u.role === "owner" ? "Owner" : u.role === "shipping" ? "Shipping labels only" : "Staff"}
               </p>
             </div>
             {u.role !== "owner" && (
@@ -262,7 +262,7 @@ function Team() {
                   className="text-xs underline"
                   disabled={busy}
                   onClick={() => {
-                    const pw = prompt(`New password for ${u.login} (at least 6 characters)`);
+                    const pw = prompt(`New password for ${u.login} (at least 8 characters)`);
                     if (pw) void run(() => shopify("team-password", { id: u.id, password: pw }), "Password changed");
                   }}
                 >
@@ -283,12 +283,19 @@ function Team() {
       </ul>
       <input className="field" placeholder="Username (English letters, no spaces)" autoCapitalize="none" autoCorrect="off" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} />
       <input className="field" placeholder="Name (optional)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-      <input className="field" placeholder="Password (at least 6 characters)" type="password" autoComplete="new-password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+      <input className="field" placeholder="Password (at least 8 characters)" type="password" autoComplete="new-password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+      <div className="grid grid-cols-2 gap-2">
+        {[["staff", "Full access"], ["shipping", "Shipping labels only"]].map(([r, l]) => (
+          <button key={r} onClick={() => setForm({ ...form, role: r })} className={`rounded-xl border px-3 py-2 ${form.role === r ? "border-ink bg-ink text-cream" : "border-line bg-white"}`}>
+            {l}
+          </button>
+        ))}
+      </div>
       {msg && <p>{msg}</p>}
       <button
         className="btn-dark w-full"
         disabled={busy || !form.username || !form.password}
-        onClick={() => run(() => shopify("team-create", form).then(() => setForm({ username: "", name: "", password: "" })), "User added")}
+        onClick={() => run(() => shopify("team-create", form).then(() => setForm({ username: "", name: "", password: "", role: "staff" })), "User added")}
       >
         Add user
       </button>
