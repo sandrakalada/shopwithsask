@@ -14,7 +14,19 @@ export type Product = {
   /** Shein SKU from the purchase (e.g. sz2403056386576003) or a full product link */
   supplier_sku?: string | null;
   supplier_url?: string | null;
+  /** where it is kept: "Bag 1" ... "Bag 8" */
+  location?: string | null;
+  /** all product photos from Shopify */
+  images?: string[] | null;
 };
+
+/** Photo fingerprint for Find my product (computed on this device for photos newer than the built-in index). */
+export type Embedding = { url: string; product_id: string; e: string };
+
+export const BAGS = Array.from({ length: 8 }, (_, i) => `Bag ${i + 1}`);
+
+/** The product on the store website. */
+export const websiteLink = (p: Pick<Product, "handle">) => (p.handle ? `https://shopwithsask.com/products/${encodeURIComponent(p.handle)}` : null);
 
 /** Link to the product on Shein: the saved link, or a Shein search for its SKU. */
 export function supplierLink(p: Pick<Product, "supplier_sku" | "supplier_url">) {
@@ -151,7 +163,10 @@ export type Shipment = {
 
 export type Setting = { key: string; value: unknown };
 
-export type Reason = "receive" | "sale" | "return" | "adjust" | "count" | "damage" | "shopify";
+export type Reason = "receive" | "sale" | "return" | "adjust" | "count" | "damage" | "defect" | "used" | "shopify";
+
+/** Pieces that left stock but still cost money. */
+export const WRITE_OFF: Reason[] = ["damage", "defect", "used"];
 
 export type Movement = {
   id: string;
@@ -186,6 +201,7 @@ export const db = new Dexie("sask-inventory") as Dexie & {
   invoices: EntityTable<Invoice, "id">;
   settings: EntityTable<Setting, "key">;
   shipments: EntityTable<Shipment, "id">;
+  embeddings: EntityTable<Embedding, "url">;
 };
 
 db.version(1).stores({
@@ -206,6 +222,10 @@ db.version(2).stores({
 
 db.version(3).stores({
   shipments: "id, order_id, status, created_at",
+});
+
+db.version(4).stores({
+  embeddings: "url, product_id",
 });
 
 export async function getMeta(key: string) {

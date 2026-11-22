@@ -23,6 +23,12 @@ const DocIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const CameraIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" />
+  </svg>
+);
+
 const PlusBoxIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M21 8.5V16l-9 5-9-5V8l9-5 4.5 2.5" /><path d="M3.3 7.7 12 12.5l3.5-1.9M12 12.5V21" /><path d="M19 2v6M16 5h6" />
@@ -39,6 +45,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; Icon: (p:
       { href: "/items?view=top", label: "Top sellers", Icon: ChartIcon },
       { href: "/labels", label: "Barcode stickers", Icon: PrintIcon },
       { href: "/scan", label: "Scan", Icon: ScanIcon },
+      { href: "/find", label: "Find my product", Icon: CameraIcon },
       { href: "/history", label: "Stock history", Icon: ClockIcon },
     ],
   },

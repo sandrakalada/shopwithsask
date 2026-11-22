@@ -1,7 +1,8 @@
 "use client";
 
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, type Product, type Variant } from "@/lib/db";
+import { db, WRITE_OFF, type Product, type Variant } from "@/lib/db";
+import { costInEgp } from "@/lib/stock";
 import { productMatcher } from "@/lib/lines";
 import { egp } from "@/lib/pdf";
 
@@ -29,10 +30,16 @@ export function useProductStats(product: Product | undefined, variants: Variant[
       }
     }
     const ids = variants.map((v) => v.id);
-    const lost = ids.length ? (await db.movements.where("variant_id").anyOf(ids).toArray()).filter((m) => m.reason === "damage").reduce((t, m) => t - m.delta, 0) : 0;
+    const rate = Number((await db.settings.get("sar_to_egp"))?.value ?? 13) || 13;
+    const vmap = new Map(variants.map((v) => [v.id, v]));
+    const offs = ids.length ? (await db.movements.where("variant_id").anyOf(ids).toArray()).filter((m) => WRITE_OFF.includes(m.reason)) : [];
+    const lost = offs.reduce((t, m) => t - m.delta, 0);
+    const lostCost = offs.reduce((t, m) => t + -m.delta * (costInEgp(vmap.get(m.variant_id) ?? {}, rate) ?? 0), 0);
+    const byReason = { damage: 0, defect: 0, used: 0 } as Record<string, number>;
+    for (const m of offs) byReason[m.reason] += -m.delta;
     const stock = variants.filter((v) => !v.archived).reduce((t, v) => t + Math.max(0, v.quantity), 0);
     const had = stock + sold + Math.max(0, lost);
-    return { had, sold, delivered, stock, lost: Math.max(0, lost), revenue, orders: orderIds.size, first, last, sellThrough: had ? Math.round((sold / had) * 100) : 0 };
+    return { had, sold, delivered, stock, lost: Math.max(0, lost), lostCost, byReason, revenue, orders: orderIds.size, first, last, sellThrough: had ? Math.round((sold / had) * 100) : 0 };
   }, [product?.id, variants.map((v) => `${v.id}:${v.quantity}`).join(",")]);
 }
 
@@ -55,9 +62,22 @@ export default function ProductStats({ product, variants }: { product: Product; 
         </div>
         <p className="mt-3 text-xs text-taupe">
           {egp(s.revenue)} from {s.orders} {s.orders === 1 ? "order" : "orders"} · {s.delivered} delivered and paid
-          {s.lost ? ` · ${s.lost} damaged or lost` : ""}
+
           {s.first ? ` · first sale ${date(s.first)}, last ${date(s.last)}` : " · no sales yet"}
         </p>
+        {s.lost > 0 && (
+          <div className="mt-3 rounded-xl bg-sand px-3 py-2 text-xs">
+            <p className="font-semibold text-ink">
+              Write-offs: {s.lost} {s.lost === 1 ? "piece" : "pieces"} · cost {egp(s.lostCost)}
+            </p>
+            <p className="text-taupe">
+              {[["damage", "damaged / lost"], ["defect", "defective"], ["used", "used"]]
+                .filter(([k]) => s.byReason[k])
+                .map(([k, l]) => `${s.byReason[k]} ${l}`)
+                .join(" · ")}
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );

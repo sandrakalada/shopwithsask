@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, supplierLink, type Product, type Reason, type Variant } from "@/lib/db";
+import { BAGS, db, supplierLink, websiteLink, type Product, type Reason, type Variant } from "@/lib/db";
 import { newBarcode, reasonLabel, saveProduct, saveVariant, variantLabel } from "@/lib/stock";
 import { pending, pendingDelta, usePending } from "@/lib/pending";
 import CostRow from "@/components/CostRow";
@@ -55,7 +55,7 @@ function Item() {
             <p className="text-sm text-taupe">{product.product_type ?? "No type"}</p>
             <p className="mt-1 text-3xl font-semibold">{total}</p>
             <p className="text-sm text-taupe">{total === 1 ? "piece" : "pieces"} in stock</p>
-            <div className="mt-3 flex gap-2">
+            <div className="mt-3 flex flex-wrap gap-2">
               <button className="btn-light px-3 py-2" onClick={() => setEdit("product")}>Edit</button>
               <Link className="btn-light px-3 py-2" href={`/labels?product=${product.id}`}>
                 <PrintIcon className="h-4 w-4" /> Stickers
@@ -67,7 +67,24 @@ function Item() {
               ) : (
                 <button className="btn-plain px-3 py-2 text-taupe" onClick={() => setEdit("product")}>Add Shein link</button>
               )}
+              {websiteLink(product) && (
+                <a className="btn-light px-3 py-2" href={websiteLink(product)!} target="_blank" rel="noreferrer noopener">
+                  Website
+                </a>
+              )}
             </div>
+            <label className="mt-3 flex items-center gap-2 text-sm">
+              <span className="text-taupe">Stored in</span>
+              <select
+                className="rounded-xl bg-surface px-3 py-2 text-sm font-semibold ring-1 ring-line ring-inset"
+                value={product.location ?? ""}
+                onChange={(e) => void saveProduct({ ...product, location: e.target.value || null })}
+                aria-label="Where this product is stored"
+              >
+                <option value="">Not set</option>
+                {BAGS.map((b) => <option key={b}>{b}</option>)}
+              </select>
+            </label>
           </div>
         </div>
 

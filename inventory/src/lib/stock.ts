@@ -8,6 +8,8 @@ export const REASONS: { value: Reason; label: string; sign: 1 | -1 | 0 }[] = [
   { value: "sale", label: "Sold", sign: -1 },
   { value: "return", label: "Returned", sign: 1 },
   { value: "damage", label: "Damaged / lost", sign: -1 },
+  { value: "defect", label: "Defective", sign: -1 },
+  { value: "used", label: "Used", sign: -1 },
   { value: "adjust", label: "Adjustment", sign: 0 },
   { value: "count", label: "Stock count", sign: 0 },
 ];

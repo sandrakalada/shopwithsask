@@ -117,6 +117,8 @@ const SHOPIFY_REASON: Record<string, string> = {
   receive: "received",
   return: "restock",
   damage: "damaged",
+  defect: "damaged",
+  used: "correction",
   count: "cycle_count_available",
   sale: "correction",
   adjust: "correction",
@@ -263,11 +265,11 @@ async function pull() {
   do {
     const d: any = await gql(
       `query($after: String, $loc: ID!) {
-        productVariants(first: 100, after: $after) {
+        productVariants(first: 50, after: $after) {
           pageInfo { hasNextPage endCursor }
           nodes {
             id title sku price
-            product { id handle title productType status featuredMedia { preview { image { url } } } translations(locale: "ar") { key value } shein: metafield(namespace: "custom", key: "shein_id") { value } }
+            product { id handle title productType status featuredMedia { preview { image { url } } } translations(locale: "ar") { key value } shein: metafield(namespace: "custom", key: "shein_id") { value } media(first: 6) { nodes { preview { image { url } } } } }
             inventoryItem { id tracked unitCost { amount } inventoryLevel(locationId: $loc) { quantities(names: ["available"]) { quantity } } }
           }
         }
@@ -279,7 +281,7 @@ async function pull() {
   } while (after);
 
   const [{ data: products, error: pe }, { data: variants, error: ve }] = await Promise.all([
-    admin.from("products").select("id, handle, title, title_ar, product_type, image_url, archived, shopify_product_id, supplier_url"),
+    admin.from("products").select("id, handle, title, title_ar, product_type, image_url, archived, shopify_product_id, supplier_url, images"),
     admin.from("variants").select("id, product_id, title, sku, barcode, price, quantity, archived, cost, shopify_dirty, shopify_variant_id, shopify_inventory_item_id"),
   ]);
   if (pe || ve) throw pe ?? ve;
@@ -308,11 +310,12 @@ async function pull() {
         archived: sp.status === "ARCHIVED",
         shopify_product_id: spId,
         title_ar: (sp.translations ?? []).find((t: any) => t.key === "title")?.value ?? null,
+        images: (sp.media?.nodes ?? []).map((m: any) => m.preview?.image?.url?.split("?")[0]).filter(Boolean),
       };
       // Shein product number saved on the Shopify product (metafield custom.shein_id) -> link to the Shein page
       const sheinId = String(sp.shein?.value ?? "").match(/\d{5,}/)?.[0];
       if (sheinId) (row as Record<string, unknown>).supplier_url = sheinUrl(sp.title, sheinId);
-      const changed = !existingP || Object.entries(row).some(([k, v]) => (existingP as any)[k] !== v);
+      const changed = !existingP || Object.entries(row).some(([k, v]) => (Array.isArray(v) ? JSON.stringify(v) !== JSON.stringify((existingP as any)[k] ?? []) : (existingP as any)[k] !== v));
       if (!existingP) newProducts++;
       productRows.set(spId, changed ? row : {});
     }

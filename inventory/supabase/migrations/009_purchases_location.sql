@@ -1,0 +1,1 @@
+-- applied: supplier_purchases table (unmatched Shein purchases) and products.location (Bag 1-8)

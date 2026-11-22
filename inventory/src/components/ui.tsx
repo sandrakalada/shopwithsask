@@ -72,10 +72,16 @@ export function VariantRow({ v, p }: { v: Variant; p?: Product }) {
 type Mode = "add" | "remove" | "count";
 const MODE_REASONS: Record<Mode, { value: Reason; label: string }[]> = {
   add: [{ value: "receive", label: "Received" }, { value: "return", label: "Returned" }, { value: "adjust", label: "Correction" }],
-  remove: [{ value: "sale", label: "Sold" }, { value: "damage", label: "Damaged / lost" }, { value: "adjust", label: "Correction" }],
+  remove: [
+    { value: "sale", label: "Sold" },
+    { value: "damage", label: "Damaged / lost" },
+    { value: "defect", label: "Defective" },
+    { value: "used", label: "Used" },
+    { value: "adjust", label: "Correction" },
+  ],
   count: [],
 };
-const modeOf = (r: Reason): Mode => (r === "count" ? "count" : r === "sale" || r === "damage" ? "remove" : "add");
+const modeOf = (r: Reason): Mode => (r === "count" ? "count" : r === "sale" || r === "damage" || r === "defect" || r === "used" ? "remove" : "add");
 
 /** Change stock for one size: add, remove or set the counted amount, with a reason. */
 export function AdjustSheet({
@@ -138,6 +144,9 @@ export function AdjustSheet({
             ))}
           </div>
 
+          {(reason === "damage" || reason === "defect" || reason === "used") && (
+            <p className="-mt-1 text-xs text-taupe">Leaves stock but its cost still counts as your cost (shown under Write-offs).</p>
+          )}
           {mode !== "count" && (
             <div className="flex flex-wrap gap-2">
               {MODE_REASONS[mode].map((r) => (

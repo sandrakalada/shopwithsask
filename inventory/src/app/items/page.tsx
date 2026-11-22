@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, newestFirst, supplierLink, type Product, type Variant } from "@/lib/db";
+import { BAGS, db, newestFirst, WRITE_OFF, supplierLink, websiteLink, type Product, type Variant } from "@/lib/db";
 import { costIn, costInEgp, saveVariant, setSetting, variantLabel } from "@/lib/stock";
 void saveVariant;
 import { pending, pendingDelta, usePending } from "@/lib/pending";
@@ -26,6 +26,7 @@ function Inventory() {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<Filter>((params.get("filter") as Filter) ?? "all");
   const [type, setType] = useState("all");
+  const [bag, setBag] = useState("all");
   const [toast, setToast] = useState<string | null>(null);
   // menu links such as /items?view=top switch the view even when already on this page
   useEffect(() => {
@@ -54,6 +55,7 @@ function Inventory() {
     const term = q.trim().toLowerCase();
     return (data?.rows ?? []).filter(({ p, vs }) => {
       if (type !== "all" && p.product_type !== type) return false;
+      if (bag !== "all" && (bag === "none" ? !!p.location : p.location !== bag)) return false;
       if (filter === "in" && !vs.some((v) => v.quantity > 0)) return false;
       if (filter === "out" && !vs.some((v) => v.quantity <= 0)) return false;
       if (filter === "low" && !vs.some((v) => v.quantity <= v.low_stock_at)) return false;
@@ -65,7 +67,20 @@ function Inventory() {
         vs.some((v) => v.barcode.toLowerCase().includes(term) || (v.sku ?? "").toLowerCase().includes(term))
       );
     });
-  }, [data, q, filter, type]);
+  }, [data, q, filter, type, bag]);
+
+  // write-offs: damaged, defective and used pieces that left stock but still cost money
+  const writeOffs = useLiveQuery(async () => {
+    const [moves, variants, rateRow] = await Promise.all([db.movements.filter((m) => WRITE_OFF.includes(m.reason)).toArray(), db.variants.toArray(), db.settings.get("sar_to_egp")]);
+    const rate = Number(rateRow?.value ?? 13) || 13;
+    const vmap = new Map(variants.map((v) => [v.id, v]));
+    let pieces = 0, cost = 0;
+    for (const m of moves) {
+      pieces += -m.delta;
+      cost += -m.delta * (costInEgp(vmap.get(m.variant_id) ?? {}, rate) ?? 0);
+    }
+    return { pieces, cost };
+  }, []);
 
   const { count, Sentinel } = useIncremental(rows.length, 40, `${q}|${filter}|${type}|${view}`);
 
@@ -137,7 +152,7 @@ function Inventory() {
           <TopProducts />
         ) : (
         <>
-        {view === "costs" && !assign && data && <CostSummary totals={totals} rate={data.rate} />}
+        {view === "costs" && !assign && data && <CostSummary totals={totals} rate={data.rate} writeOffs={writeOffs} />}
 
         <label className="relative block">
           <SearchIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-taupe" />
@@ -153,6 +168,11 @@ function Inventory() {
             <option value="all">All types</option>
             {types.map((t) => <option key={t}>{t}</option>)}
           </select>
+          <select value={bag} onChange={(e) => setBag(e.target.value)} className="shrink-0 rounded-full border border-line bg-white px-3 py-1.5 text-sm" aria-label="Filter by bag">
+            <option value="all">All bags</option>
+            {BAGS.map((b) => <option key={b}>{b}</option>)}
+            <option value="none">No bag set</option>
+          </select>
         </div>
         <p className="mt-3 text-xs text-taupe">
           {rows.length} products · {totals.units} pieces in stock
@@ -166,9 +186,14 @@ function Inventory() {
                   <Thumb src={p.image_url} size={40} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[15px] font-semibold">{p.title}</p>
-                    <p className="truncate text-[13px] text-taupe">{p.product_type ?? ""}</p>
+                    <p className="truncate text-[13px] text-taupe">{[p.product_type, p.location].filter(Boolean).join(" · ")}</p>
                   </div>
                 </Link>
+                {websiteLink(p) && (
+                  <a href={websiteLink(p)!} target="_blank" rel="noreferrer noopener" className="chip min-h-8 px-2.5 text-[12px]" aria-label={`${p.title} on the website`}>
+                    Site
+                  </a>
+                )}
                 {supplierLink(p) && (
                   <a href={supplierLink(p)!} target="_blank" rel="noreferrer noopener" className="chip min-h-8 px-2.5 text-[12px] text-caramel" aria-label={`${p.title} on Shein`}>
                     Shein
@@ -210,7 +235,7 @@ function Inventory() {
   );
 }
 
-function CostSummary({ totals, rate }: { totals: { units: number; retail: number; cost: number; missing: number }; rate: number }) {
+function CostSummary({ totals, rate, writeOffs }: { totals: { units: number; retail: number; cost: number; missing: number }; rate: number; writeOffs?: { pieces: number; cost: number } }) {
   const [r, setR] = useState(String(rate));
   useEffect(() => setR(String(rate)), [rate]);
   const margin = totals.retail ? Math.round(((totals.retail - totals.cost) / totals.retail) * 100) : 0;
@@ -229,6 +254,11 @@ function CostSummary({ totals, rate }: { totals: { units: number; retail: number
       <p className="text-xs text-taupe">
         Margin about {margin}% · {totals.missing} sizes in stock have no cost yet
       </p>
+      {!!writeOffs?.pieces && (
+        <p className="rounded-xl bg-sand px-3 py-2 text-xs">
+          <span className="font-semibold">Write-offs:</span> {writeOffs.pieces} {writeOffs.pieces === 1 ? "piece" : "pieces"} damaged, defective or used · cost {egp(writeOffs.cost)}
+        </p>
+      )}
       <label className="flex items-center justify-between gap-3">
         <span className="text-taupe">1 SAR =</span>
         <span className="flex items-center gap-2">
