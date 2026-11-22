@@ -95,6 +95,7 @@ function Labels() {
   const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);
   const [file, setFile] = useState<{ sig: string; pdf: Blob } | null>(null);
+  const [progress, setProgress] = useState<[number, number] | null>(null);
 
   const data = useLiveQuery(async () => {
     const [products, variants] = await Promise.all([db.products.toArray(), db.variants.toArray()]);
@@ -142,17 +143,26 @@ function Labels() {
   const waitingImages = chosen.some((r) => !r.img);
   const sig = chosen.map((r) => `${r.key}x${r.copies}`).join(",");
 
-  // keep the print sheet and the PDF ready so Print / Share open instantly on the tap
+  // keep the print sheet and the PDF ready so Print / Share open instantly on the tap.
+  // Waits until you stop tapping, then builds in small steps (no freezing on "Select all").
   useEffect(() => {
     if (waitingImages || !images.length) return;
-    preparePrint(images, W, H);
     let cancelled = false;
     const t = setTimeout(async () => {
+      preparePrint(images, W, H);
       setBusy(true);
-      const pdf = await imagesToPdf(images.map((url) => ({ url, ratio: H / W })), W, H);
-      if (!cancelled) setFile({ sig, pdf });
-      setBusy(false);
-    }, 300);
+      setProgress([0, images.length]);
+      try {
+        const pdf = await imagesToPdf(images.map((url) => ({ url, ratio: H / W })), W, H, (d, n) => !cancelled && setProgress([d, n]), () => cancelled);
+        if (!cancelled) setFile({ sig, pdf });
+      } catch {
+        /* selection changed while building */
+      }
+      if (!cancelled) {
+        setBusy(false);
+        setProgress(null);
+      }
+    }, 700);
     return () => {
       cancelled = true;
       clearTimeout(t);
@@ -223,7 +233,7 @@ function Labels() {
             <PrintIcon className="h-5 w-5" /> {ready ? `Print ${images.length}` : chosen.length ? "Preparing" : "Select stickers"}
           </button>
           <button className="btn-light" disabled={!ready || !file || file.sig !== sig || busy} onClick={() => file && shareFile(file.pdf, `stickers-${images.length}.pdf`)}>
-            Share PDF
+            {progress ? `Preparing PDF ${progress[0]}/${progress[1]}` : "Share PDF"}
           </button>
         </div>
       </div>

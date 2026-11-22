@@ -10,18 +10,36 @@ export async function elementToImage(el: HTMLElement) {
   return { url: canvas.toDataURL("image/jpeg", 0.92), ratio: canvas.height / canvas.width };
 }
 
-/** Builds a PDF with one image per page, each page exactly widthMm x heightMm. */
-export async function imagesToPdf(images: { url: string; ratio: number }[], widthMm: number, heightMm?: number) {
+/** Builds a PDF with one image per page, each page exactly widthMm x heightMm.
+ * Repeated images are embedded once (copies of the same sticker reuse it), and the work is done in
+ * small steps so the screen never freezes on big batches. */
+export async function imagesToPdf(
+  images: { url: string; ratio: number }[],
+  widthMm: number,
+  heightMm?: number,
+  onProgress?: (done: number, total: number) => void,
+  isCancelled?: () => boolean,
+) {
   const { jsPDF } = await import("jspdf");
   let pdf: InstanceType<typeof jsPDF> | null = null;
-  for (const img of images) {
+  const alias = new Map<string, string>();
+  for (let n = 0; n < images.length; n++) {
+    if (isCancelled?.()) throw new Error("cancelled");
+    const img = images[n];
     const h = heightMm ?? img.ratio * widthMm;
     const fmt: [number, number] = [widthMm, h];
     const orientation = widthMm > h ? "landscape" : "portrait";
     if (!pdf) pdf = new jsPDF({ unit: "mm", format: fmt, orientation, compress: true });
     else pdf.addPage(fmt, orientation);
-    pdf.addImage(img.url, "JPEG", 0, 0, widthMm, h);
+    if (!alias.has(img.url)) alias.set(img.url, `i${alias.size}`);
+    const kind = img.url.startsWith("data:image/png") ? "PNG" : "JPEG";
+    pdf.addImage(img.url, kind, 0, 0, widthMm, h, alias.get(img.url), "FAST");
+    if (n % 8 === 7) {
+      onProgress?.(n + 1, images.length);
+      await new Promise((r) => setTimeout(r, 0)); // let the screen breathe
+    }
   }
+  onProgress?.(images.length, images.length);
   return pdf!.output("blob");
 }
 

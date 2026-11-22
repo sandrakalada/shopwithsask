@@ -655,6 +655,76 @@ async function teamAction(caller: any, body: any) {
   throw new Error("unknown team action");
 }
 
+// ---------- offline sale: record an order in Shopify ----------
+
+type SaleItem = { shopifyVariantId?: string | null; title: string; quantity: number; price: number };
+type Sale = {
+  customer: { name?: string; phone?: string; address?: string; city?: string; customerId?: string | null };
+  items: SaleItem[];
+  shipping?: { title: string; price: number };
+  discount?: number;
+  note?: string;
+  paid: boolean;
+  fulfilled: boolean;
+  draftOnly?: boolean; // marks the order as a Shopify test order
+};
+
+const egpMoney = (n: number) => ({ amount: Number(n || 0).toFixed(2), currencyCode: "EGP" });
+
+/** Records an offline sale as a real Shopify order (paid or cash on delivery, delivered now or not).
+ * Shopify deducts the stock; the order comes back to the app through the orders webhook.
+ * No tax lines are added (the store charges no tax). */
+async function createOfflineOrder(sale: Sale & { payment?: string }) {
+  if (!sale.items?.length) throw new Error("Add at least one item");
+  const bag = (n: number) => ({ shopMoney: egpMoney(n) });
+  const [firstName, ...rest] = (sale.customer.name || "Walk-in customer").trim().split(/\s+/);
+  const itemsTotal = sale.items.reduce((t, i) => t + i.price * i.quantity, 0);
+  const shipping = sale.shipping && sale.shipping.price > 0 ? sale.shipping : null;
+  const discount = Math.min(Math.max(0, sale.discount ?? 0), itemsTotal);
+  const total = itemsTotal + (shipping?.price ?? 0) - discount;
+  const gateway = /instapay/i.test(sale.payment ?? "") ? "Instapay" : "Cash on Delivery (COD)";
+
+  const order: Record<string, unknown> = {
+    currency: "EGP",
+    lineItems: sale.items.map((i) =>
+      i.shopifyVariantId
+        ? { variantId: gid("ProductVariant", i.shopifyVariantId), quantity: i.quantity, priceSet: bag(i.price) }
+        : { title: i.title, quantity: i.quantity, priceSet: bag(i.price), taxable: false, requiresShipping: true },
+    ),
+    financialStatus: sale.paid ? "PAID" : "PENDING",
+    transactions: [{ kind: "SALE", status: sale.paid ? "SUCCESS" : "PENDING", gateway, amountSet: bag(total) }],
+    tags: ["offline", "sask-app"],
+    sourceName: "sask-app",
+    note: sale.note || null,
+    shippingAddress: {
+      firstName,
+      lastName: rest.join(" ") || null,
+      address1: sale.customer.address || null,
+      city: sale.customer.city || "Cairo",
+      phone: sale.customer.phone || null,
+      countryCode: "EG",
+    },
+  };
+  if (sale.fulfilled) order.fulfillmentStatus = "FULFILLED";
+  if (sale.customer.phone) order.phone = sale.customer.phone;
+  if (sale.customer.customerId) order.customer = { toAssociate: { id: gid("Customer", sale.customer.customerId) } };
+  if (shipping) order.shippingLines = [{ title: shipping.title, priceSet: bag(shipping.price) }];
+  if (discount > 0) order.discountCode = { itemFixedDiscountCode: { code: "OFFLINE-DISCOUNT", amountSet: bag(discount) } };
+  if (sale.draftOnly) order.test = true;
+
+  const r = await gql(
+    `mutation($order: OrderCreateOrderInput!, $options: OrderCreateOptionsInput) {
+      orderCreate(order: $order, options: $options) { order { id name totalPriceSet { shopMoney { amount } } } userErrors { field message } }
+    }`,
+    { order, options: { inventoryBehaviour: "DECREMENT_OBEYING_POLICY", sendReceipt: false, sendFulfillmentReceipt: false } },
+  );
+  const ue = r.orderCreate.userErrors;
+  if (ue?.length) throw new Error(ue.map((e: any) => e.message).join("; "));
+  const created = r.orderCreate.order;
+  await refreshOrder(num(created.id));
+  return { orderId: num(created.id), name: created.name, total: Number(created.totalPriceSet.shopMoney.amount) };
+}
+
 /** Everything, once a day (scheduled in the database). */
 async function daily() {
   const result: Record<string, unknown> = {};
@@ -756,6 +826,7 @@ Deno.serve(async (req) => {
     if (action === "all") return json({ push: await push(), pull: await pull(), orders: await syncOrdersAndCustomers(), webhooks: await setup() });
     if (action === "setup") return json(await setup());
     if (typeof action === "string" && action.startsWith("team-")) return json(await teamAction(user.user, body));
+    if (action === "create-order") return json(await createOfflineOrder(body.sale));
     return json({ error: "unknown action" }, 400);
   } catch (e) {
     console.error(e);
