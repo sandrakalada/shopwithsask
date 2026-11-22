@@ -21,8 +21,8 @@ export default function Login() {
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-6">
-      <Image src="/icons/icon-192.png" alt="" width={72} height={72} className="mx-auto rounded-2xl" />
-      <h1 className="mt-5 text-center text-2xl font-semibold">Sask Inventory</h1>
+      <Image src="/brand-wordmark.png" alt="SASK" width={180} height={64} className="mx-auto h-auto w-44" priority />
+      <h1 className="mt-6 text-center text-lg font-semibold tracking-wide text-espresso">Inventory</h1>
       <p className="mt-1 text-center text-sm text-taupe">Sign in to manage stock</p>
       <form onSubmit={submit} className="mt-8 space-y-3">
         <input className="field" type="email" autoComplete="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />

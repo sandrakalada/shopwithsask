@@ -34,7 +34,7 @@ export default function Home() {
 
   return (
     <>
-      <Header title="Shop With Sask" />
+      <Header title="Shop With Sask" logo />
       <main className="space-y-5 p-4">
         <div className="grid grid-cols-2 gap-3">
           <Stat label="Units in stock" value={data ? data.units.toLocaleString() : "–"} />

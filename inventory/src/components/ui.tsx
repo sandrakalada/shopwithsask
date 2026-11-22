@@ -8,7 +8,7 @@ import { recordMovement, REASONS, setCount, thumb, variantLabel } from "@/lib/st
 import { BackIcon, MinusIcon, PlusIcon } from "./Icons";
 import { SyncBadge } from "./Shell";
 
-export function Header({ title, back, right }: { title: string; back?: boolean; right?: React.ReactNode }) {
+export function Header({ title, back, right, logo }: { title: string; back?: boolean; right?: React.ReactNode; logo?: boolean }) {
   const router = useRouter();
   return (
     <header className="no-print sticky top-0 z-20 flex items-center gap-2 border-b border-line bg-cream/95 px-4 py-3 backdrop-blur">
@@ -17,7 +17,14 @@ export function Header({ title, back, right }: { title: string; back?: boolean; 
           <BackIcon />
         </button>
       )}
-      <h1 className="min-w-0 flex-1 truncate text-lg font-semibold">{title}</h1>
+      {logo ? (
+        <h1 className="flex min-w-0 flex-1 items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand-wordmark.png" alt={title} className="h-6 w-auto" />
+        </h1>
+      ) : (
+        <h1 className="min-w-0 flex-1 truncate text-lg font-semibold">{title}</h1>
+      )}
       {right}
       <SyncBadge />
     </header>

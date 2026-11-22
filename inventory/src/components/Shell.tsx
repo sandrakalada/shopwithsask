@@ -89,7 +89,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             const scan = href === "/scan";
             return (
               <li key={href}>
-                <Link href={href} className={`flex flex-col items-center gap-0.5 py-2 text-[11px] ${active ? "text-ink" : "text-taupe"}`}>
+                <Link href={href} className={`flex flex-col items-center gap-0.5 py-2 text-[11px] ${active ? "text-caramel" : "text-taupe"}`}>
                   {scan ? (
                     <span className="-mt-6 flex h-14 w-14 items-center justify-center rounded-full bg-ink text-cream shadow-lg">
                       <Icon className="h-7 w-7" />
