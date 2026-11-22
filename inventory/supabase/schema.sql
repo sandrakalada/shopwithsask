@@ -48,7 +48,7 @@ create index if not exists movements_created_idx on public.stock_movements(creat
 
 -- updated_at bookkeeping (the app pulls rows changed since its last sync)
 create or replace function public.touch_updated_at() returns trigger
-language plpgsql as $$
+language plpgsql set search_path = public as $$
 begin
   new.updated_at := now();
   return new;
@@ -69,6 +69,7 @@ begin
   update public.variants set quantity = quantity + new.delta where id = new.variant_id;
   return new;
 end $$;
+revoke execute on function public.apply_stock_movement() from public, anon, authenticated;
 
 drop trigger if exists stock_movement_apply on public.stock_movements;
 create trigger stock_movement_apply after insert on public.stock_movements

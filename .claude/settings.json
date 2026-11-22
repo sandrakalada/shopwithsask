@@ -1,5 +1,17 @@
 {
   "permissions": {
-    "allow": ["mcp__Shopify"]
+    "allow": [
+      "mcp__Shopify",
+      "mcp__Supabase",
+      "mcp__Vercel",
+      "Bash",
+      "Edit",
+      "Write",
+      "Read",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "WebSearch"
+    ]
   }
 }
