@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, type Product, type Reason, type Variant } from "@/lib/db";
+import { db, supplierLink, type Product, type Reason, type Variant } from "@/lib/db";
 import { newBarcode, reasonLabel, saveProduct, saveVariant, variantLabel } from "@/lib/stock";
 import { pending, pendingDelta, usePending } from "@/lib/pending";
 import { AdjustSheet, Header, Labeled, QtyPill, Stepper, Thumb, timeAgo, Toast } from "@/components/ui";
@@ -57,6 +57,13 @@ function Item() {
               <Link className="btn-light px-3 py-2" href={`/labels?product=${product.id}`}>
                 <PrintIcon className="h-4 w-4" /> Stickers
               </Link>
+              {supplierLink(product) ? (
+                <a className="btn-light px-3 py-2" href={supplierLink(product)!} target="_blank" rel="noreferrer noopener">
+                  Shein
+                </a>
+              ) : (
+                <button className="btn-plain px-3 py-2 text-taupe" onClick={() => setEdit("product")}>Add Shein link</button>
+              )}
             </div>
           </div>
         </div>
@@ -164,8 +171,19 @@ function ProductForm({ product, onClose }: { product: Product; onClose: () => vo
   const [title, setTitle] = useState(product.title);
   const [type, setType] = useState(product.product_type ?? "");
   const [image, setImage] = useState(product.image_url ?? "");
+  const [shein, setShein] = useState(product.supplier_url ?? product.supplier_sku ?? "");
   async function save(archived = false) {
-    await saveProduct({ id: product.id, handle: product.handle, title: title.trim() || product.title, product_type: type || null, image_url: image.trim() || null, archived });
+    const link = shein.trim();
+    const isUrl = /^https?:\/\//i.test(link);
+    await saveProduct({
+      ...product,
+      title: title.trim() || product.title,
+      product_type: type || null,
+      image_url: image.trim() || null,
+      supplier_url: isUrl ? link.replace(/^http:/i, "https:") : null,
+      supplier_sku: isUrl ? product.supplier_sku ?? null : link || null,
+      archived,
+    });
     onClose();
   }
   return (
@@ -177,6 +195,10 @@ function ProductForm({ product, onClose }: { product: Product; onClose: () => vo
           {TYPES.map((t) => <option key={t}>{t}</option>)}
         </select>
         <input className="field" value={image} onChange={(e) => setImage(e.target.value)} placeholder="Image link (optional)" />
+        <label className="block text-sm">
+          <span className="text-taupe">Shein link or Shein SKU</span>
+          <input className="field mt-1" dir="ltr" value={shein} onChange={(e) => setShein(e.target.value)} placeholder="https://ar.shein.com/... or sz2403056386576003" />
+        </label>
         <div className="grid grid-cols-2 gap-2 pt-2">
           <button className="btn-light text-red-700" onClick={() => confirm("Hide this item from the app? You can ask to restore it later.") && save(true)}>Hide item</button>
           <button className="btn-dark" onClick={() => save()}>Save</button>

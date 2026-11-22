@@ -11,7 +11,17 @@ export type Product = {
   updated_at: string;
   created_at?: string;
   shopify_product_id?: string | null;
+  /** Shein SKU from the purchase (e.g. sz2403056386576003) or a full product link */
+  supplier_sku?: string | null;
+  supplier_url?: string | null;
 };
+
+/** Link to the product on Shein: the saved link, or a Shein search for its SKU. */
+export function supplierLink(p: Pick<Product, "supplier_sku" | "supplier_url">) {
+  if (p.supplier_url && /^https:\/\//.test(p.supplier_url)) return p.supplier_url;
+  if (p.supplier_sku) return `https://ar.shein.com/pdsearch/${encodeURIComponent(p.supplier_sku.trim())}/`;
+  return null;
+}
 
 /** Newest product first: Shopify product numbers grow over time, so the latest upload has the biggest number. */
 export function newestFirst(a: Product, b: Product) {

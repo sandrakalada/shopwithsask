@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, newestFirst, type Product, type Variant } from "@/lib/db";
+import { db, newestFirst, supplierLink, type Product, type Variant } from "@/lib/db";
 import { costIn, costInEgp, saveVariant, setSetting, variantLabel } from "@/lib/stock";
 void saveVariant;
 import { pending, pendingDelta, usePending } from "@/lib/pending";
@@ -160,14 +160,21 @@ function Inventory() {
         <ul className="mt-2 space-y-3 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0 2xl:grid-cols-3">
           {rows.slice(0, count).map(({ p, vs }) => (
             <li key={p.id} className="card overflow-hidden">
-              <Link href={assign ? "#" : `/item?id=${p.id}`} onClick={(e) => assign && e.preventDefault()} className="flex items-center gap-3 px-4 pt-3 active:opacity-70">
-                <Thumb src={p.image_url} size={40} />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-[15px] font-semibold">{p.title}</p>
-                  <p className="truncate text-[13px] text-taupe">{p.product_type ?? ""}</p>
-                </div>
+              <div className="flex items-center gap-2 pr-4 pt-3">
+                <Link href={assign ? "#" : `/item?id=${p.id}`} onClick={(e) => assign && e.preventDefault()} className="flex min-w-0 flex-1 items-center gap-3 pl-4 active:opacity-70">
+                  <Thumb src={p.image_url} size={40} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[15px] font-semibold">{p.title}</p>
+                    <p className="truncate text-[13px] text-taupe">{p.product_type ?? ""}</p>
+                  </div>
+                </Link>
+                {supplierLink(p) && (
+                  <a href={supplierLink(p)!} target="_blank" rel="noreferrer noopener" className="chip min-h-8 px-2.5 text-[12px] text-caramel" aria-label={`${p.title} on Shein`}>
+                    Shein
+                  </a>
+                )}
                 <QtyPill qty={vs.reduce((s, v) => s + v.quantity, 0)} low={0} />
-              </Link>
+              </div>
               <div className="mt-2 divide-y divide-line border-t border-line [&>*]:border-line">
                 {vs.map((v) =>
                   assign ? (
