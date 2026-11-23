@@ -487,3 +487,4 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-23 02:35 Cairo check (account day Nov 22): 508 EGP total incl. old sets earlier; NEW 198 (4 ATC, 1 purchase), WARM 92 (5 ATC, 1 purchase). 36 ads each, no issues. No new orders since #1402. Stock OK (patchwork skirt 1 left).
 - 2026-11-23 05:35 Cairo check: account day Nov 22 final 523 EGP: NEW 212 (5 ATC, 2 checkouts, 1 purchase), WARM 93 (5 ATC, 1 purchase), old sets ~218 before pause. New day 9 so far. No new orders. 36 ads each, no issues. Stock OK.
 - 2026-11-23 08:35 Cairo check: 39 EGP today (NEW 36, WARM 3), 0 ATC yet. No new orders. No issues. Stock OK.
+- 2026-11-23 owner: +70 EGP/day to high-end campaign, keep it running: NEW 300->350, WARM 150->170 (total 520/day). New product ad photos: only purple bomber and burgundy jacket have >=1080 photos (already in both ad sets); black velvet gold 1024 px; other 6 jackets no high-res photos; green cardigan DRAFT.
