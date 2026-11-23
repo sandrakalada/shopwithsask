@@ -501,3 +501,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 23 new link ads (bags + accessories, store photos >=1080 px checked sharp at 1:1; OTTO bag skipped as soft; summer motifs skipped: crab, seahorse, starfish, ice cream, watermelon, pineapple, seaside).
 - Plus reused creatives: leopard tote, high-stock skirts/shirts/tops, resurfaced vests/tops, jackets, up to 50 ads.
 - Campaign total now 590/day (NEW 350, WARM 170, BAGS-ACC 70).
+
+- 2026-11-23 owner approved: NEW 52564976960720 350->250/day, WARM 52564976965920 170->270/day (NEW 0 ATC on 282 spend, WARM 11 ATC). Total still 590/day.
