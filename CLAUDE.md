@@ -35,6 +35,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - Real revenue = orders that are fulfilled AND paid. ShopifyQL filter: `WHERE order_fulfillment_status = 'fulfilled' AND order_payment_status = 'paid'`.
 
 ## Instagram
+- Products waiting for the owner to upload (with their stock and cost): notes/pending-uploads.md. Check it when new products sync.
 - Instagram study and competitor list: notes/instagram-competitors.md. Read it before any Instagram or marketing work.
 - Instagram captions: follow notes/instagram-captions.md (English only, short, 1-4 emojis, never price or sizes). When the owner sends an image for Instagram, write the caption from it.
 - Instagram skills installed in .claude/skills (ig-caption-writer, ig-humanizer, ig-hashtag-strategist, ig-carousel-planner, ig-content-planner, ig-hook-extractor, ig-profile-optimizer, ig-repurposer, ig-audience-insights). Draft-only use: never publish or ask for Publora/API keys. The owner's rules above override them (English, short, emojis allowed in captions, no price/sizes).
