@@ -52,7 +52,7 @@ export default function FindPage() {
     let cancelled = false;
     (async () => {
       try {
-        setStatus(navigator.onLine ? "Loading the recognition model (first time only, about 35 MB)" : "Loading the recognition model");
+        setStatus(navigator.onLine ? "Downloading the recognition model (first time only, about 65 MB, Wi-Fi is best). After this it works offline." : "Loading the recognition model");
         const [index] = await Promise.all([indexRef.current ? Promise.resolve(indexRef.current) : loadIndex(), loadModel()]);
         if (cancelled) return;
         indexRef.current = index;

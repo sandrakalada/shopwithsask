@@ -3,8 +3,13 @@
 import { db, type Product } from "./db";
 import { supabase } from "./supabase";
 
-/** Find my product: an on-device image model (MobileCLIP S0, served from this app, 22 MB)
+/** Find my product: an on-device fashion image model (Marqo FashionSigLIP, trained on clothing and accessories,
+ * served from this app, 53 MB, saved on the phone after the first time)
  * turns a photo into a fingerprint and compares it with every product photo. Nothing is uploaded. */
+
+const MODEL = "fashionsiglip";
+/** fingerprint length of this model: older fingerprints (from the previous model) are ignored */
+const DIM = 768;
 
 type Model = { embed: (blob: Blob | string) => Promise<Float32Array> };
 let modelP: Promise<Model> | null = null;
@@ -20,8 +25,8 @@ export function loadModel(): Promise<Model> {
     const onnx = T.env.backends.onnx as unknown as { wasm: { wasmPaths: unknown; numThreads: number } };
     onnx.wasm.wasmPaths = { mjs: "/ort/ort-wasm-simd-threaded.mjs", wasm: "/ort/ort-wasm-simd-threaded.wasm" };
     onnx.wasm.numThreads = 1;
-    const processor = await T.AutoProcessor.from_pretrained("mobileclip_s0");
-    const model = await T.CLIPVisionModelWithProjection.from_pretrained("mobileclip_s0", { dtype: "fp16", device: "wasm" });
+    const processor = await T.AutoProcessor.from_pretrained(MODEL);
+    const model = await T.CLIPVisionModelWithProjection.from_pretrained(MODEL, { dtype: "q4f16", device: "wasm" });
     return {
       async embed(src) {
         const img = typeof src === "string" ? await T.RawImage.fromURL(src) : await T.RawImage.fromBlob(src);
@@ -67,14 +72,18 @@ export async function loadIndex(): Promise<IndexItem[]> {
   // photos you confirmed with "This is it" (shared between your devices)
   try {
     const { data } = (await supabase?.from("find_examples").select("id, product_id, e").limit(5000)) ?? { data: null };
-    for (const r of data ?? []) out.push({ p: r.product_id, u: `taught:${r.id}`, v: fromB64(r.e), taught: true });
+    for (const r of data ?? []) {
+      const v = fromB64(r.e);
+      if (v.length === DIM) out.push({ p: r.product_id, u: `taught:${r.id}`, v, taught: true });
+    }
   } catch {
     /* offline: use what is on this device */
   }
   for (const it of [...local.map((l) => ({ p: l.product_id, u: l.url, e: l.e })), ...base.items]) {
     if (seen.has(it.u)) continue;
     seen.add(it.u);
-    out.push({ p: it.p, u: it.u, v: fromB64(it.e) });
+    const v = fromB64(it.e);
+    if (v.length === DIM) out.push({ p: it.p, u: it.u, v });
   }
   return out;
 }
@@ -82,6 +91,8 @@ export async function loadIndex(): Promise<IndexItem[]> {
 /** Photos of products added after the index was made: fingerprint them on this device (a few at a time). */
 export async function indexNewPhotos(index: IndexItem[], products: Product[], limit = 24, onProgress?: (n: number, total: number) => void, shouldStop?: () => boolean) {
   const have = new Set(index.map((i) => i.u));
+  // fingerprints made by the previous model on this phone are useless now: drop them so the photos are redone
+  await db.embeddings.filter((x) => fromB64(x.e).length !== DIM).delete();
   const todo = products.flatMap((p) => (p.images?.length ? p.images : p.image_url ? [p.image_url] : []).slice(0, 4).filter((u) => !have.has(u)).map((u) => ({ p, u })));
   const batch = todo.slice(0, limit);
   if (!batch.length) return 0;
