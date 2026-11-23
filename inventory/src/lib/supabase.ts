@@ -12,3 +12,12 @@ export const supabase: SupabaseClient | null = supabaseConfigured
       auth: { persistSession: true, autoRefreshToken: true, storageKey: "sask-inventory-auth", experimental: { passkey: true } },
     })
   : null;
+
+/** Who is signed in on this phone, read from the saved sign-in (works offline, no network wait). */
+export function signedInUser(): { email?: string; user_metadata?: Record<string, unknown>; app_metadata?: Record<string, unknown> } | null {
+  try {
+    return JSON.parse(localStorage.getItem("sask-inventory-auth") ?? "null")?.user ?? null;
+  } catch {
+    return null;
+  }
+}

@@ -6,7 +6,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import QRCode from "qrcode";
 import { db, newestFirst, type Product, type Variant } from "@/lib/db";
 import { stickerLink, variantLabel } from "@/lib/stock";
-import { imagesToPdf, isIOS, preparePdfPrint, preparePrint, printNow, shareFile } from "@/lib/pdf";
+import { imagesToPdf, isIOS, preparePdfPrint, preparePrint, printNow, savePdf } from "@/lib/pdf";
 import { Header, Stepper, Thumb } from "@/components/ui";
 import { PrintIcon } from "@/components/Icons";
 
@@ -181,7 +181,7 @@ function Labels() {
 
   return (
     <>
-      <Header title="Barcode stickers" back />
+      <Header title="Barcode stickers" back="/items" />
       <main className="space-y-3 p-4 pb-40">
         <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
           {variantId && <Chip on={scope === "one"} onClick={() => setScope("one")}>This size</Chip>}
@@ -234,11 +234,11 @@ function Labels() {
 
       <div className="no-print fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+60px)] z-30 px-3 lg:bottom-6 lg:left-64">
         <div className="mx-auto grid max-w-xl grid-cols-2 gap-2 rounded-2xl bg-canvas/90 p-2 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] backdrop-blur-xl">
-          <button className="btn-dark" disabled={!ready} onClick={printNow}>
-            <PrintIcon className="h-5 w-5" /> {ready ? `Print ${images.length}` : chosen.length ? "Preparing" : "Select stickers"}
+          <button className="btn-dark" disabled={!fileReady || !images.length} onClick={() => file && savePdf(file.pdf, `stickers-${images.length}.pdf`)}>
+            {progress ? `Preparing ${progress[0]}/${progress[1]}` : images.length ? `Save PDF (${images.length})` : "Select stickers"}
           </button>
-          <button className="btn-light" disabled={!ready || !file || file.sig !== sig || busy} onClick={() => file && shareFile(file.pdf, `stickers-${images.length}.pdf`)}>
-            {progress ? `Preparing PDF ${progress[0]}/${progress[1]}` : "Share PDF"}
+          <button className="btn-light" disabled={!ready} onClick={printNow}>
+            <PrintIcon className="h-5 w-5" /> Print
           </button>
         </div>
       </div>

@@ -48,8 +48,8 @@ function Item() {
   const [toast, setToast] = useState<string | null>(null);
   const pend = usePending();
 
-  if (product === undefined) return <Header title="" back />;
-  if (!product) return (<><Header title="Not found" back /><p className="p-4 text-sm text-taupe">This item is not on this phone.</p></>);
+  if (product === undefined) return <Header title="" back="/items" />;
+  if (!product) return (<><Header title="Not found" back="/items" /><p className="p-4 text-sm text-taupe">This item is not on this phone.</p></>);
 
   const colours = [...new Set(variants.filter((v) => !v.archived).map((v) => colourOf(v.title)).filter(Boolean) as string[])];
   const multi = colours.length > 1;
@@ -78,8 +78,9 @@ function Item() {
         <div className="flex gap-4">
           <Thumb src={product.image_url} size={96} zoom={product.images?.length ? product.images : true} />
           <div className="min-w-0 flex-1">
-            <p className="text-sm text-taupe">{product.product_type ?? "No type"}</p>
-            <p className="mt-1 text-3xl font-semibold">{total}</p>
+            <h2 className="text-[17px] leading-snug font-semibold">{product.title}</h2>
+            <p className="text-sm text-taupe">{product.product_type ?? "No type"}{live[0]?.sku ? ` · ${live[0].sku}` : ""}</p>
+            <p className="mt-2 text-3xl font-semibold">{total}</p>
             <p className="text-sm text-taupe">{total === 1 ? "piece" : "pieces"} in stock</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button className="btn-light px-3 py-2" onClick={() => setEdit("product")}>Edit</button>
@@ -91,7 +92,7 @@ function Item() {
                   Shein
                 </a>
               ) : (
-                <button className="btn-plain px-3 py-2 text-taupe" onClick={() => setEdit("product")}>Add Shein link</button>
+                <button className="btn-light px-3 py-2 text-taupe" onClick={() => setEdit("product")}>+ Shein link</button>
               )}
               {websiteLink(product) && (
                 <a className="btn-light px-3 py-2" href={websiteLink(product)!} target="_blank" rel="noreferrer noopener">

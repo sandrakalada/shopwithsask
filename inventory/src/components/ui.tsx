@@ -10,14 +10,20 @@ import { SyncBadge } from "./Shell";
 import SideMenu from "./SideMenu";
 import Lightbox from "./Lightbox";
 
-export function Header({ title, back, right, logo }: { title: string; back?: boolean; right?: React.ReactNode; logo?: boolean }) {
+export function Header({ title, back, right, logo }: { title: string; back?: boolean | string; right?: React.ReactNode; logo?: boolean }) {
   const router = useRouter();
+  // opened straight from a link or the Home Screen there is no page to go back to: go up to the parent page instead
+  const goBack = () => {
+    const parent = typeof back === "string" ? back : "/";
+    if (((window as unknown as { __saskNav?: number }).__saskNav ?? 0) > 0) router.back();
+    else router.replace(parent);
+  };
   return (
     <header className="no-print sticky top-0 z-20 border-b border-line bg-canvas/85 backdrop-blur-xl backdrop-saturate-150">
       <div className="pt-safe" />
       <div className="mx-auto flex h-12 max-w-xl items-center gap-1 px-2 lg:h-16 lg:max-w-6xl lg:px-8">
         {back ? (
-          <button onClick={() => router.back()} className="flex h-11 min-w-11 items-center justify-center rounded-full text-ink active:bg-sand" aria-label="Back">
+          <button onClick={goBack} className="flex h-11 min-w-11 items-center justify-center rounded-full text-ink active:bg-sand" aria-label="Back">
             <BackIcon />
           </button>
         ) : (

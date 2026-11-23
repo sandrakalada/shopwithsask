@@ -40,7 +40,7 @@ function History() {
 
   return (
     <>
-      <Header title="History" back />
+      <Header title="History" back="/" />
       <main className="p-4">
         <select className="field" value={reason} onChange={(e) => setReason(e.target.value)}>
           <option value="all">All changes</option>

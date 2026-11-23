@@ -27,14 +27,14 @@ function OrderView() {
   // the label is drawn as soon as the order opens, so Print is a single tap
   const { label, offscreen } = useShippingLabel(order, shipment);
 
-  if (order === undefined) return <Header title="" back />;
-  if (!order) return (<><Header title="Order" back /><p className="p-4 text-sm text-taupe">This order is not on this phone yet.</p></>);
+  if (order === undefined) return <Header title="" back="/orders" />;
+  if (!order) return (<><Header title="Order" back="/orders" /><p className="p-4 text-sm text-taupe">This order is not on this phone yet.</p></>);
 
   if (shippingOnly) {
     // labels-only account: the label and the two print buttons, nothing else
     return (
       <>
-        <Header title={order.name} back />
+        <Header title={order.name} back="/orders" />
         <main className="space-y-4 p-4">
           <div className="grid grid-cols-2 gap-2">
             <button className="btn-dark py-4" disabled={!label} onClick={() => label && printNow()}>
@@ -62,7 +62,7 @@ function OrderView() {
 
   return (
     <>
-      <Header title={order.name} back />
+      <Header title={order.name} back="/orders" />
       <main className="p-4 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-6">
         <div className="space-y-4">
         <section className="card p-4">

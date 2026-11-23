@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { db } from "@/lib/db";
-import { supabase } from "@/lib/supabase";
+import { supabase, signedInUser } from "@/lib/supabase";
 import { resetLocal } from "@/lib/sync";
 import { useRole } from "./Shell";
 
@@ -77,10 +77,8 @@ function useNav() {
   const params = useSearchParams();
   const [who, setWho] = useState<string>("");
   useEffect(() => {
-    supabase?.auth.getSession().then(({ data }) => {
-      const u = data.session?.user;
-      setWho((u?.user_metadata?.name as string) || (u?.email ?? "").replace("@team.shopwithsask.com", ""));
-    });
+    const u = signedInUser();
+    setWho((u?.user_metadata?.name as string) || (u?.email ?? "").replace("@team.shopwithsask.com", ""));
   }, []);
   const sections =
     role === "shipping" ? [{ title: "", items: SECTIONS.flatMap((x) => x.items).filter((i) => i.href === "/orders") }] : SECTIONS;
@@ -91,7 +89,7 @@ function useNav() {
 }
 
 /** Logo, grouped links and Sign out; used by the phone drawer and the desktop sidebar. */
-function NavContent() {
+function NavContent({ onNavigate }: { onNavigate?: () => void }) {
   const { sections, who, isActive } = useNav();
   return (
     <>
@@ -112,6 +110,7 @@ function NavContent() {
                     <Link
                       href={href}
                       aria-current={active ? "page" : undefined}
+                      onClick={onNavigate}
                       className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-[15px] transition-colors hover:bg-sand/70 active:bg-sand lg:min-h-10 lg:text-[14px] ${active ? "bg-sand font-semibold" : ""}`}
                     >
                       <Icon className="h-[21px] w-[21px] text-taupe lg:h-5 lg:w-5" />
@@ -145,26 +144,67 @@ export function DesktopSidebar() {
   );
 }
 
-/** Phone: menu button that opens the same navigation as a drawer. */
+/** Phone: menu button that opens the same navigation as a drawer.
+ * Closes on any link tap (even one that only changes the view), the backdrop, the close button,
+ * Escape or swiping it left. The page behind cannot scroll while it is open. */
 export default function SideMenu() {
   const [open, setOpen] = useState(false);
+  const [shown, setShown] = useState(false);
+  const [dx, setDx] = useState(0);
   const pathname = usePathname();
-  useEffect(() => setOpen(false), [pathname]);
+  const params = useSearchParams();
+  const close = () => setOpen(false);
+  useEffect(() => setOpen(false), [pathname, params]);
+  useEffect(() => {
+    if (!open) {
+      const t = setTimeout(() => setShown(false), 220);
+      return () => clearTimeout(t);
+    }
+    setShown(true);
+    const y = window.scrollY;
+    const b = document.body.style;
+    const prev = { position: b.position, top: b.top, width: b.width };
+    Object.assign(b, { position: "fixed", top: `-${y}px`, width: "100%" });
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      Object.assign(b, prev);
+      window.scrollTo(0, y);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+  const start = useRef(0);
+  const visible = open && shown;
   return (
     <>
-      <button onClick={() => setOpen(true)} className="flex h-11 min-w-11 items-center justify-center rounded-full active:bg-sand lg:hidden" aria-label="Menu" aria-expanded={open}>
+      <button onClick={() => setOpen(true)} className="flex h-11 min-w-11 items-center justify-center rounded-full active:bg-sand lg:hidden" aria-label="Open menu" aria-expanded={open} aria-haspopup="dialog">
         <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden>
           <path d="M4 7h16M4 12h16M4 17h16" />
         </svg>
       </button>
-      {open &&
+      {shown &&
         createPortal(
           // rendered on <body>: the blurred sticky header would otherwise trap a fixed panel
-          <div className="fixed inset-0 z-50 flex lg:hidden" onClick={() => setOpen(false)}>
-            <nav aria-label="Main menu" className="pt-safe pb-safe flex h-full w-72 max-w-[80%] flex-col bg-canvas shadow-xl" onClick={(e) => e.stopPropagation()}>
-              <NavContent />
+          <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Main menu">
+            <div className={`absolute inset-0 bg-black/40 transition-opacity duration-200 ${visible ? "opacity-100" : "opacity-0"}`} onClick={close} />
+            <nav
+              aria-label="Main menu"
+              className={`pt-safe pb-safe absolute inset-y-0 left-0 flex w-72 max-w-[82%] flex-col bg-canvas shadow-xl transition-transform duration-200 ease-out ${visible ? "translate-x-0" : "-translate-x-full"}`}
+              style={dx ? { transform: `translateX(${dx}px)`, transition: "none" } : undefined}
+              onTouchStart={(e) => (start.current = e.touches[0].clientX)}
+              onTouchMove={(e) => setDx(Math.min(0, e.touches[0].clientX - start.current))}
+              onTouchEnd={() => {
+                if (dx < -70) close();
+                setDx(0);
+              }}
+            >
+              <button onClick={close} className="absolute top-[calc(env(safe-area-inset-top)+10px)] right-2 flex h-11 w-11 items-center justify-center rounded-full text-taupe active:bg-sand" aria-label="Close menu">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
+                  <path d="M6 6l12 12M18 6 6 18" />
+                </svg>
+              </button>
+              <NavContent onNavigate={close} />
             </nav>
-            <div className="flex-1 bg-black/40" />
           </div>,
           document.body,
         )}

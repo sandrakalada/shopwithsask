@@ -53,10 +53,25 @@ export function SyncBadge() {
   );
 }
 
+/** The sign-in saved on this phone (Supabase removes it on sign out or when it is revoked). */
+function savedSession(): Session | null {
+  try {
+    const s = JSON.parse(localStorage.getItem("sask-inventory-auth") ?? "null");
+    return s?.user && s.refresh_token ? (s as Session) : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
+  // pages opened inside the app (the Back button uses it: none means go up to the parent page)
+  useEffect(() => {
+    const w = window as unknown as { __saskNav?: number };
+    w.__saskNav = (w.__saskNav ?? -1) + 1;
+  }, [pathname]);
 
   useEffect(() => {
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
@@ -84,15 +99,28 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     document.addEventListener("visibilitychange", onShow);
     window.addEventListener("focus", onShow);
     if (!supabase) return;
+    // offline, Supabase keeps retrying the renewal for about 30 seconds before answering: open straight away instead
+    const saved = savedSession();
+    if (saved && !navigator.onLine) setSession(saved);
+    const timer = setTimeout(() => setSession((cur) => (cur === undefined ? savedSession() : cur)), 2500);
     supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
+      clearTimeout(timer);
+      // offline with an expired sign-in (it lasts an hour) Supabase cannot renew it and returns nothing:
+      // keep using the saved sign-in so the app works offline; it renews as soon as there is a connection
+      setSession((cur) => data.session ?? (cur || savedSession()));
       // pick up role changes (e.g. an account switched to labels-only) as soon as the app opens
       if (data.session && navigator.onLine) void supabase!.auth.refreshSession().catch(() => {});
     });
     const { data } = supabase.auth.onAuthStateChange((event, s) => {
-      setSession(s);
+      setSession(s ?? (event === "SIGNED_OUT" ? null : savedSession()));
     });
-    return () => data.subscription.unsubscribe();
+    // back online: renew the sign-in, then send what was saved offline
+    const onOnline = () => void supabase!.auth.getSession().then(({ data: d }) => d.session && setSession(d.session));
+    window.addEventListener("online", onOnline);
+    return () => {
+      data.subscription.unsubscribe();
+      window.removeEventListener("online", onOnline);
+    };
   }, []);
 
   useEffect(() => {

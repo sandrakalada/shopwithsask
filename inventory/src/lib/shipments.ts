@@ -1,8 +1,9 @@
 "use client";
 
+
 import { db, type Order, type Shipment, type ShipmentStatus } from "./db";
 import { requestSync, shopify } from "./sync";
-import { supabase } from "./supabase";
+import { signedInUser, supabase } from "./supabase";
 
 export const STATUS_LABEL: Record<ShipmentStatus, string> = {
   ready: "Ready for pick-up",
@@ -31,7 +32,7 @@ export function trackingUrl(courier: string, tracking: string) {
 /** Saves on this device first (works offline) and uploads with the next sync. */
 export async function saveShipment(s: Shipment) {
   const row = { ...s, updated_at: new Date().toISOString() };
-  if (!row.created_by) row.created_by = (await supabase?.auth.getSession())?.data.session?.user.email ?? null;
+  if (!row.created_by) row.created_by = signedInUser()?.email ?? null;
   await db.transaction("rw", db.shipments, db.outbox, async () => {
     await db.shipments.put(row);
     await db.outbox.add({ table: "shipments", row: row as unknown as Record<string, unknown>, created_at: row.updated_at });

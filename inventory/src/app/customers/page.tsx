@@ -98,7 +98,7 @@ export default function Customers() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold">{egp(c.amount_spent)}</p>
-                  <p className="text-xs text-taupe">{c.orders_count} orders</p>
+                  <p className="text-xs text-taupe">{c.orders_count} {c.orders_count === 1 ? "order" : "orders"}</p>
                 </div>
               </Link>
             </li>

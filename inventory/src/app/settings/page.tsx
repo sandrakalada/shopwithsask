@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, getMeta, setMeta } from "@/lib/db";
-import { supabase } from "@/lib/supabase";
+import { supabase, signedInUser } from "@/lib/supabase";
 import { resetLocal, shopify, syncNow } from "@/lib/sync";
 import { getSetting, setSetting, variantLabel } from "@/lib/stock";
 import { Header, timeAgo } from "@/components/ui";
@@ -65,7 +65,7 @@ export default function Settings() {
   }
 
   useEffect(() => {
-    supabase?.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? null));
+    setEmail(signedInUser()?.email ?? null);
   }, []);
 
   async function exportStock() {
@@ -213,11 +213,9 @@ function Team() {
     }
   }
   useEffect(() => {
-    supabase?.auth.getSession().then(({ data }) => {
-      const owner = data.session?.user.app_metadata?.role === "owner";
-      setIsOwner(owner);
-      if (owner && navigator.onLine) void load();
-    });
+    const owner = signedInUser()?.app_metadata?.role === "owner";
+    setIsOwner(owner);
+    if (owner && navigator.onLine) void load();
   }, []);
   if (!isOwner) return null;
 

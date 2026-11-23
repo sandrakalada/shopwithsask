@@ -80,7 +80,7 @@ export async function loadIndex(): Promise<IndexItem[]> {
 }
 
 /** Photos of products added after the index was made: fingerprint them on this device (a few at a time). */
-export async function indexNewPhotos(index: IndexItem[], products: Product[], limit = 24, onProgress?: (n: number, total: number) => void) {
+export async function indexNewPhotos(index: IndexItem[], products: Product[], limit = 24, onProgress?: (n: number, total: number) => void, shouldStop?: () => boolean) {
   const have = new Set(index.map((i) => i.u));
   const todo = products.flatMap((p) => (p.images?.length ? p.images : p.image_url ? [p.image_url] : []).slice(0, 4).filter((u) => !have.has(u)).map((u) => ({ p, u })));
   const batch = todo.slice(0, limit);
@@ -88,6 +88,9 @@ export async function indexNewPhotos(index: IndexItem[], products: Product[], li
   const m = await loadModel();
   let done = 0;
   for (const { p, u } of batch) {
+    // your own photo always goes first: stop learning as soon as you take one
+    if (shouldStop?.()) return todo.length - done;
+    if (!navigator.onLine) return todo.length - done;
     try {
       const v = await m.embed(`${u}${u.includes("?") ? "&" : "?"}width=360`);
       const e = toB64(v);

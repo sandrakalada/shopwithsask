@@ -141,7 +141,7 @@ export default function TopProducts() {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{r.title}</p>
                 <p className="truncate text-xs text-taupe">
-                  {r.units} sold · {r.orders.size} orders{r.stock != null ? ` · ${r.stock} left` : ""}{r.through != null ? ` · ${r.through}% sold` : ""}
+                  {r.units} sold · {r.orders.size} {r.orders.size === 1 ? "order" : "orders"}{r.stock != null ? ` · ${r.stock} left` : ""}{r.through != null ? ` · ${r.through}% sold` : ""}
                 </p>
               </div>
               <div className="text-right">

@@ -38,8 +38,8 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
     if (!s && order) setS(newShipmentForOrder(order));
   }, [order, s]);
 
-  if (orderId && order === null) return (<><Header title="Shipment" back /><p className="p-4 text-sm text-taupe">This order is not on this device yet.</p></>);
-  if (!s) return <Header title="" back />;
+  if (orderId && order === null) return (<><Header title="Shipment" back="/shipments" /><p className="p-4 text-sm text-taupe">This order is not on this device yet.</p></>);
+  if (!s) return <Header title="" back="/shipments" />;
 
   const set = (patch: Partial<Shipment>) => setS({ ...s, ...patch });
   const setR = (patch: Partial<Shipment["recipient"]>) => setS({ ...s, recipient: { ...s.recipient, ...patch } });
@@ -73,7 +73,7 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
 
   return (
     <>
-      {!editing && <Header title={title} back />}
+      {!editing && <Header title={title} back="/shipments" />}
       <main className={editing ? "space-y-4" : "space-y-4 p-4 pb-32 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0"}>
         <div className="space-y-4">
           <section className="card space-y-3 p-4">
@@ -172,8 +172,8 @@ function ShipmentView({ id }: { id: string }) {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [notify, setNotify] = useState(false);
 
-  if (s === undefined) return <Header title="" back />;
-  if (!s) return (<><Header title="Shipment" back /><p className="p-4 text-sm text-taupe">This shipment is not on this device yet.</p></>);
+  if (s === undefined) return <Header title="" back="/shipments" />;
+  if (!s) return (<><Header title="Shipment" back="/shipments" /><p className="p-4 text-sm text-taupe">This shipment is not on this device yet.</p></>);
 
   const unpaid = order && (order.financial_status === "PENDING" || order.financial_status === "PARTIALLY_PAID");
   const run = async (key: string, fn: () => Promise<unknown>, ok: string) => {
@@ -192,7 +192,7 @@ function ShipmentView({ id }: { id: string }) {
 
   return (
     <>
-      <Header title={s.order_name ? `Shipment ${s.order_name}` : "Shipment"} back />
+      <Header title={s.order_name ? `Shipment ${s.order_name}` : "Shipment"} back="/shipments" />
       <main className="p-4 pb-28 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-6">
         <div className="space-y-4">
           {edit ? (

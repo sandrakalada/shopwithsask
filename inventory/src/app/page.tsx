@@ -7,17 +7,16 @@ import { productMatcher } from "@/lib/lines";
 import { costInEgp } from "@/lib/stock";
 import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
+import { ReceiptIcon, ScanIcon, SearchIcon, TruckIcon } from "@/components/Icons";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { signedInUser } from "@/lib/supabase";
 
 /** Home: four tappable numbers, nothing else. */
 function useFirstName() {
   const [name, setName] = useState<string | null>(null);
   useEffect(() => {
-    supabase?.auth.getSession().then(({ data }) => {
-      const n = (data.session?.user.user_metadata?.name as string | undefined)?.trim();
-      setName(n ? n.split(" ")[0] : null);
-    });
+    const n = (signedInUser()?.user_metadata?.name as string | undefined)?.trim();
+    setName(n ? n.split(" ")[0] : null);
   }, []);
   return name;
 }
@@ -116,6 +115,20 @@ export default function Home() {
           </p>
           <h1 className="text-[30px] font-bold tracking-tight">{firstName ? `Hi ${firstName}` : "Hi"}</h1>
         </div>
+        {/* the four jobs done most often, one tap away */}
+        <nav aria-label="Quick actions" className="grid grid-cols-4 gap-2">
+          {[
+            { href: "/scan", label: "Scan", Icon: ScanIcon },
+            { href: "/find", label: "Find item", Icon: SearchIcon },
+            { href: "/invoice?new=1", label: "New sale", Icon: ReceiptIcon },
+            { href: "/shipment?new=1", label: "Ship", Icon: TruckIcon },
+          ].map(({ href, label, Icon }) => (
+            <Link key={href} href={href} className="card flex min-h-[72px] flex-col items-center justify-center gap-1.5 text-[12.5px] font-semibold active:bg-sand">
+              <Icon className="h-6 w-6 text-caramel" />
+              {label}
+            </Link>
+          ))}
+        </nav>
         {data?.empty && <p className="card p-4 text-sm text-taupe">Your products download from Shopify automatically when you are online.</p>}
 
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">

@@ -81,7 +81,7 @@ function InvoiceRouter() {
   }, [orderId, router]);
 
   if (id) return <InvoiceView id={id} />;
-  if (orderId) return <Header title="Invoice" back />;
+  if (orderId) return <Header title="Invoice" back="/orders" />;
   return <InvoiceBuilder customerId={p.get("customer")} editId={p.get("edit")} fromOrder={p.get("from")} />;
 }
 
@@ -142,8 +142,8 @@ function InvoiceView({ id }: { id: string }) {
     };
   }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (inv === undefined) return <Header title="" back />;
-  if (!inv) return (<><Header title="Invoice" back /><p className="p-4 text-sm text-taupe">Invoice not found.</p></>);
+  if (inv === undefined) return <Header title="" back="/orders" />;
+  if (!inv) return (<><Header title="Invoice" back="/orders" /><p className="p-4 text-sm text-taupe">Invoice not found.</p></>);
 
   const file = `Shop-With-Sask-${inv.number}.pdf`;
   const first = (inv.customer_name ?? "").split(" ")[0];
@@ -419,7 +419,7 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
 
   return (
     <>
-      <Header title={editing ? `Edit ${editing.number}` : linkedOrder ? `Invoice for ${linkedOrder.name}` : "New invoice"} back />
+      <Header title={editing ? `Edit ${editing.number}` : linkedOrder ? `Invoice for ${linkedOrder.name}` : "New invoice"} back="/orders" />
       <main className="space-y-5 p-4">
         {!editing && (
           <section>

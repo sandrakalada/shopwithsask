@@ -16,15 +16,15 @@ function CustomerView() {
   const orders = useLiveQuery(async () => (await db.orders.where("customer_id").equals(id).toArray()).sort((a, b) => b.created_at.localeCompare(a.created_at)), [id], []);
   const invoices = useLiveQuery(() => db.invoices.where("customer_id").equals(id).toArray(), [id], []);
 
-  if (c === undefined) return <Header title="" back />;
-  if (!c) return (<><Header title="Customer" back /><p className="p-4 text-sm text-taupe">Not on this phone yet.</p></>);
+  if (c === undefined) return <Header title="" back="/customers" />;
+  if (!c) return (<><Header title="Customer" back="/customers" /><p className="p-4 text-sm text-taupe">Not on this phone yet.</p></>);
 
   const phone = c.phone ?? (orders[0] ? orderPhone(orders[0]) : null);
   const first = (c.name ?? "").split(" ")[0];
 
   return (
     <>
-      <Header title={c.name ?? "Customer"} back />
+      <Header title={c.name ?? "Customer"} back="/customers" />
       <main className="space-y-4 p-4">
         <section className="card p-4">
           <p className="text-lg font-semibold">{c.name}</p>

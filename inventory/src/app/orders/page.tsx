@@ -79,7 +79,7 @@ function Orders() {
         <label className="mt-3 flex items-center gap-2 text-sm">
           <input type="checkbox" checked={month} onChange={(e) => setMonth(e.target.checked)} /> This month only
         </label>
-        <p className="mt-2 text-xs text-taupe">{rows.length} orders</p>
+        <p className="mt-2 text-xs text-taupe">{rows.length} {rows.length === 1 ? "order" : "orders"}</p>
         <div className="card mt-2 hidden overflow-hidden lg:block">
           <table className="w-full text-left text-[14px]">
             <thead className="border-b border-line text-[12px] tracking-wide text-taupe uppercase">

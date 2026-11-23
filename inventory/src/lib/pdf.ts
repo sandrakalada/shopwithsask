@@ -143,6 +143,30 @@ export async function shareFile(blob: Blob, filename: string, text?: string) {
   return "opened";
 }
 
+/** Save a PDF in one tap. iPhone: opens the share sheet with only the file, so "Save to Files" is right there.
+ * Computer: downloads it straight to the Downloads folder. Call straight from a tap. */
+export async function savePdf(blob: Blob, filename: string) {
+  const file = new File([blob], filename, { type: "application/pdf" });
+  const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
+  if (isIOS() && nav.canShare?.({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file] });
+      return "shared";
+    } catch (e) {
+      if ((e as Error).name === "AbortError") return "cancelled";
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  return "downloaded";
+}
+
 /** Egyptian numbers to WhatsApp international format: 01xxxxxxxxx -> 201xxxxxxxxx */
 export function waNumber(phone: string | null | undefined) {
   if (!phone) return null;

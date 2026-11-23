@@ -29,25 +29,44 @@ export default function FindPage() {
     return { pmap: new Map(products.map((p) => [p.id, p])), products: products.filter((p) => !p.archived), variants };
   }, []);
 
+  // a photo is being matched: background learning pauses so your result comes first
+  const busyRef = useRef(false);
+  const learningRef = useRef(false);
+  const learn = async (cancelled: () => boolean) => {
+    if (learningRef.current || !indexRef.current || !data) return;
+    learningRef.current = true;
+    const stop = () => cancelled() || busyRef.current;
+    try {
+      let left = 1;
+      while (left > 0 && !stop()) left = await indexNewPhotos(indexRef.current, data.products, 6, (n, t) => !stop() && setStatus(`Learning new product photos in the background (${n}/${t}). You can take a photo any time.`), stop);
+    } catch {
+      /* try again next time */
+    }
+    learningRef.current = false;
+    if (!cancelled()) setStatus(null);
+  };
+
   // load the model and the photo index once; then fingerprint any new product photos in the background
   useEffect(() => {
     if (!data) return;
     let cancelled = false;
     (async () => {
       try {
-        setStatus("Loading the recognition model (first time only, about 36 MB)");
+        setStatus(navigator.onLine ? "Loading the recognition model (first time only, about 35 MB)" : "Loading the recognition model");
         const [index] = await Promise.all([indexRef.current ? Promise.resolve(indexRef.current) : loadIndex(), loadModel()]);
         if (cancelled) return;
         indexRef.current = index;
         setReady(true);
         setStatus(null);
-        let left = await indexNewPhotos(index, data.products, 24, (n, t) => !cancelled && setStatus(`Learning new product photos ${n}/${t}`));
-        while (left > 0 && !cancelled) left = await indexNewPhotos(index, data.products, 24, (n, t) => !cancelled && setStatus(`Learning new product photos ${n}/${t}`));
-        if (!cancelled) setStatus(null);
+        void learn(() => cancelled);
       } catch (e) {
         if (!cancelled) {
           setStatus(null);
-          setError(`The recognition model could not load (${(e as Error).message}). Check the connection and open this page again.`);
+          setError(
+            navigator.onLine
+              ? `The recognition model could not load (${(e as Error).message}). Close the app fully and open this page again.`
+              : "No connection, and the recognition model is not saved on this phone yet. Open this page once with internet; after that it works offline.",
+          );
         }
       }
     })();
@@ -62,6 +81,8 @@ export default function FindPage() {
     setResults(null);
     setPhoto(URL.createObjectURL(file));
     setBusy(true);
+    busyRef.current = true;
+    setStatus(null);
     try {
       const m = await loadModel();
       const index = indexRef.current ?? (indexRef.current = await loadIndex());
@@ -70,9 +91,11 @@ export default function FindPage() {
       setTaught(null);
       setResults(rank(q, filtered(index), 8));
     } catch (e) {
-      setError(`Could not read that photo (${(e as Error).message}).`);
+      setError(`Could not read that photo (${(e as Error).message}). Try again, or choose the photo from your library.`);
     }
     setBusy(false);
+    busyRef.current = false;
+    void learn(() => false);
   }
 
   // only compare with products of the chosen type
@@ -129,6 +152,7 @@ export default function FindPage() {
           <ul className="card divide-y divide-line overflow-hidden">
             {busy && <li className="p-4 text-sm text-taupe">Comparing with your products...</li>}
             {!busy && !results && <li className="p-4 text-sm text-taupe">Matches appear here after you take a photo.</li>}
+            {!busy && results?.length === 0 && <li className="p-4 text-sm text-taupe">No products to compare with yet{type !== "all" ? ` in ${type}` : ""}. Choose All types, or open this page with internet once so it can learn your product photos.</li>}
             {!busy &&
               results?.map((r, i) => {
                 const p = data?.pmap.get(r.productId);
@@ -162,7 +186,7 @@ export default function FindPage() {
                 );
               })}
           </ul>
-          {results && !busy && <p className="mt-2 px-1 text-xs text-taupe">Green bar = how close the match is. Pick the type to narrow it down. Tap "This is it" on the right one (find it in Inventory if it is not listed): the app learns your photo, so next time it matches straight away.</p>}
+          {!!results?.length && !busy && <p className="mt-2 px-1 text-xs text-taupe">Green bar = how close the match is. Pick the type to narrow it down. Tap "This is it" on the right one (find it in Inventory if it is not listed): the app learns your photo, so next time it matches straight away.</p>}
         </section>
       </main>
     </>
