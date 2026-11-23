@@ -38,7 +38,8 @@ export function useProductStats(product: Product | undefined, allVariants: Varia
         let colour = l.shopify_variant_id ? colourOf(byShopify.get(l.shopify_variant_id)?.title) : parseLineTitle(l.title).colour;
         if (isSkirt && !isMine && ((l.shopify_variant_id && dupVariants.has(l.shopify_variant_id)) || (!l.shopify_variant_id && /^bohemian desert maxi skirt/i.test(l.title)))) {
           isMine = true;
-          colour = l.shopify_variant_id ? "Beige" : colour ?? "Beige";
+          // old orders without a colour were the original white skirt
+          colour = l.shopify_variant_id ? "Beige" : colour ?? (/beige/i.test(l.title) ? "Beige" : /black/i.test(l.title) ? "Black" : "White");
         }
         if (!isMine) continue;
         if (multi) {

@@ -65,7 +65,7 @@ export default function TopProducts() {
         let colour = v ? colourOf(v.title) : parseLineTitle(l.title).colour;
         if (skirt && !v && /^bohemian desert maxi skirt/i.test(l.title)) {
           prod = skirt;
-          colour = colour ?? "Beige";
+          colour = colour ?? (/beige/i.test(l.title) ? "Beige" : /black/i.test(l.title) ? "Black" : "White");
         }
         if (skirt && beigeDup && prod?.id === beigeDup.id) {
           prod = skirt;
