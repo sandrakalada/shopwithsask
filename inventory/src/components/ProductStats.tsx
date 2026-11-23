@@ -8,14 +8,17 @@ import { egp } from "@/lib/pdf";
 
 /** Everything this product has done since the beginning:
  * pieces we had = in stock now + sold (every order that was not cancelled) + damaged / lost. Updates by itself. */
-export function useProductStats(product: Product | undefined, variants: Variant[]) {
+export function useProductStats(product: Product | undefined, allVariants: Variant[], chosen = "all") {
   return useLiveQuery(async () => {
     if (!product) return null;
     const [orders, products] = await Promise.all([db.orders.toArray(), db.products.toArray()]);
-    const mine = new Set(variants.map((v) => v.shopify_variant_id).filter(Boolean) as string[]);
+    const pickC = chosen === "all" ? null : chosen.toLowerCase();
+    // the chosen colour's sizes (all sizes when no colour is chosen)
+    const variants = pickC ? allVariants.filter((v) => colourOf(v.title)?.toLowerCase() === pickC) : allVariants;
+    const mine = new Set(allVariants.map((v) => v.shopify_variant_id).filter(Boolean) as string[]);
     const match = productMatcher(products);
     const rate0 = Number((await db.settings.get("sar_to_egp"))?.value ?? 13) || 13;
-    const byShopify = new Map(variants.filter((v) => v.shopify_variant_id).map((v) => [v.shopify_variant_id!, v]));
+    const byShopify = new Map(allVariants.filter((v) => v.shopify_variant_id).map((v) => [v.shopify_variant_id!, v]));
     const costs = variants.map((v) => costInEgp(v, rate0)).filter((c): c is number => c != null);
     const avgCost = costs.length ? costs.reduce((a, b) => a + b, 0) / costs.length : null;
     let sold = 0, revenue = 0, delivered = 0, cogs = 0, costMissing = 0, first: string | null = null, last: string | null = null;
@@ -24,9 +27,10 @@ export function useProductStats(product: Product | undefined, variants: Variant[
     const isSkirt = /white, black & beige/i.test(product.title);
     const dup = isSkirt ? products.find((p) => /^bohemian desert maxi skirt - beige$/i.test(p.title)) : undefined;
     const dupVariants = dup ? new Set((await db.variants.where("product_id").equals(dup.id).toArray()).map((v) => v.shopify_variant_id)) : new Set();
-    const colours = new Set(variants.map((v) => colourOf(v.title)?.toLowerCase()).filter(Boolean) as string[]);
+    const colours = new Set(allVariants.map((v) => colourOf(v.title)?.toLowerCase()).filter(Boolean) as string[]);
     const multi = colours.size > 1;
     const soldByColour = new Map<string, number>();
+    const pick = chosen === "all" ? null : chosen.toLowerCase();
     for (const o of orders) {
       if (o.cancelled_at) continue;
       for (const l of o.line_items) {
@@ -40,6 +44,7 @@ export function useProductStats(product: Product | undefined, variants: Variant[
         if (multi) {
           const k = (colour ?? "Other").toLowerCase();
           soldByColour.set(k, (soldByColour.get(k) ?? 0) + l.quantity);
+          if (pick && k !== pick) continue; // a colour is chosen: count only its sales
         }
         sold += l.quantity;
         revenue += Number(l.total ?? (l.price ?? 0) * l.quantity);
@@ -56,6 +61,8 @@ export function useProductStats(product: Product | undefined, variants: Variant[
     const ids = variants.map((v) => v.id);
     const rate = Number((await db.settings.get("sar_to_egp"))?.value ?? 13) || 13;
     const vmap = new Map(variants.map((v) => [v.id, v]));
+    const allIds = allVariants.map((v) => v.id);
+    const allOffs = allIds.length ? (await db.movements.where("variant_id").anyOf(allIds).toArray()).filter((m) => WRITE_OFF.includes(m.reason)) : [];
     const offs = ids.length ? (await db.movements.where("variant_id").anyOf(ids).toArray()).filter((m) => WRITE_OFF.includes(m.reason)) : [];
     const lost = offs.reduce((t, m) => t - m.delta, 0);
     const lostCost = offs.reduce((t, m) => t + -m.delta * (costInEgp(vmap.get(m.variant_id) ?? {}, rate) ?? 0), 0);
@@ -67,12 +74,12 @@ export function useProductStats(product: Product | undefined, variants: Variant[
     // what it cost to stock every piece we ever had (sold + in stock + written off), at the purchase price
     const colourRows = multi
       ? [...colours].map((c) => {
-          const vs = variants.filter((v) => colourOf(v.title)?.toLowerCase() === c);
+          const vs = allVariants.filter((v) => colourOf(v.title)?.toLowerCase() === c);
           const st = vs.filter((v) => !v.archived).reduce((t, v) => t + Math.max(0, v.quantity), 0);
           const cs = vs.map((v) => costInEgp(v, rate0)).filter((x): x is number => x != null);
           const unit = cs.length ? cs.reduce((a, b) => a + b, 0) / cs.length : avgCost;
           const sd = soldByColour.get(c) ?? 0;
-          const lostC = offs.filter((m) => vs.some((v) => v.id === m.variant_id)).reduce((t, m) => t - m.delta, 0);
+          const lostC = allOffs.filter((m) => vs.some((v) => v.id === m.variant_id)).reduce((t, m) => t - m.delta, 0);
           const hd = st + sd + Math.max(0, lostC);
           const bought = product.purchased ? Object.entries(product.purchased).find(([k]) => k.toLowerCase() === c)?.[1] ?? null : null;
           return { bought, colour: c[0].toUpperCase() + c.slice(1), had: hd, sold: sd, stock: st, unit, paid: unit != null ? unit * hd : null };
@@ -81,11 +88,11 @@ export function useProductStats(product: Product | undefined, variants: Variant[
     const stockPaid = multi ? colourRows.reduce((t, r) => t + (r.paid ?? 0), 0) : avgCost != null ? avgCost * had : null;
     const bought = product.purchased ? Object.values(product.purchased).reduce((a, b) => a + Number(b || 0), 0) : null;
     return { bought, colourRows, stockPaid, avgCost, profit, costMissing, cogs, had, sold, delivered, stock, lost: Math.max(0, lost), lostCost, byReason, revenue, orders: orderIds.size, first, last, sellThrough: had ? Math.round((sold / had) * 100) : 0 };
-  }, [product?.id, variants.map((v) => `${v.id}:${v.quantity}`).join(",")]);
+  }, [product?.id, chosen, allVariants.map((v) => `${v.id}:${v.quantity}:${v.cost}`).join(",")]);
 }
 
-export default function ProductStats({ product, variants }: { product: Product; variants: Variant[] }) {
-  const s = useProductStats(product, variants);
+export default function ProductStats({ product, variants, colour = "all" }: { product: Product; variants: Variant[]; colour?: string }) {
+  const s = useProductStats(product, variants, colour);
   if (!s) return null;
   const date = (d: string | null) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "-");
   return (

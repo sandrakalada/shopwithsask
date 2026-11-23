@@ -86,6 +86,16 @@ export default function Home() {
       pieces: inStock.reduce((s, v) => s + v.quantity, 0),
       value: inStock.reduce((s, v) => s + v.quantity * (v.price ?? 0), 0),
       cost: inStock.reduce((s, v) => s + v.quantity * (costInEgp(v, rate) ?? 0), 0),
+      ...(() => {
+        // pieces with no purchase price yet: estimate them with the average cost-to-price ratio of the priced ones
+        const known = inStock.filter((v) => costInEgp(v, rate) != null && v.price);
+        const ratio = known.length ? known.reduce((t, v) => t + v.quantity * costInEgp(v, rate)!, 0) / known.reduce((t, v) => t + v.quantity * (v.price ?? 0), 0) : 0;
+        const missing = inStock.filter((v) => costInEgp(v, rate) == null);
+        return {
+          noCostPcs: missing.reduce((t, v) => t + v.quantity, 0),
+          estMissing: missing.reduce((t, v) => t + v.quantity * (v.price ?? 0) * ratio, 0),
+        };
+      })(),
       soldToday: todays.filter((m) => m.reason === "sale").reduce((s, m) => s - m.delta, 0),
       receivedToday: todays.filter((m) => m.reason === "receive").reduce((s, m) => s + m.delta, 0),
       // month to date, unfulfilled only
@@ -112,7 +122,12 @@ export default function Home() {
           <Tile href="/items?filter=in" label="In stock" value={data ? `${data.products} products` : "–"} sub={data ? `${data.pieces} pieces` : ""} />
           <Tile href="/orders?f=open&since=month" label="Orders to ship" value={data ? String(data.toShip) : "–"} sub="this month, unfulfilled" />
           <Tile href="/items?view=costs" label="Selling value" value={data ? egp(data.value) : "–"} sub="stock at selling price" />
-          <Tile href="/items?view=costs" label="Cost value" value={data ? (data.cost ? egp(data.cost) : "Add costs") : "–"} sub="stock at cost price" />
+          <Tile
+            href="/items?view=costs&filter=nocost"
+            label="Cost value"
+            value={data ? (data.cost ? egp(data.cost + (data.estMissing ?? 0)) : "Add costs") : "–"}
+            sub={data?.noCostPcs ? `${egp(data.cost)} known + ${data.noCostPcs} pcs estimated` : "stock at cost price"}
+          />
         </div>
 
         <section>

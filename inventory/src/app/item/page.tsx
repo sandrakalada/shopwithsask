@@ -9,13 +9,27 @@ import { newBarcode, reasonLabel, saveProduct, saveVariant, variantLabel } from 
 import { pending, pendingDelta, usePending } from "@/lib/pending";
 import CostRow from "@/components/CostRow";
 import ProductStats from "@/components/ProductStats";
+import { colourOf } from "@/lib/lines";
 import { AdjustSheet, Header, Labeled, QtyPill, Stepper, Thumb, timeAgo, Toast } from "@/components/ui";
 import { MinusIcon, PlusIcon, PrintIcon } from "@/components/Icons";
 
 const TYPES = ["Dresses", "Tops", "Bottoms", "Vests", "Jackets", "Matching Set", "Beach Set", "Accessories", "Bags"];
 
 function Item() {
-  const id = useSearchParams().get("id") ?? "";
+  const params = useSearchParams();
+  const rawId = params.get("id") ?? "";
+  // the beige-only "Bohemian Desert Maxi Skirt - Beige" is the same skirt as the 3-colour one: open that on Beige
+  const alias = useLiveQuery(async () => {
+    const p = await db.products.get(rawId);
+    if (!p || !/^bohemian desert maxi skirt - beige$/i.test(p.title)) return null;
+    const main = await db.products.filter((x) => /white, black & beige/i.test(x.title) && !x.archived).first();
+    return main?.id ?? null;
+  }, [rawId]);
+  const id = alias ?? rawId;
+  const [colour, setColour] = useState<string>(params.get("colour") ?? "all");
+  useEffect(() => {
+    if (alias) setColour("Beige");
+  }, [alias]);
   const product = useLiveQuery(() => db.products.get(id), [id]);
   const rate = useLiveQuery(async () => Number((await db.settings.get("sar_to_egp"))?.value ?? 13) || 13, [], 13);
   const variants = useLiveQuery(() => db.variants.where("product_id").equals(id).toArray(), [id], []);
@@ -37,7 +51,10 @@ function Item() {
   if (product === undefined) return <Header title="" back />;
   if (!product) return (<><Header title="Not found" back /><p className="p-4 text-sm text-taupe">This item is not on this phone.</p></>);
 
-  const live = variants.filter((v) => !v.archived);
+  const colours = [...new Set(variants.filter((v) => !v.archived).map((v) => colourOf(v.title)).filter(Boolean) as string[])];
+  const multi = colours.length > 1;
+  const inColour = (v: Variant) => !multi || colour === "all" || colourOf(v.title)?.toLowerCase() === colour.toLowerCase();
+  const live = variants.filter((v) => !v.archived && inColour(v));
   const total = live.reduce((s, v) => s + v.quantity, 0);
 
   function quick(v: Variant, delta: number) {
@@ -97,9 +114,19 @@ function Item() {
           </div>
         </div>
 
+        {multi && (
+          <div className="seg" style={{ gridTemplateColumns: `repeat(${colours.length + 1}, minmax(0, 1fr))` }}>
+            {["all", ...colours].map((c) => (
+              <button key={c} onClick={() => setColour(c)} className={`seg-btn ${colour.toLowerCase() === c.toLowerCase() ? "seg-on" : ""}`}>
+                {c === "all" ? "All colours" : c}
+              </button>
+            ))}
+          </div>
+        )}
+
         <section>
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="font-semibold">Sizes</h2>
+            <h2 className="font-semibold">Sizes{multi && colour !== "all" ? ` · ${colour}` : ""}</h2>
             <span className="text-xs text-taupe">New sizes come from Shopify</span>
           </div>
           <ul className="card divide-y divide-line">
@@ -123,7 +150,7 @@ function Item() {
           <p className="mt-2 text-xs text-taupe">Tap More to count or record a reason. Tap a size to edit its price or SKU.</p>
         </section>
 
-        <ProductStats product={product} variants={variants} />
+        <ProductStats product={product} variants={variants} colour={multi ? colour : "all"} />
 
         <section>
           <div className="mb-2 flex items-center justify-between">
