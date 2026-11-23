@@ -495,3 +495,9 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-23 evening (owner: replace outdated images): new product photos 1536x1920 (viewed sharp). Archived 26 old ads for 7 new jackets (13 per set); created carousel v2 (5 photos) + photo v2 per jacket for 8 jackets (incl. new black velvet floral cropped, 2,050) in NEW + WARM = 32 ads. Green cable cardigan still DRAFT. Owner asked why no add-to-carts: site ATC tested OK on iPhone; carts 7/day; sessions ~140/day vs ~400 before (Instagram high-end only); cart rate ~5% unchanged. Proposed NEW 350->250, WARM 170->270 (waiting).
 - 2026-11-23 20:35 Cairo check: 379 EGP today. NEW 272 (0 ATC, CPM 310), WARM 107 (5 ATC). No orders today. 49 active ads per set, no issues, all advertised products in stock. NEW meets pause-losers threshold but owner said keep the campaign running; asked owner again (budget shift 350/170 -> 250/270).
 - 2026-11-23 night (owner: resurface old products in high-end areas): archived 'photo v2' duplicates of new jackets (carousels kept); added IG-post ads (page set) for burgundy velvet mini skirt, maroon corset top, sleeveless red long top, embroidered black vest, boho pom-pom vest, boho embroidered vest, embroidered denim vest to NEW + WARM (see task output).
+
+## 2026-11-23 BAGS, ACCESSORIES & HIGH STOCK ad set (owner approved 70/day)
+- Ad set 52565323029320 in high-end campaign 52564976948720, 70 EGP/day, same targeting as NEW CUSTOMERS (high-end circles, women 21-44 Advantage+, IG only, engagers excluded), ADD_TO_CART.
+- 23 new link ads (bags + accessories, store photos >=1080 px checked sharp at 1:1; OTTO bag skipped as soft; summer motifs skipped: crab, seahorse, starfish, ice cream, watermelon, pineapple, seaside).
+- Plus reused creatives: leopard tote, high-stock skirts/shirts/tops, resurfaced vests/tops, jackets, up to 50 ads.
+- Campaign total now 590/day (NEW 350, WARM 170, BAGS-ACC 70).
