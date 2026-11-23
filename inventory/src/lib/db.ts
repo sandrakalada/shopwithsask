@@ -18,6 +18,8 @@ export type Product = {
   location?: string | null;
   /** all product photos from Shopify */
   images?: string[] | null;
+  /** pieces bought on Shein so far: {"all": n} or per colour {"White": n, ...} */
+  purchased?: Record<string, number> | null;
 };
 
 /** Photo fingerprint for Find my product (computed on this device for photos newer than the built-in index). */

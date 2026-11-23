@@ -74,11 +74,13 @@ export function useProductStats(product: Product | undefined, variants: Variant[
           const sd = soldByColour.get(c) ?? 0;
           const lostC = offs.filter((m) => vs.some((v) => v.id === m.variant_id)).reduce((t, m) => t - m.delta, 0);
           const hd = st + sd + Math.max(0, lostC);
-          return { colour: c[0].toUpperCase() + c.slice(1), had: hd, sold: sd, stock: st, unit, paid: unit != null ? unit * hd : null };
+          const bought = product.purchased ? Object.entries(product.purchased).find(([k]) => k.toLowerCase() === c)?.[1] ?? null : null;
+          return { bought, colour: c[0].toUpperCase() + c.slice(1), had: hd, sold: sd, stock: st, unit, paid: unit != null ? unit * hd : null };
         })
       : [];
     const stockPaid = multi ? colourRows.reduce((t, r) => t + (r.paid ?? 0), 0) : avgCost != null ? avgCost * had : null;
-    return { colourRows, stockPaid, avgCost, profit, costMissing, cogs, had, sold, delivered, stock, lost: Math.max(0, lost), lostCost, byReason, revenue, orders: orderIds.size, first, last, sellThrough: had ? Math.round((sold / had) * 100) : 0 };
+    const bought = product.purchased ? Object.values(product.purchased).reduce((a, b) => a + Number(b || 0), 0) : null;
+    return { bought, colourRows, stockPaid, avgCost, profit, costMissing, cogs, had, sold, delivered, stock, lost: Math.max(0, lost), lostCost, byReason, revenue, orders: orderIds.size, first, last, sellThrough: had ? Math.round((sold / had) * 100) : 0 };
   }, [product?.id, variants.map((v) => `${v.id}:${v.quantity}`).join(",")]);
 }
 
@@ -108,6 +110,16 @@ export default function ProductStats({ product, variants }: { product: Product; 
           <p className="mt-0.5 text-xs text-taupe">
             {s.had} pieces since the beginning ({s.sold} sold + {s.stock} in stock{s.lost ? ` + ${s.lost} written off` : ""}){s.avgCost != null && !s.colourRows.length ? ` × ${egp(s.avgCost)} each` : ""}
           </p>
+          {s.bought != null && (
+            <p className={`mt-1.5 text-xs font-medium ${s.bought === s.had ? "text-success" : "text-warn"}`}>
+              Bought on Shein: {s.bought} {s.bought === 1 ? "piece" : "pieces"}
+              {s.bought === s.had
+                ? " · matches the pieces had"
+                : s.bought > s.had
+                  ? ` · ${s.bought - s.had} more than sold + in stock (missing, given away or not yet in Shopify?)`
+                  : ` · ${s.had - s.bought} fewer than sold + in stock (some bought outside Shein or not sent yet)`}
+            </p>
+          )}
           {!!s.colourRows.length && (
             <table className="mt-2 w-full text-xs">
               <thead className="text-taupe">
@@ -116,6 +128,7 @@ export default function ProductStats({ product, variants }: { product: Product; 
                   <th className="text-right font-medium">Had</th>
                   <th className="text-right font-medium">Sold</th>
                   <th className="text-right font-medium">Stock</th>
+                  <th className="text-right font-medium">Bought</th>
                   <th className="text-right font-medium">Each</th>
                   <th className="text-right font-medium">Paid</th>
                 </tr>
@@ -127,6 +140,7 @@ export default function ProductStats({ product, variants }: { product: Product; 
                     <td className="text-right">{r.had}</td>
                     <td className="text-right">{r.sold}</td>
                     <td className="text-right">{r.stock}</td>
+                    <td className={`text-right ${r.bought != null && r.bought !== r.had ? "text-warn" : ""}`}>{r.bought ?? "-"}</td>
                     <td className="text-right">{r.unit != null ? egp(r.unit) : "-"}</td>
                     <td className="text-right font-semibold">{r.paid != null ? egp(r.paid) : "-"}</td>
                   </tr>
