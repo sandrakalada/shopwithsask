@@ -6,7 +6,17 @@ export const metadata: Metadata = {
   title: "Sask Inventory",
   description: "Stock tracking for Shop With Sask",
   appleWebApp: { capable: true, title: "Inventory", statusBarStyle: "default" },
-  icons: { icon: "/favicon.ico", apple: "/icons/apple-touch-icon.png" },
+  icons: { icon: [{ url: "/favicon.ico" }, { url: "/icons/share-512.png", sizes: "512x512", type: "image/png" }], apple: "/icons/apple-touch-icon.png" },
+  metadataBase: new URL("https://sask-inventory.vercel.app"),
+  openGraph: {
+    title: "Sask Inventory",
+    description: "Stock tracking for Shop With Sask",
+    url: "https://sask-inventory.vercel.app",
+    siteName: "Shop With Sask",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SASK Inventory" }],
+    type: "website",
+  },
+  twitter: { card: "summary_large_image", images: ["/og.png"] },
   robots: { index: false, follow: false },
 };
 
