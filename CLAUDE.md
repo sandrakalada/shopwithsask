@@ -32,6 +32,9 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 8. Google title without store name: after the product syncs to Merchant Center, insert a productInput (title only) for each en and ar offer into the supplemental data source "Clean titles (supplemental)" (dataSources/10801163941), title = feed title with " | Shop With Sask" / " | Sask" removed and any variant suffix kept as " - {variant}". Shopify SEO titles stay unchanged.
 9. Status ACTIVE; publish to Online Store and Google & YouTube; add to its type collection and New Collection; move it to the top of New Collection and Shop All (both MANUAL).
 
+## Google Merchant Center monitoring
+- Check Merchant Center daily (scheduled task "Daily Merchant Center check", 11:37 Cairo): account issues, product disapprovals, image sizes, return policy, shipping policy, clean titles. Fix whatever can be fixed and report briefly; list anything needing the owner.
+
 ## Reporting
 - Real revenue = orders that are fulfilled AND paid. ShopifyQL filter: `WHERE order_fulfillment_status = 'fulfilled' AND order_payment_status = 'paid'`.
 
