@@ -28,6 +28,19 @@ function Inventory() {
   const [filter, setFilter] = useState<Filter>((params.get("filter") as Filter) ?? "all");
   const [type, setType] = useState("all");
   const [bag, setBag] = useState("all");
+  // sort order, remembered per view on this phone
+  const [sort, setSortState] = useState<string>("newest");
+  useEffect(() => {
+    try {
+      setSortState(localStorage.getItem(`sask-sort-${view}`) ?? "newest");
+    } catch {}
+  }, [view]);
+  const setSort = (v: string) => {
+    setSortState(v);
+    try {
+      localStorage.setItem(`sask-sort-${view}`, v);
+    } catch {}
+  };
   const [toast, setToast] = useState<string | null>(null);
   // menu links such as /items?view=top switch the view even when already on this page
   useEffect(() => {
@@ -69,6 +82,34 @@ function Inventory() {
       );
     });
   }, [data, q, filter, type, bag]);
+
+  const sorted = useMemo(() => {
+    const rate = data?.rate ?? 13;
+    const stock = (vs: Variant[]) => vs.reduce((t, v) => t + Math.max(0, v.quantity), 0);
+    const price = (vs: Variant[]) => Math.max(0, ...vs.map((v) => Number(v.price ?? 0)));
+    const cost = (vs: Variant[]) => {
+      const c = vs.map((v) => costInEgp(v, rate)).filter((x): x is number => x != null);
+      return c.length ? Math.max(...c) : null;
+    };
+    const list = [...rows];
+    const by: Record<string, (a: (typeof rows)[number], b: (typeof rows)[number]) => number> = {
+      newest: (a, b) => newestFirst(a.p, b.p),
+      oldest: (a, b) => newestFirst(b.p, a.p),
+      name: (a, b) => a.p.title.localeCompare(b.p.title),
+      priceHigh: (a, b) => price(b.vs) - price(a.vs),
+      priceLow: (a, b) => price(a.vs) - price(b.vs),
+      stockHigh: (a, b) => stock(b.vs) - stock(a.vs),
+      stockLow: (a, b) => stock(a.vs) - stock(b.vs),
+      costHigh: (a, b) => (cost(b.vs) ?? -1) - (cost(a.vs) ?? -1),
+      costLow: (a, b) => (cost(a.vs) ?? 1e9) - (cost(b.vs) ?? 1e9),
+      valueHigh: (a, b) => (cost(b.vs) ?? 0) * stock(b.vs) - (cost(a.vs) ?? 0) * stock(a.vs),
+      margin: (a, b) => {
+        const m = (x: (typeof rows)[number]) => { const c = cost(x.vs), pr = price(x.vs); return c != null && pr ? (pr - c) / pr : -1; };
+        return m(b) - m(a);
+      },
+    };
+    return list.sort((a, b) => (by[sort] ?? by.newest)(a, b) || newestFirst(a.p, b.p));
+  }, [rows, sort, data]);
 
   // write-offs: damaged, defective and used pieces that left stock but still cost money
   const writeOffs = useLiveQuery(async () => {
@@ -165,22 +206,44 @@ function Inventory() {
               {l}
             </button>
           ))}
-          <select value={type} onChange={(e) => setType(e.target.value)} className="shrink-0 rounded-full border border-line bg-white px-3 py-1.5 text-sm">
+          <select value={type} onChange={(e) => setType(e.target.value)} className="min-h-10 shrink-0 rounded-full border border-line bg-white px-3 text-[16px]">
             <option value="all">All types</option>
             {types.map((t) => <option key={t}>{t}</option>)}
           </select>
-          <select value={bag} onChange={(e) => setBag(e.target.value)} className="shrink-0 rounded-full border border-line bg-white px-3 py-1.5 text-sm" aria-label="Filter by bag">
+          <select value={bag} onChange={(e) => setBag(e.target.value)} className="min-h-10 shrink-0 rounded-full border border-line bg-white px-3 text-[16px]" aria-label="Filter by bag">
             <option value="all">All bags</option>
             {BAGS.map((b) => <option key={b}>{b}</option>)}
             <option value="none">No bag set</option>
           </select>
         </div>
-        <p className="mt-3 text-xs text-taupe">
-          {rows.length} products · {totals.units} pieces in stock
-        </p>
+        <div className="mt-2 flex min-h-11 items-center justify-between gap-3">
+          <p className="text-xs text-taupe">
+            {rows.length} products · {totals.units} pieces in stock
+          </p>
+          <label className="flex shrink-0 items-center gap-1.5 text-sm">
+            <span className="text-taupe">Sort</span>
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="min-h-10 rounded-full border border-line bg-white px-3 text-[16px] font-semibold" aria-label="Sort products">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="name">Name A to Z</option>
+              <option value="priceHigh">Price: high to low</option>
+              <option value="priceLow">Price: low to high</option>
+              <option value="stockHigh">Most in stock</option>
+              <option value="stockLow">Least in stock</option>
+              {view === "costs" && (
+                <>
+                  <option value="costHigh">Cost: high to low</option>
+                  <option value="costLow">Cost: low to high</option>
+                  <option value="valueHigh">Stock value at cost</option>
+                  <option value="margin">Best margin</option>
+                </>
+              )}
+            </select>
+          </label>
+        </div>
 
         <ul className="mt-2 space-y-3 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0 2xl:grid-cols-3">
-          {rows.slice(0, count).map(({ p, vs }) => (
+          {sorted.slice(0, count).map(({ p, vs }) => (
             <li key={p.id} className="card overflow-hidden">
               <div className="flex items-center gap-2 pr-4 pt-3">
                 <Link href={assign ? "#" : `/item?id=${p.id}`} onClick={(e) => assign && e.preventDefault()} className="flex min-w-0 flex-1 items-center gap-3 pl-4 active:opacity-70">
