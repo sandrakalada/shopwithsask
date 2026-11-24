@@ -7,7 +7,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 ## Store facts
 - Currency EGP. Ships to Egypt only.
 - Delivery: 85 EGP Cairo/Giza, 125 EGP Express (Cairo/Giza), 95 EGP Alexandria, 100 EGP Delta & Canal, 165 EGP North Coast, 199 EGP Upper Egypt & Red Sea. Free standard delivery in Cairo/Giza on orders of 1,999 EGP or more.
-- Delivery times (Google Merchant): handling 0 days; transit Cairo/Giza Standard 2-5 days, Express 1-2, Alexandria, Delta & Canal and North Coast 4-7, Upper Egypt & Red Sea 5-9.
+- Google Merchant shipping: one policy "Egypt Standard Delivery", all of Egypt, 199 EGP flat, no free threshold, transit 5-9 days, handling 0, cutoff 23:59 Cairo. Merchant Center cannot rate by governorate for Egypt, so the highest checkout rate is used to avoid shipping-mismatch flags. Do not restore per-zone services. Google & YouTube app shipping = "Manually set up in Google Merchant Center", auto sync off.
 - Payment: cash on delivery or Instapay.
 
 ## Always
