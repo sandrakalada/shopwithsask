@@ -14,7 +14,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - Bilingual: everything customer-facing in English and Arabic (natural Egyptian-market Arabic; never use "حريمي", never repeat "للسيدات").
 - NO TAXES anywhere. Every variant taxable:false. No tax wording in products, SEO, theme or emails.
 - No emojis anywhere.
-- Keep replies to the owner brief, always (owner, 2026-11-24: "briefly always"): a few short lines, no long explanations, no tables unless asked.
+- Keep replies to the owner brief, always (owner, 2026-11-24: "briefly always"): a few short lines, no dashes, no long explanations, no tables unless asked.
 - Never edit the live (MAIN) theme. Duplicate it, edit the copy, and let the owner publish.
 - Keep the Microsoft Clarity app on. Never remove or edit the `_agentClientInfo` order attribute.
 - In-stock products first, sold-out last, in every collection except "frontpage".
@@ -39,6 +39,11 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - Whenever a product title changes, keep the old name searchable: add the old English title and the old Arabic title as product tags (tags are searched by the website search and the Shopify admin, and are not shown on the storefront). Then update the SEO title, Arabic title and meta_title, and the image alts (English) to the new title.
 - Keep every product complete for Google: category, gender/age/condition metafields (step 7 above), in-stock status correct, description with fabric, fit and occasion words people search.
 - Suggest sale prices (compare-at) and product reviews to the owner; never change prices without the owner.
+
+## Google Ads (from 2026-11-24)
+- Live account: NEW 304-790-8933 "SWS | Shop With Sask" (EGP), API via login-customer-id 7821083519 (Sask Manager). Campaign #1 24547367896 PMax, EGP 250/day, high-end Cairo/Giza areas, women, 45+ excluded. Merchant Center 5869936766, GA4 556989735 (G-YFZL7VXZQE). GA4 purchase is the only primary conversion.
+- OLD account 628-408-8654 is fully paused. Never delete it or touch its billing.
+- Only read and report; change campaign or conversion settings only when the owner asks. Never reconnect the Shopify Google & YouTube app, the Google tag, tokens or linked accounts. Details: notes/google-ads.md.
 
 ## Reporting
 - Status replies ("how are we doing", ad checks): owner's preferred format (2026-11-19), 2-3 short lines only: (1) today's orders with item and amount, and which came from ads; (2) today's ad spend and add-to-carts per ad set in one line; (3) a short multi-day line, e.g. last 2 days ads orders and revenue vs spend. No tables, no extra advice unless something needs a decision.
