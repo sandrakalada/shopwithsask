@@ -101,10 +101,12 @@ function Item() {
                 </a>
               )}
             </div>
+            {/* nothing to store when sold out; the bag is kept and shows again once stock is added */}
+            {variants.some((v) => !v.archived && v.quantity > 0) && (
             <label className="mt-3 flex items-center gap-2 text-sm">
               <span className="text-taupe">Stored in</span>
               <select
-                className="rounded-xl bg-surface px-3 py-2 text-sm font-semibold ring-1 ring-line ring-inset"
+                className="min-h-11 rounded-xl bg-surface px-3 text-[16px] font-semibold ring-1 ring-line ring-inset"
                 value={product.location ?? ""}
                 onChange={(e) => void saveProduct({ ...product, location: e.target.value || null })}
                 aria-label="Where this product is stored"
@@ -113,6 +115,7 @@ function Item() {
                 {BAGS.map((b) => <option key={b}>{b}</option>)}
               </select>
             </label>
+            )}
           </div>
         </div>
 
