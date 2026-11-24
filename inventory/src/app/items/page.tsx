@@ -6,6 +6,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { BAGS, db, newestFirst, WRITE_OFF, supplierLink, websiteLink, type Product, type Variant } from "@/lib/db";
 import { costIn, costInEgp, saveVariant, setSetting, variantLabel } from "@/lib/stock";
+import { shopify } from "@/lib/sync";
 void saveVariant;
 import { pending, pendingDelta, usePending } from "@/lib/pending";
 import { egp } from "@/lib/pdf";
@@ -242,6 +243,20 @@ function Inventory() {
 function CostSummary({ totals, rate, writeOffs }: { totals: { units: number; retail: number; cost: number; missing: number }; rate: number; writeOffs?: { pieces: number; cost: number } }) {
   const [r, setR] = useState(String(rate));
   useEffect(() => setR(String(rate)), [rate]);
+  // today's market rate (updated daily) and whether the owner set her own
+  const live = useLiveQuery(() => db.settings.get("sar_to_egp_live").then((x) => x?.value as { rate: number; date: string } | undefined), []);
+  const mode = useLiveQuery(() => db.settings.get("sar_to_egp_mode").then((x) => (x?.value as string) ?? "auto"), [], "auto");
+  const [fx, setFx] = useState<string | null>(null);
+  async function useToday() {
+    setFx("Getting today's rate...");
+    try {
+      const res = (await shopify("fx", { reset: true })) as { rate: number };
+      await db.settings.bulkPut([{ key: "sar_to_egp", value: res.rate }, { key: "sar_to_egp_mode", value: "auto" }, { key: "sar_to_egp_live", value: { rate: res.rate, date: new Date().toISOString().slice(0, 10) } }]);
+      setFx(null);
+    } catch (e) {
+      setFx(navigator.onLine ? `Could not get today's rate (${(e as Error).message}).` : "No connection. Try again when you are online.");
+    }
+  }
   const margin = totals.retail ? Math.round(((totals.retail - totals.cost) / totals.retail) * 100) : 0;
   return (
     <div className="card mb-3 space-y-3 p-4 text-sm">
@@ -271,11 +286,31 @@ function CostSummary({ totals, rate, writeOffs }: { totals: { units: number; ret
             inputMode="decimal"
             value={r}
             onChange={(e) => setR(e.target.value)}
-            onBlur={() => Number(r) > 0 && Number(r) !== rate && setSetting("sar_to_egp", Number(r))}
+            onBlur={() => {
+              if (Number(r) > 0 && Number(r) !== rate) {
+                void setSetting("sar_to_egp", Number(r));
+                void setSetting("sar_to_egp_mode", "manual");
+              }
+            }}
           />
           <span>EGP</span>
         </span>
       </label>
+      <div className="flex min-h-11 items-center justify-between gap-3 text-xs text-taupe">
+        <span>
+          {mode === "manual"
+            ? `Your own rate. ${live ? `Today's rate: ${live.rate} (${new Date(live.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })})` : ""}`
+            : live
+              ? `Today's rate, updated ${new Date(live.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}. Type a number to use your own.`
+              : "Updates to today's rate every day. Type a number to use your own."}
+        </span>
+        {(mode === "manual" || !live) && (
+          <button className="btn-light min-h-10 shrink-0 px-3 text-[13px]" onClick={() => void useToday()}>
+            Use today&apos;s rate
+          </button>
+        )}
+      </div>
+      {fx && <p className="text-xs text-taupe">{fx}</p>}
     </div>
   );
 }

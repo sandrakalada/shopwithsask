@@ -915,6 +915,29 @@ async function onInventoryLevel(p: { inventory_item_id: number; location_id: num
 
 // ---------- entry ----------
 
+/** Today's SAR to EGP rate (open.er-api.com, backup fawazahmed0 currency API). Saved as sar_to_egp_live;
+ * also becomes the rate used everywhere (sar_to_egp) unless the owner typed her own rate (mode "manual"). */
+async function updateRate(reset = false) {
+  let rate: number | null = null;
+  try {
+    const r = await fetch("https://open.er-api.com/v6/latest/SAR", { signal: AbortSignal.timeout(10000) });
+    rate = Number((await r.json())?.rates?.EGP) || null;
+  } catch { /* try the backup */ }
+  if (!rate) {
+    const r = await fetch("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/sar.json", { signal: AbortSignal.timeout(10000) });
+    rate = Number((await r.json())?.sar?.egp) || null;
+  }
+  if (!rate || rate < 5 || rate > 50) throw new Error("no exchange rate today");
+  rate = Math.round(rate * 100) / 100;
+  const { data: modeRow } = await admin.from("app_settings").select("value").eq("key", "sar_to_egp_mode").maybeSingle();
+  const manual = !reset && modeRow?.value === "manual";
+  const rows: { key: string; value: unknown }[] = [{ key: "sar_to_egp_live", value: { rate, date: new Date().toISOString().slice(0, 10) } }];
+  if (!manual) rows.push({ key: "sar_to_egp", value: rate }, { key: "sar_to_egp_mode", value: "auto" });
+  const { error } = await admin.from("app_settings").upsert(rows);
+  if (error) throw error;
+  return { rate, applied: !manual };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "POST only" }, 405);
@@ -946,7 +969,9 @@ Deno.serve(async (req) => {
       const cb = await req.json().catch(() => ({}));
       if (cb.action === "scopes") return json({ scopes: await accessScopes() }); // read-only health check
       if (cb.action === "stock-check") return json(await stockCheck()); // read-only stock audit
-      return json(await daily());
+      if (cb.action === "fx") return json(await updateRate());
+      const fx = await updateRate().catch((e) => ({ error: String(e) }));
+      return json({ ...(await daily()), fx });
     }
 
     const jwt = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
@@ -957,6 +982,7 @@ Deno.serve(async (req) => {
     const action = body.action;
     // shipping-only accounts just print labels; they cannot run syncs or manage anything
     if (user.user.app_metadata?.role === "shipping") return json({ error: "not allowed for this account" }, 403);
+    if (action === "fx") return json(await updateRate(!!body.reset));
     if (action === "push") return json(await push());
     if (action === "pull") return json({ push: await push(), pull: await pull() });
     if (action === "orders") return json(await syncOrdersAndCustomers(!!body.full));
