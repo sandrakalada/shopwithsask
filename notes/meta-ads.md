@@ -507,3 +507,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-23 21:35 UTC check: NEW 338 spend 1 ATC; WARM 157 spend 15 ATC; BAGS-ACC 0 impressions yet (created 19:31 UTC, ads still in review). No orders today. All advertised bags/accessories in stock, no ad issues. NEW not paused (owner set 250/day minutes earlier).
 
 - 2026-11-24 00:35 UTC check: NEW 362 spend 2 ATC; WARM 173 spend 23 ATC; BAGS-ACC started delivering (8 EGP, 32 imp). No new orders since #1402, so stock unchanged. No ad issues.
+
+- 2026-11-24 03:35 UTC check: Nov 23 final (acct tz): NEW 363 / 2 ATC, WARM 176 / 23 ATC, BAGS-ACC 11 / 0. 0 orders on Nov 23 (23 ATC, 0 checkouts). Overnight quiet, no ad issues, stock unchanged.
