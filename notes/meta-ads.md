@@ -520,3 +520,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-24 12:35 UTC check: today NEW 157 / 10 ATC / 5 IC, WARM 131 / 13 ATC, BAGS-ACC 53 / 3 ATC. 0 orders since Nov 22. FB catalog test still paused (awaiting photo OK). No ad issues.
 
 - 2026-11-24 ~13:00 UTC: owner team (Mina M. Morcos) published the Ads Manager draft at 10:57 UTC: campaign 52565506125320, ad set 52565506125520 (150/day, Purchase, product set in stock, url_tags OK), live since 11:12. Off vs owner spec: age 18-65 with Advantage+ audience on, all placements (no FB/IG feed limit), locations only Heliopolis + Zamalek cities + 2 mi Rehab circle with travelers included. Fix proposed, awaiting owner OK. API duplicate 52565513827920 stays paused.
+
+- 2026-11-24 owner said "fix it": ad set 52565506125520 now women 20-45, Advantage+ audience off, FB feed + IG feed only, 10 high-end circles residents only. Mobile cart flow tested OK.
