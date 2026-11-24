@@ -530,3 +530,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-24 18:35 UTC check: orders today #1403 2,050 (WARM), #1404 1,065 ruffle skirt (FB test catalog), #1405 1,550 embroidered denim puff sleeve jacket New Cairo (no utm; now sold out, not in ads). Spend NEW 177 / 11 ATC, WARM 192 / 20 ATC / 2 pur, BAGS-ACC 66 / 4, FB test 71 / 5 ATC. CART RT 0 impressions 4h: audience ~20 people after filters, too small; proposed widening (30 days, no area filter) to owner. No ad issues.
 
 - 2026-11-24 owner OK: CART RT widened, audience 52565583013920 now 30 days (ATC or IC, excl. Purchase), ad set geo all Egypt (people who came from the high-end ads), women 20-45, IG only.
+
+- 2026-11-24 owner: removed summer items from catalog product set 1646945297477460 (filter: in stock AND product_type != Beach Set AND name excludes summer, sundress, beach, tropical, bermuda, shorts, straw, pineapple, watermelon, ice cream, seaside, starfish, crab, seahorse, popsicle, short-sleeve, one-shoulder, off-shoulder). 249 -> 206 products.
