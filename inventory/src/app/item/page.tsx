@@ -94,6 +94,7 @@ function Item() {
               ) : (
                 <button className="btn-light px-3 py-2 text-taupe" onClick={() => setEdit("product")}>+ Shein link</button>
               )}
+              {product.status === "DRAFT" && <span className="inline-flex min-h-11 items-center rounded-xl bg-sand px-3 text-sm font-semibold text-taupe">Draft, not on the website yet</span>}
               {websiteLink(product) && (
                 <a className="btn-light px-3 py-2" href={websiteLink(product)!} target="_blank" rel="noreferrer noopener">
                   Website

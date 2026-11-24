@@ -189,6 +189,7 @@ function Inventory() {
                     <p className="truncate text-[13px] text-taupe">{[p.product_type, p.location].filter(Boolean).join(" · ")}</p>
                   </div>
                 </Link>
+                {p.status === "DRAFT" && <span className="chip min-h-10 bg-sand px-3 text-[13px] text-taupe ring-0">Draft</span>}
                 {websiteLink(p) && (
                   <a href={websiteLink(p)!} target="_blank" rel="noreferrer noopener" className="chip min-h-10 px-3 text-[13px]" aria-label={`${p.title} on the website`}>
                     Site

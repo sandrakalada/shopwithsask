@@ -282,7 +282,7 @@ async function pull() {
   } while (after);
 
   const [{ data: products, error: pe }, { data: variants, error: ve }] = await Promise.all([
-    admin.from("products").select("id, handle, title, title_ar, product_type, image_url, archived, shopify_product_id, supplier_url, images"),
+    admin.from("products").select("id, handle, title, title_ar, product_type, image_url, archived, shopify_product_id, supplier_url, images, status"),
     admin.from("variants").select("id, product_id, title, sku, barcode, price, quantity, archived, cost, shopify_dirty, shopify_variant_id, shopify_inventory_item_id, image_url"),
   ]);
   if (pe || ve) throw pe ?? ve;
@@ -309,6 +309,7 @@ async function pull() {
         product_type: sp.productType || null,
         image_url: sp.featuredMedia?.preview?.image?.url?.split("?")[0] ?? null,
         archived: sp.status === "ARCHIVED",
+        status: sp.status ?? null,
         shopify_product_id: spId,
         title_ar: (sp.translations ?? []).find((t: any) => t.key === "title")?.value ?? null,
         images: (sp.media?.nodes ?? []).map((m: any) => m.preview?.image?.url?.split("?")[0]).filter(Boolean),

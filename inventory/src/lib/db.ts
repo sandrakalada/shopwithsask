@@ -18,6 +18,8 @@ export type Product = {
   location?: string | null;
   /** all product photos from Shopify */
   images?: string[] | null;
+  /** Shopify status: ACTIVE, DRAFT or ARCHIVED */
+  status?: string | null;
   /** pieces bought on Shein so far: {"all": n} or per colour {"White": n, ...} */
   purchased?: Record<string, number> | null;
 };
@@ -28,7 +30,8 @@ export type Embedding = { url: string; product_id: string; e: string };
 export const BAGS = Array.from({ length: 8 }, (_, i) => `Bag ${i + 1}`);
 
 /** The product on the store website. */
-export const websiteLink = (p: Pick<Product, "handle">) => (p.handle ? `https://shopwithsask.com/products/${encodeURIComponent(p.handle)}` : null);
+/** Link to the product on the website; drafts have no page yet. */
+export const websiteLink = (p: Pick<Product, "handle" | "status">) => (p.handle && (p.status ?? "ACTIVE") === "ACTIVE" ? `https://shopwithsask.com/products/${encodeURIComponent(p.handle)}` : null);
 
 /** Link to the product on Shein: the saved link, or a Shein search for its SKU. */
 export function supplierLink(p: Pick<Product, "supplier_sku" | "supplier_url">) {
