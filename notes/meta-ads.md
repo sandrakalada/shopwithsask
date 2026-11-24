@@ -528,3 +528,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-24 15:35 UTC check: ORDER #1403 2,050 black velvet floral cropped jacket, Cairo, from WARM ad 52565276180520 (carousel v2). Jacket now sold out: paused its ads in NEW, WARM, BAGS-ACC, CART RT. Today NEW 170 / 11 ATC, WARM 178 / 18 ATC, BAGS-ACC 63 / 4 ATC, FB test 41 / 0, CART RT just started. No ad issues.
 
 - 2026-11-24 18:35 UTC check: orders today #1403 2,050 (WARM), #1404 1,065 ruffle skirt (FB test catalog), #1405 1,550 embroidered denim puff sleeve jacket New Cairo (no utm; now sold out, not in ads). Spend NEW 177 / 11 ATC, WARM 192 / 20 ATC / 2 pur, BAGS-ACC 66 / 4, FB test 71 / 5 ATC. CART RT 0 impressions 4h: audience ~20 people after filters, too small; proposed widening (30 days, no area filter) to owner. No ad issues.
+
+- 2026-11-24 owner OK: CART RT widened, audience 52565583013920 now 30 days (ATC or IC, excl. Purchase), ad set geo all Egypt (people who came from the high-end ads), women 20-45, IG only.
