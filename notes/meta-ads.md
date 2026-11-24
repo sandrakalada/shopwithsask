@@ -513,3 +513,6 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-24 06:35 UTC check: today NEW 58 / 5 ATC / 4 IC, WARM 45 / 5 ATC, BAGS-ACC 10 / 0. No orders yet. No ad issues.
 
 - 2026-11-24 09:35 UTC check: today NEW 120 / 9 ATC / 5 IC, WARM 58 / 9 ATC, BAGS-ACC 32 / 3 ATC. No orders since Nov 22. No ad issues.
+
+## 2026-11-24 FB + IG catalog test (owner asked to run on Facebook)
+- Campaign 52565513827920 "SWS | Sales | IG + FB Feed | Egypt | Nov 2026", ad set 52565513837320 (150/day, Purchase, product set 1646945297477460 SWS in stock, women 20-45, high-end circles residents only, FB feed + IG feed, Advantage+ audience off), ad 52565513871320 catalog creative 1119335180899733 (EN+AR, SHOP_NOW, creative enhancements opted out, owner url_tags with campaign/ad names). Built PAUSED via API because the Ads Manager draft is not reachable; waiting for owner OK on catalog photos (quality rule).
