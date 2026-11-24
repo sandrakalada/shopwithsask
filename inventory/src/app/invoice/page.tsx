@@ -10,6 +10,7 @@ import { requestSync, shopify } from "@/lib/sync";
 import { supabase } from "@/lib/supabase";
 import { addressLines, egp, elementToImage, imagesToPdf, preparePrint, printNow, shareFile, waLink } from "@/lib/pdf";
 import { Header, Labeled, Stepper, Thumb } from "@/components/ui";
+import { readScreenshots } from "@/lib/screenshotOrder";
 import { PlusIcon, PrintIcon, SearchIcon, WhatsAppIcon } from "@/components/Icons";
 import InvoiceDoc, { type InvoiceStore } from "@/components/InvoiceDoc";
 import { orderCustomerName, orderPhone, paymentLabel } from "@/components/orderUi";
@@ -214,12 +215,30 @@ function InvoiceView({ id }: { id: string }) {
   );
 }
 
+/** Same zones and prices as the Shopify checkout (Settings > Shipping). Cairo / Giza ships free from 1,999 EGP. */
 const DELIVERY = [
-  { label: "Cairo / Giza", fee: 75 },
-  { label: "Express", fee: 100 },
-  { label: "Alexandria", fee: 120 },
-  { label: "Free", fee: 0 },
-];
+  { key: "cairo", label: "Cairo / Giza", fee: 85, freeFrom: 1999 },
+  { key: "express", label: "Express Cairo / Giza", fee: 125 },
+  { key: "alex", label: "Alexandria", fee: 95 },
+  { key: "delta", label: "Delta & Canal", fee: 100 },
+  { key: "north", label: "North Coast", fee: 165 },
+  { key: "upper", label: "Upper Egypt & Red Sea", fee: 199 },
+  { key: "free", label: "Free delivery", fee: 0 },
+] as const;
+const zoneFee = (key: string, subtotal: number) => {
+  const z = DELIVERY.find((d) => d.key === key) ?? DELIVERY[0];
+  return "freeFrom" in z && subtotal >= z.freeFrom ? 0 : z.fee;
+};
+/** Picks the zone from the address text (English or Arabic), like Shopify does from the governorate. */
+function zoneForAddress(text: string): string | null {
+  const t = text.toLowerCase();
+  if (/alex|اسكندري|إسكندري/.test(t)) return "alex";
+  if (/matrouh|marsa|sahel|north coast|مطروح|الساحل|العلمين|alamein/.test(t)) return "north";
+  if (/aswan|asyut|assiut|beni suef|fayoum|faiyum|luxor|minya|new valley|qena|red sea|sohag|hurghada|اسوان|أسوان|اسيوط|أسيوط|بني سويف|الفيوم|الاقصر|الأقصر|المنيا|الوادي الجديد|قنا|البحر الاحمر|البحر الأحمر|سوهاج|الغردقة/.test(t)) return "upper";
+  if (/sharqia|sharkia|zagazig|beheira|damanhour|dakahlia|mansoura|damietta|gharbia|tanta|ismailia|kafr|monufia|menoufia|port said|qalyubia|banha|suez|الشرقية|الزقازيق|البحيرة|دمنهور|الدقهلية|المنصورة|دمياط|الغربية|طنطا|الاسماعيلية|الإسماعيلية|كفر الشيخ|المنوفية|بورسعيد|القليوبية|بنها|السويس/.test(t)) return "delta";
+  if (/cairo|giza|october|zayed|tagamo|new cairo|maadi|nasr city|heliopolis|helwan|sheikh|القاهرة|الجيزة|اكتوبر|أكتوبر|زايد|التجمع|المعادي|مدينة نصر|مصر الجديدة|حلوان/.test(t)) return "cairo";
+  return null;
+}
 
 type Line = InvoiceItem & { image?: string | null; shopify_variant_id?: string | null };
 
@@ -236,7 +255,9 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
   const [address, setAddress] = useState("");
   const [custId, setCustId] = useState<string | null>(customerId);
   const [items, setItems] = useState<Line[]>([]);
-  const [fee, setFee] = useState(75);
+  const [zone, setZone] = useState<string>("cairo");
+  /** delivery fee taken from an order or invoice being edited (keeps what the customer was charged) */
+  const [fixedFee, setFixedFee] = useState<number | null>(null);
   const [discount, setDiscount] = useState("");
   const [payment, setPayment] = useState("Cash on delivery");
   const [note, setNote] = useState("");
@@ -268,6 +289,8 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
     setName(c.name ?? "");
     setPhone(c.phone ?? "");
     setAddress(c.address);
+    const z = zoneForAddress(c.address ?? "");
+    if (z) setZone(z);
   }
 
   async function loadOrder(o: Order) {
@@ -281,7 +304,7 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
       lines.push({ title: l.title, title_ar: p?.title_ar ?? null, size: l.variant_title, sku: l.sku, quantity: l.quantity, price: Number(l.price ?? 0), variant_id: v?.id ?? null, image: l.image, shopify_variant_id: l.shopify_variant_id });
     }
     setItems(lines);
-    setFee(Number(o.shipping ?? 0));
+    setFixedFee(Number(o.shipping ?? 0));
     setDiscount(o.discounts ? String(o.discounts) : "");
     setPayment(/instapay/i.test(paymentLabel(o)) ? "Instapay" : "Cash on delivery");
     setLang((o.locale ?? "").toLowerCase().startsWith("ar") ? "ar" : "en");
@@ -296,7 +319,7 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
         setEditing(inv);
         fillCustomer({ id: inv.customer_id, name: inv.customer_name, phone: inv.customer_phone, address: inv.customer_address ?? "" });
         setItems(inv.items);
-        setFee(inv.shipping);
+        setFixedFee(inv.shipping);
         setDiscount(inv.discount ? String(inv.discount) : "");
         setPayment(inv.payment_method ?? "Cash on delivery");
         setNote(inv.note ?? "");
@@ -339,6 +362,7 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
 
   const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const disc = Number(discount) || 0;
+  const fee = fixedFee ?? zoneFee(zone, subtotal);
   const total = Math.max(0, subtotal + fee - disc);
   const scratch = !linkedOrder && !editing; // a brand-new offline sale
 
@@ -349,6 +373,37 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
       return [...list, { title, title_ar: titleAr ?? null, size: v.title, sku: v.sku, quantity: 1, price: v.price ?? 0, variant_id: v.id, image, shopify_variant_id: v.shopify_variant_id ?? null }];
     });
     setSearch("");
+  }
+
+  // fill the form from chat screenshots (Instagram, WhatsApp): read on this phone, then checked by you
+  const shotRef = useRef<HTMLInputElement>(null);
+  const [shot, setShot] = useState<{ step: string | null; done?: string; text?: string; error?: string; previews?: string[] } | null>(null);
+  async function fromScreenshots(files: File[]) {
+    if (!files.length) return;
+    const previews = files.map((f) => URL.createObjectURL(f));
+    setShot({ step: "Starting", previews });
+    try {
+      const [products, variants] = await Promise.all([db.products.toArray(), db.variants.toArray()]);
+      const res = await readScreenshots(files, products, variants, (step) => setShot((x) => ({ ...(x ?? {}), step, previews })));
+      const filled: string[] = [];
+      if (res.name && !name) { setName(res.name); filled.push("name"); }
+      if (res.phone && !phone) { setPhone(res.phone); filled.push("phone"); }
+      if (res.address && !address) {
+        setAddress(res.address);
+        filled.push("address");
+        const z = zoneForAddress(res.address);
+        if (z) { setZone(z); setFixedFee(null); filled.push("delivery zone"); }
+      }
+      if (res.phone) {
+        const known = await db.customers.filter((c) => (c.phone ?? "").replace(/\D/g, "").endsWith(res.phone!.slice(1))).first();
+        if (known) { setCustId(known.id); if (!name && known.name) setName(known.name); filled.push("saved customer"); }
+      }
+      for (const it of res.items) add(it.variant, it.product.title, it.variant.image_url ?? it.product.image_url, it.product.title_ar);
+      if (res.items.length) filled.push(`${res.items.length} item${res.items.length > 1 ? "s" : ""}`);
+      setShot({ step: null, previews, text: res.text, done: filled.length ? `Filled in: ${filled.join(", ")}. Check everything below before creating the invoice.` : "I could not find order details in these screenshots. Fill the form below." });
+    } catch (e) {
+      setShot({ step: null, previews, error: `Could not read the screenshots (${(e as Error).message}).` });
+    }
   }
 
   async function submit() {
@@ -368,7 +423,7 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
           sale: {
             customer: { name: name.trim(), phone: phone.trim(), address: address.trim(), customerId: custId },
             items: items.map((i) => ({ shopifyVariantId: i.shopify_variant_id ?? null, title: i.title, quantity: i.quantity, price: i.price })),
-            shipping: fee ? { title: DELIVERY.find((d) => d.fee === fee)?.label ?? "Delivery", price: fee } : undefined,
+            shipping: { title: fixedFee != null ? "Delivery" : `${(DELIVERY.find((d) => d.key === zone) ?? DELIVERY[0]).label} Delivery`, price: fee },
             discount: disc,
             note: note.trim(),
             paid,
@@ -421,6 +476,40 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
     <>
       <Header title={editing ? `Edit ${editing.number}` : linkedOrder ? `Invoice for ${linkedOrder.name}` : "New invoice"} back="/orders" />
       <main className="space-y-5 p-4">
+        {!editing && !linkedOrder && (
+          <section>
+            <h2 className="section-title">Order from a chat</h2>
+            <div className="card space-y-3 p-4">
+              <p className="text-sm text-taupe">Got the order on Instagram or WhatsApp? Add screenshots of the chat: the app reads the name, phone, address, sizes and the product photos, and fills the invoice for you to check.</p>
+              <button className="btn-dark w-full" disabled={!!shot?.step} onClick={() => shotRef.current?.click()}>
+                {shot?.step ? "Reading..." : "Fill from chat screenshots"}
+              </button>
+              <input ref={shotRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => { void fromScreenshots([...(e.target.files ?? [])]); e.target.value = ""; }} />
+              {shot?.previews?.length ? (
+                <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {shot.previews.map((u) => <img key={u} src={u} alt="Chat screenshot" className="h-28 w-auto shrink-0 rounded-lg ring-1 ring-line" />)}
+                </div>
+              ) : null}
+              {shot?.step && (
+                <div>
+                  <div className="relative h-1.5 overflow-hidden rounded-full bg-sand" role="progressbar" aria-label="Reading the screenshots">
+                    <div className="indeterminate absolute inset-y-0 w-1/3 rounded-full bg-caramel" />
+                  </div>
+                  <p className="mt-1 text-xs text-taupe">{shot.step}</p>
+                </div>
+              )}
+              {shot?.done && <p className="rounded-xl bg-cream p-3 text-sm">{shot.done}</p>}
+              {shot?.error && <p className="text-sm text-red-700">{shot.error}</p>}
+              {shot?.text && (
+                <details className="text-xs text-taupe">
+                  <summary className="min-h-11 cursor-pointer py-3 font-semibold text-ink">Text read from the screenshots</summary>
+                  <pre className="whitespace-pre-wrap font-sans">{shot.text}</pre>
+                </details>
+              )}
+            </div>
+          </section>
+        )}
         {!editing && (
           <section>
             <h2 className="section-title">Start from an order (optional)</h2>
@@ -525,13 +614,19 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
           <h2 className="section-title">Delivery and payment</h2>
           <div className="card space-y-3 p-4">
             <div className="grid grid-cols-2 gap-2">
-              {DELIVERY.map((d) => (
-                <button key={d.label} onClick={() => setFee(d.fee)} className={`chip justify-center rounded-xl ${fee === d.fee ? "chip-on" : ""}`}>
-                  {d.label} {d.fee ? `· ${d.fee}` : ""}
-                </button>
-              ))}
+              {DELIVERY.map((d) => {
+                const on = fixedFee == null && zone === d.key;
+                const price = zoneFee(d.key, subtotal);
+                return (
+                  <button key={d.key} onClick={() => { setZone(d.key); setFixedFee(null); }} className={`chip h-auto min-h-11 flex-col justify-center rounded-xl py-1.5 text-center leading-tight ${on ? "chip-on" : ""}`}>
+                    <span>{d.label}</span>
+                    <span className={`text-[12px] ${on ? "text-white/80" : "text-taupe"}`}>{price ? `${price} EGP` : "Free"}</span>
+                  </button>
+                );
+              })}
             </div>
-            {subtotal > 1999 && fee === 75 && <p className="text-[12px] text-taupe">Orders over 1,999 EGP in Cairo / Giza ship free.</p>}
+            {fixedFee != null && <p className="text-[12px] text-taupe">Delivery {egp(fixedFee)} from the original order. Pick a zone to change it.</p>}
+            {fixedFee == null && zone === "cairo" && <p className="text-[12px] text-taupe">{subtotal >= 1999 ? "Free delivery: Cairo / Giza orders from 1,999 EGP." : `Free in Cairo / Giza from 1,999 EGP (${egp(1999 - subtotal)} more).`}</p>}
             <div className="seg grid-cols-2">
               {["Cash on delivery", "Instapay"].map((m) => (
                 <button key={m} onClick={() => { setPayment(m); setPaid(m === "Instapay"); }} className={`seg-btn ${payment === m ? "seg-on" : ""}`}>

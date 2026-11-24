@@ -6,7 +6,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 
 ## Store facts
 - Currency EGP. Ships to Egypt only.
-- Delivery: 75 EGP Cairo/Giza, 100 EGP Express, 120 EGP Alexandria. Free in Cairo/Giza on orders over 1,999 EGP.
+- Delivery (Shopify checkout rates): Cairo/Giza 85 EGP (free from 1,999 EGP), Express Cairo/Giza 125, Alexandria 95, Delta & Canal 100, North Coast 165, Upper Egypt & Red Sea 199.
 - Payment: cash on delivery or Instapay.
 
 ## Always

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { variantLabel } from "@/lib/stock";
-import { indexNewPhotos, loadIndex, loadModel, rank, teach, type IndexItem } from "@/lib/vision";
+import { indexNewPhotos, loadIndex, loadModel, rank, teach, watchModelProgress, type IndexItem } from "@/lib/vision";
 import { Header, QtyPill, Thumb } from "@/components/ui";
 
 type Result = { productId: string; score: number; u: string };
@@ -23,6 +23,12 @@ export default function FindPage() {
   const [type, setType] = useState("all");
   const [query, setQuery] = useState<Float32Array | null>(null);
   const [taught, setTaught] = useState<string | null>(null);
+  const [dl, setDl] = useState<number | null>(null);
+  const [step, setStep] = useState<string | null>(null);
+  useEffect(() => {
+    watchModelProgress(setDl);
+    return () => watchModelProgress(null);
+  }, []);
 
   const data = useLiveQuery(async () => {
     const [products, variants] = await Promise.all([db.products.toArray(), db.variants.toArray()]);
@@ -84,9 +90,12 @@ export default function FindPage() {
     busyRef.current = true;
     setStatus(null);
     try {
+      setStep(ready ? "Reading your photo" : "Getting the recognition ready, then reading your photo");
       const m = await loadModel();
       const index = indexRef.current ?? (indexRef.current = await loadIndex());
       const q = await m.embed(await shrink(file));
+      setStep(`Comparing with ${new Set(index.map((i) => i.p)).size} products`);
+      await new Promise((r) => setTimeout(r, 30));
       setQuery(q);
       setTaught(null);
       setResults(rank(q, filtered(index), 8));
@@ -94,6 +103,7 @@ export default function FindPage() {
       setError(`Could not read that photo (${(e as Error).message}). Try again, or choose the photo from your library.`);
     }
     setBusy(false);
+    setStep(null);
     busyRef.current = false;
     void learn(() => false);
   }
@@ -143,14 +153,30 @@ export default function FindPage() {
             ))}
           </div>
           {status && <p className="text-xs text-taupe">{status}</p>}
-          {!ready && !error && <div className="h-1 overflow-hidden rounded-full bg-sand"><div className="h-full w-1/3 animate-pulse rounded-full bg-caramel" /></div>}
+          {dl != null ? (
+            <div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-sand" role="progressbar" aria-valuenow={dl} aria-valuemin={0} aria-valuemax={100}>
+                <div className="h-full rounded-full bg-caramel transition-[width] duration-300" style={{ width: `${dl}%` }} />
+              </div>
+              <p className="mt-1 text-xs text-taupe">Downloading the recognition model: {dl}% (first time only)</p>
+            </div>
+          ) : (
+            (!ready || busy) && !error && (
+              <div>
+                <div className="relative h-1.5 overflow-hidden rounded-full bg-sand" role="progressbar" aria-label="Working">
+                  <div className="indeterminate absolute inset-y-0 w-1/3 rounded-full bg-caramel" />
+                </div>
+                <p className="mt-1 text-xs text-taupe">{busy ? step ?? "Working" : "Getting the recognition ready"}</p>
+              </div>
+            )
+          )}
           {error && <p className="text-sm text-red-700">{error}</p>}
         </section>
 
         <section>
           <p className="section-title">{busy ? "Looking" : results ? "Closest matches" : "Matches"}</p>
           <ul className="card divide-y divide-line overflow-hidden">
-            {busy && <li className="p-4 text-sm text-taupe">Comparing with your products...</li>}
+            {busy && <li className="p-4 text-sm text-taupe">{step ?? "Comparing with your products"}...</li>}
             {!busy && !results && <li className="p-4 text-sm text-taupe">Matches appear here after you take a photo.</li>}
             {!busy && results?.length === 0 && <li className="p-4 text-sm text-taupe">No products to compare with yet{type !== "all" ? ` in ${type}` : ""}. Choose All types, or open this page with internet once so it can learn your product photos.</li>}
             {!busy &&
@@ -162,7 +188,7 @@ export default function FindPage() {
                 return (
                   <li key={r.productId} className="flex items-center">
                     <Link href={`/item?id=${p.id}`} className={`flex min-w-0 flex-1 items-center gap-3 py-3 pl-4 active:bg-sand ${i === 0 ? "bg-cream" : ""}`}>
-                      <Thumb src={r.u} size={56} />
+                      <Thumb src={r.u || p.image_url} size={56} />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[15px] font-semibold">{p.title}</p>
                         <p className="truncate text-xs text-taupe">

@@ -14,8 +14,18 @@ const DIM = 768;
 type Model = { embed: (blob: Blob | string) => Promise<Float32Array> };
 let modelP: Promise<Model> | null = null;
 
+type Progress = (pct: number | null) => void;
+let onProgress: Progress | null = null;
+/** Download progress of the model (0-100), or null once it is only being set up. */
+export function watchModelProgress(cb: Progress | null) {
+  onProgress = cb;
+}
+
 export function loadModel(): Promise<Model> {
   modelP ??= (async () => {
+    try {
+      localStorage.setItem("sask-find-used", "1");
+    } catch {}
     const T = await import("@huggingface/transformers");
     T.env.allowRemoteModels = false;
     T.env.allowLocalModels = true;
@@ -26,7 +36,16 @@ export function loadModel(): Promise<Model> {
     onnx.wasm.wasmPaths = { mjs: "/ort/ort-wasm-simd-threaded.mjs", wasm: "/ort/ort-wasm-simd-threaded.wasm" };
     onnx.wasm.numThreads = 1;
     const processor = await T.AutoProcessor.from_pretrained(MODEL);
-    const model = await T.CLIPVisionModelWithProjection.from_pretrained(MODEL, { dtype: "q4f16", device: "wasm" });
+    const files = new Map<string, number>();
+    const model = await T.CLIPVisionModelWithProjection.from_pretrained(MODEL, {
+      dtype: "q4f16",
+      device: "wasm",
+      progress_callback: (e: { status: string; file?: string; progress?: number }) => {
+        if (e.status === "progress" && e.file) files.set(e.file, e.progress ?? 0);
+        if (e.status === "progress") onProgress?.(Math.round([...files.values()].reduce((a, b) => a + b, 0) / Math.max(1, files.size)));
+        if (e.status === "ready" || e.status === "done") onProgress?.(null);
+      },
+    } as never);
     return {
       async embed(src) {
         const img = typeof src === "string" ? await T.RawImage.fromURL(src) : await T.RawImage.fromBlob(src);
@@ -117,15 +136,21 @@ export async function indexNewPhotos(index: IndexItem[], products: Product[], li
 
 /** Best matching products for a photo, most similar first. */
 export function rank(q: Float32Array, index: IndexItem[], top = 6) {
-  const best = new Map<string, { score: number; u: string }>();
+  // each product keeps its two best photo scores: one lucky photo of another item no longer wins on its own
+  const best = new Map<string, { s1: number; s2: number; u: string; taught: boolean }>();
   for (const it of index) {
     let s = 0;
     for (let i = 0; i < q.length; i++) s += q[i] * it.v[i];
     s /= 127;
     const b = best.get(it.p);
-    if (!b || s > b.score) best.set(it.p, { score: s, u: it.u });
+    if (!b) best.set(it.p, { s1: s, s2: -1, u: it.u, taught: !!it.taught });
+    else if (s > b.s1) Object.assign(b, { s2: b.s1, s1: s, u: it.taught ? b.u : it.u, taught: b.taught || !!it.taught });
+    else if (s > b.s2) b.s2 = s;
   }
-  return [...best.entries()].map(([p, b]) => ({ productId: p, ...b })).sort((a, b) => b.score - a.score).slice(0, top);
+  return [...best.entries()]
+    .map(([p, b]) => ({ productId: p, u: b.u.startsWith("taught:") ? "" : b.u, score: b.taught || b.s2 < 0 ? b.s1 : (b.s1 + b.s2) / 2 }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, top);
 }
 
 /** "This is it": remember this photo for that product, so similar photos match it next time. */
