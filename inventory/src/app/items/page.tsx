@@ -128,7 +128,7 @@ function Inventory() {
         right={
           !assign && (
             <div className="flex items-center gap-1">
-              <Link href="/labels" className="p-1" aria-label="Print stickers">
+              <Link href="/labels" className="flex h-11 w-11 items-center justify-center rounded-full active:bg-sand" aria-label="Print stickers">
                 <PrintIcon />
               </Link>
             </div>
@@ -190,12 +190,12 @@ function Inventory() {
                   </div>
                 </Link>
                 {websiteLink(p) && (
-                  <a href={websiteLink(p)!} target="_blank" rel="noreferrer noopener" className="chip min-h-8 px-2.5 text-[12px]" aria-label={`${p.title} on the website`}>
+                  <a href={websiteLink(p)!} target="_blank" rel="noreferrer noopener" className="chip min-h-10 px-3 text-[13px]" aria-label={`${p.title} on the website`}>
                     Site
                   </a>
                 )}
                 {supplierLink(p) && (
-                  <a href={supplierLink(p)!} target="_blank" rel="noreferrer noopener" className="chip min-h-8 px-2.5 text-[12px] text-caramel" aria-label={`${p.title} on Shein`}>
+                  <a href={supplierLink(p)!} target="_blank" rel="noreferrer noopener" className="chip min-h-10 px-3 text-[13px] text-caramel" aria-label={`${p.title} on Shein`}>
                     Shein
                   </a>
                 )}

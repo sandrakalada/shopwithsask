@@ -96,7 +96,7 @@ function CustomerView() {
 function Stat({ k, v }: { k: string; v: string }) {
   return (
     <div className="rounded-xl bg-sand px-2 py-2">
-      <p className="text-[11px] text-taupe">{k}</p>
+      <p className="text-xs text-taupe">{k}</p>
       <p className="truncate text-sm font-semibold">{v}</p>
     </div>
   );

@@ -119,8 +119,8 @@ export default function TopProducts() {
           </button>
         ))}
       </div>
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" checked={realOnly} onChange={(e) => setRealOnly(e.target.checked)} /> Only delivered and paid orders (real revenue)
+      <label className="flex min-h-11 items-center gap-2.5 text-sm">
+        <input type="checkbox" className="h-5 w-5 shrink-0 accent-ink" checked={realOnly} onChange={(e) => setRealOnly(e.target.checked)} /> Only delivered and paid orders (real revenue)
       </label>
       <div className="card grid grid-cols-2 gap-3 p-4 text-sm">
         <div>

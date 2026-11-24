@@ -58,7 +58,7 @@ function Orders() {
         title="Orders"
         right={
           role === "shipping" ? null : (
-            <Link href="/invoice?new=1" className="p-1" aria-label="New invoice">
+            <Link href="/invoice?new=1" className="flex h-11 w-11 items-center justify-center rounded-full active:bg-sand" aria-label="New invoice">
               <PlusIcon />
             </Link>
           )
@@ -76,8 +76,8 @@ function Orders() {
             </button>
           ))}
         </div>
-        <label className="mt-3 flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={month} onChange={(e) => setMonth(e.target.checked)} /> This month only
+        <label className="mt-2 flex min-h-11 items-center gap-2.5 text-sm">
+          <input type="checkbox" className="h-5 w-5 accent-ink" checked={month} onChange={(e) => setMonth(e.target.checked)} /> This month only
         </label>
         <p className="mt-2 text-xs text-taupe">{rows.length} {rows.length === 1 ? "order" : "orders"}</p>
         <div className="card mt-2 hidden overflow-hidden lg:block">

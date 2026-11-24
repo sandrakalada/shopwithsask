@@ -37,6 +37,11 @@
   --color-warn: var(--color-warn);
   --color-danger: var(--color-danger);
   /* the iPhone's own system font (SF Pro): sharp, legible numbers, no download */
+  /* readable minimums on a phone: 12px captions, 14px secondary text */
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -96,7 +101,7 @@ textarea {
 
 /* filter chips */
 @utility chip {
-  @apply inline-flex min-h-9 shrink-0 items-center rounded-full bg-surface px-3.5 text-[14px] font-medium text-ink ring-1 ring-line ring-inset transition-colors active:opacity-70;
+  @apply inline-flex min-h-10 shrink-0 items-center rounded-full bg-surface px-3.5 text-[14px] font-medium text-ink ring-1 ring-line ring-inset transition-colors active:opacity-70;
 }
 @utility chip-on {
   @apply bg-ink text-white ring-ink;
@@ -107,7 +112,7 @@ textarea {
   @apply grid rounded-[10px] bg-sand p-0.5 text-[14px] font-semibold;
 }
 @utility seg-btn {
-  @apply min-h-9 rounded-[8px] text-taupe transition-colors;
+  @apply min-h-10 rounded-[8px] text-taupe transition-colors;
 }
 @utility seg-on {
   @apply bg-surface text-ink shadow-[0_1px_3px_rgba(0,0,0,0.12)];

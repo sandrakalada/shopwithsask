@@ -161,7 +161,7 @@ export function AdjustSheet({
             <p className="truncate text-[16px] font-semibold">{product?.title}</p>
             <p className="text-[13px] text-taupe">{variantLabel(variant.title)}</p>
           </div>
-          <button onClick={() => onClose()} className="flex h-8 w-8 items-center justify-center rounded-full bg-sand text-taupe" aria-label="Close">
+          <button onClick={() => onClose()} className="-m-1.5 flex h-11 w-11 items-center justify-center rounded-full bg-sand bg-clip-content p-1.5 text-taupe" aria-label="Close">
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" aria-hidden><path d="M6 6l12 12M18 6 6 18" /></svg>
           </button>
         </div>

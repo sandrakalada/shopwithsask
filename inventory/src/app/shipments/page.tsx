@@ -58,7 +58,7 @@ export default function ShipmentsPage() {
                     <p className="text-sm font-semibold">{o.name} · {o.shipping_address?.name ?? "Customer"}</p>
                     <p className="truncate text-xs text-taupe">{[o.shipping_address?.city, egp(o.total)].filter(Boolean).join(" · ")}</p>
                   </div>
-                  <Link href={`/shipment?order=${o.id}`} className="btn-light min-h-9 px-3 text-[14px]">
+                  <Link href={`/shipment?order=${o.id}`} className="btn-light min-h-10 px-3 text-[14px]">
                     <TruckIcon className="h-4 w-4" /> Ship
                   </Link>
                 </li>
@@ -116,7 +116,7 @@ export default function ShipmentsPage() {
                   <p className="truncate text-xs text-taupe"><span dir="ltr">{s.tracking}</span>{s.recipient.city ? ` · ${s.recipient.city}` : ""}</p>
                 </div>
                 <div className="text-right">
-                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${STATUS_TONE[s.status]}`}>{STATUS_LABEL[s.status]}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_TONE[s.status]}`}>{STATUS_LABEL[s.status]}</span>
                   {s.cod_amount > 0 && <p className="mt-1 text-xs font-semibold">{egp(s.cod_amount)}</p>}
                 </div>
               </Link>

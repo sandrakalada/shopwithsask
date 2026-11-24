@@ -137,7 +137,7 @@ export default function FindPage() {
           <input ref={libRef} type="file" accept="image/*" className="hidden" onChange={(e) => onPhoto(e.target.files?.[0])} />
           <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1">
             {["all", ...types].map((t) => (
-              <button key={t} onClick={() => setType(t)} className={`chip min-h-8 text-[13px] ${type === t ? "chip-on" : ""}`}>
+              <button key={t} onClick={() => setType(t)} className={`chip text-[13px] ${type === t ? "chip-on" : ""}`}>
                 {t === "all" ? "All types" : t}
               </button>
             ))}

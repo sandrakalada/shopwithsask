@@ -120,9 +120,11 @@ export default function Settings() {
               : "Face ID is not available in this browser. Open the app from your Home Screen on iPhone."}
           </p>
           {faceId.msg && <p className="text-red-600">{faceId.msg}</p>}
-          <button className={faceId.on ? "btn-light w-full" : "btn-dark w-full"} disabled={!faceId.available} onClick={toggleFaceId}>
-            {faceId.on ? "Turn off Face ID" : "Turn on Face ID"}
-          </button>
+          {faceId.available && (
+            <button className={faceId.on ? "btn-light w-full" : "btn-dark w-full"} onClick={toggleFaceId}>
+              {faceId.on ? "Turn off Face ID" : "Turn on Face ID"}
+            </button>
+          )}
         </section>
 
         <section className="card space-y-3 p-4 text-sm">

@@ -65,8 +65,8 @@ function Item() {
   return (
     <>
       <Header
-        title={product.title}
-        back
+        title={live[0]?.sku ?? variants.find((v) => v.sku)?.sku ?? "Item"}
+        back="/items"
         right={
           <button onClick={() => setShowHistory(true)} className="flex h-10 w-10 items-center justify-center rounded-full text-taupe active:bg-sand" aria-label="Stock history">
             <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
@@ -141,7 +141,7 @@ function Item() {
                   </p>
                 </button>
                 <Stepper value={v.quantity + pendingDelta(pend, v.id)} highlight={!!pendingDelta(pend, v.id)} label={variantLabel(v.title)} onChange={(d) => quick(v, d)} />
-                <button onClick={() => setSheet({ v, r: "count" })} className="text-[13px] font-medium text-caramel" aria-label={`Count or record a reason for ${variantLabel(v.title)}`}>
+                <button onClick={() => setSheet({ v, r: "count" })} className="-my-2 -mr-2 min-h-11 px-2 text-[13px] font-medium text-caramel" aria-label={`Count or record a reason for ${variantLabel(v.title)}`}>
                   More
                 </button>
               </li>
@@ -260,12 +260,19 @@ function ProductForm({ product, onClose }: { product: Product; onClose: () => vo
   return (
     <Sheet title="Edit item" onClose={onClose}>
       <div className="space-y-3">
-        <input className="field" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Name" />
-        <select className="field" value={type} onChange={(e) => setType(e.target.value)}>
-          <option value="">Type</option>
-          {TYPES.map((t) => <option key={t}>{t}</option>)}
-        </select>
-        <input className="field" value={image} onChange={(e) => setImage(e.target.value)} placeholder="Image link (optional)" />
+        <label className="block text-sm">
+          <span className="text-taupe">Name</span>
+          <input className="field mt-1" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Name" />
+        </label>
+        <label className="block text-sm">
+          <span className="text-taupe">Type</span>
+          <select className="field mt-1" value={type} onChange={(e) => setType(e.target.value)}>
+            <option value="">Choose a type</option>
+            {TYPES.map((t) => <option key={t}>{t}</option>)}
+          </select>
+        </label>
+        {/* photos come from Shopify; the link stays as it is */}
+        <input type="hidden" value={image} onChange={(e) => setImage(e.target.value)} />
         <label className="block text-sm">
           <span className="text-taupe">Shein link or Shein SKU</span>
           <input className="field mt-1" dir="ltr" value={shein} onChange={(e) => setShein(e.target.value)} placeholder="https://ar.shein.com/... or sz2403056386576003" />

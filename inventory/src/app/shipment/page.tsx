@@ -87,13 +87,13 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
 
           <section className="card space-y-3 p-4">
             <p className="section-title px-0">Deliver to</p>
-            <input className="field" placeholder="Name" value={s.recipient.name ?? ""} onChange={(e) => setR({ name: e.target.value })} />
-            <input className="field" placeholder="Phone" dir="ltr" inputMode="tel" value={s.recipient.phone ?? ""} onChange={(e) => setR({ phone: e.target.value })} />
-            <input className="field" placeholder="Street, building, floor, apartment" value={s.recipient.address1 ?? ""} onChange={(e) => setR({ address1: e.target.value })} />
-            <input className="field" placeholder="Area / landmark" value={s.recipient.address2 ?? ""} onChange={(e) => setR({ address2: e.target.value })} />
+            <label className="block text-[13px] text-taupe">Name<input className="field mt-1 text-ink" placeholder="Name" value={s.recipient.name ?? ""} onChange={(e) => setR({ name: e.target.value })} /></label>
+            <label className="block text-[13px] text-taupe">Phone<input className="field mt-1 text-ink" placeholder="Phone" dir="ltr" inputMode="tel" value={s.recipient.phone ?? ""} onChange={(e) => setR({ phone: e.target.value })} /></label>
+            <label className="block text-[13px] text-taupe">Address<input className="field mt-1 text-ink" placeholder="Street, building, floor, apartment" value={s.recipient.address1 ?? ""} onChange={(e) => setR({ address1: e.target.value })} /></label>
+            <label className="block text-[13px] text-taupe">Area or landmark<input className="field mt-1 text-ink" placeholder="Area / landmark" value={s.recipient.address2 ?? ""} onChange={(e) => setR({ address2: e.target.value })} /></label>
             <div className="grid grid-cols-2 gap-2">
-              <input className="field" placeholder="City" list="cities" value={s.recipient.city ?? ""} onChange={(e) => setR({ city: e.target.value })} />
-              <input className="field" placeholder="Governorate" list="cities" value={s.recipient.province ?? ""} onChange={(e) => setR({ province: e.target.value })} />
+              <label className="block text-[13px] text-taupe">City<input className="field mt-1 text-ink" placeholder="City" list="cities" value={s.recipient.city ?? ""} onChange={(e) => setR({ city: e.target.value })} /></label>
+              <label className="block text-[13px] text-taupe">Governorate<input className="field mt-1 text-ink" placeholder="Governorate" list="cities" value={s.recipient.province ?? ""} onChange={(e) => setR({ province: e.target.value })} /></label>
             </div>
             <datalist id="cities">{CITIES.map((c) => <option key={c} value={c} />)}</datalist>
           </section>

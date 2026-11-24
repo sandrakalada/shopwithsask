@@ -121,7 +121,7 @@ function OrderView() {
         <section className="card p-4">
           <p className="text-xs uppercase tracking-wide text-taupe">Customer</p>
           {customer && !shippingOnly ? (
-            <Link href={`/customer?id=${customer.id}`} className="mt-1 block font-semibold underline">
+            <Link href={`/customer?id=${customer.id}`} className="-my-1 block py-2 font-semibold underline">
               {name}
             </Link>
           ) : (

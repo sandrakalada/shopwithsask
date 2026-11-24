@@ -411,7 +411,7 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
   const Toggle = ({ on, set, children }: { on: boolean; set: (v: boolean) => void; children: React.ReactNode }) => (
     <label className="flex min-h-11 items-center justify-between gap-3 text-[15px]">
       <span>{children}</span>
-      <button type="button" role="switch" aria-checked={on} onClick={() => set(!on)} className={`relative h-[31px] w-[51px] shrink-0 rounded-full transition-colors ${on ? "bg-success" : "bg-sand ring-1 ring-line ring-inset"}`}>
+      <button type="button" role="switch" aria-checked={on} aria-label={typeof children === "string" ? children : undefined} onClick={() => set(!on)} className={`relative h-[31px] w-[51px] shrink-0 rounded-full transition-colors ${on ? "bg-success" : "bg-sand ring-1 ring-line ring-inset"}`}>
         <span className={`absolute top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow transition-[left] ${on ? "left-[22px]" : "left-[2px]"}`} />
       </button>
     </label>

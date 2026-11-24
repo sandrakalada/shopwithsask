@@ -34,7 +34,7 @@ export function StatusPills({ o }: { o: Order }) {
 }
 
 function Pill({ cls, children }: { cls: string; children: React.ReactNode }) {
-  return <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${cls}`}>{children}</span>;
+  return <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${cls}`}>{children}</span>;
 }
 
 export const orderCustomerName = (o: Order) => o.shipping_address?.name ?? o.email ?? "Customer";

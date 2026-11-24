@@ -187,7 +187,7 @@ function Cell({ k, v, sub, tone = "" }: { k: string; v: string; sub?: string; to
     <div className="min-w-0">
       <p className="text-[12px] text-taupe">{k}</p>
       <p className={`truncate text-[16px] font-semibold ${tone}`}>{v}</p>
-      {sub && <p className="truncate text-[11px] text-taupe">{sub}</p>}
+      {sub && <p className="truncate text-xs text-taupe">{sub}</p>}
     </div>
   );
 }

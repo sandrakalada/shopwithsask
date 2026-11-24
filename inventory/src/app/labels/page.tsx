@@ -195,8 +195,8 @@ function Labels() {
             {chosen.length} of {rows.length} selected · {chosen.reduce((t, r) => t + r.copies, 0)} stickers
           </span>
           <span className="flex gap-4 font-semibold text-caramel">
-            <button onClick={() => setRows((l) => l.map((r) => (visible.includes(r) ? { ...r, selected: true } : r)))}>Select all</button>
-            <button onClick={() => setRows((l) => l.map((r) => ({ ...r, selected: false })))}>None</button>
+            <button className="-my-2 py-2" onClick={() => setRows((l) => l.map((r) => (visible.includes(r) ? { ...r, selected: true } : r)))}>Select all</button>
+            <button className="-my-2 py-2" onClick={() => setRows((l) => l.map((r) => ({ ...r, selected: false })))}>None</button>
           </span>
         </div>
 
@@ -205,7 +205,7 @@ function Labels() {
             <li key={r.key} className="flex items-center gap-3 bg-surface px-3 py-2.5">
               <button
                 onClick={() => set(r.key, { selected: !r.selected })}
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ring-2 ring-inset ${r.selected ? "bg-ink ring-ink text-white" : "ring-line"}`}
+                className={`-m-2.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clip-content p-2.5 ring-2 ring-inset ring-offset-0 ${r.selected ? "bg-ink text-white ring-ink" : "ring-line"}`}
                 aria-label={`${r.selected ? "Unselect" : "Select"} ${r.p.title} ${variantLabel(r.v.title)}`}
                 aria-pressed={r.selected}
               >
@@ -216,7 +216,7 @@ function Labels() {
                 )}
               </button>
               <Thumb src={r.v.image_url ?? r.p.image_url} size={44} zoom={r.p.images?.length ? r.p.images : true} />
-              <button className="min-w-0 flex-1 text-left" onClick={() => set(r.key, { selected: !r.selected })}>
+              <button className="min-w-0 flex-1 text-left" aria-label={`${r.selected ? "Unselect" : "Select"} sticker ${variantLabel(r.v.title)}`} onClick={() => set(r.key, { selected: !r.selected })}>
                 {r.img ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={r.img} alt={`Sticker for ${r.p.title}`} className="w-full max-w-[220px] rounded-[6px] ring-1 ring-line" />
