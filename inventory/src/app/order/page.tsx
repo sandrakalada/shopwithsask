@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
+import { productMatcher } from "@/lib/lines";
 import { addressLines, egp, printNow, shareFile, waLink } from "@/lib/pdf";
 import { Header, Thumb } from "@/components/ui";
 import { PhoneIcon, PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
@@ -19,6 +20,18 @@ function OrderView() {
   const order = useLiveQuery(() => db.orders.get(id), [id]);
   const customer = useLiveQuery(async () => (order?.customer_id ? db.customers.get(order.customer_id) : undefined), [order?.customer_id]);
   const invoice = useLiveQuery(() => db.invoices.where("order_id").equals(id).first(), [id]);
+  // product page for each item: by the Shopify size, then the SKU, then the name (older orders)
+  const itemLinks = useLiveQuery(async () => {
+    if (!order) return [];
+    const products = await db.products.toArray();
+    const match = productMatcher(products);
+    return Promise.all(
+      order.line_items.map(async (l) => {
+        const v = (l.shopify_variant_id ? await db.variants.where("shopify_variant_id").equals(l.shopify_variant_id).first() : undefined) ?? (l.sku ? await db.variants.filter((x) => x.sku === l.sku && !x.archived).first() : undefined);
+        return v?.product_id ?? match(l.title).product?.id ?? null;
+      }),
+    );
+  }, [order]);
 
   const shipment = useLiveQuery(
     async () => (await db.shipments.where("order_id").equals(id).toArray()).filter((x) => x.status !== "cancelled").sort((a, b) => b.created_at.localeCompare(a.created_at))[0] ?? null,
@@ -144,8 +157,19 @@ function OrderView() {
         </section>
 
         <section className="card divide-y divide-line">
-          {order.line_items.map((l, i) => (
-            <div key={i} className="flex items-center gap-3 px-4 py-3">
+          {order.line_items.map((l, i) => {
+            const pid = itemLinks?.[i];
+            const Row2 = ({ children }: { children: React.ReactNode }) =>
+              pid ? (
+                <Link href={`/item?id=${pid}`} className="flex items-center gap-3 px-4 py-3 active:bg-sand" aria-label={`Open ${l.title}`}>
+                  {children}
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-faint" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden><path d="m9 6 6 6-6 6" /></svg>
+                </Link>
+              ) : (
+                <div className="flex items-center gap-3 px-4 py-3">{children}</div>
+              );
+            return (
+            <Row2 key={i}>
               <Thumb src={l.image} size={40} />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{l.title}</p>
@@ -156,8 +180,9 @@ function OrderView() {
                 </p>
               </div>
               <p className="text-sm font-semibold">{egp(l.total ?? (l.price ?? 0) * l.quantity)}</p>
-            </div>
-          ))}
+            </Row2>
+            );
+          })}
           <div className="space-y-1 px-4 py-3 text-sm">
             <Row k="Subtotal" v={egp(order.subtotal)} />
             <Row k="Delivery" v={egp(order.shipping)} />
