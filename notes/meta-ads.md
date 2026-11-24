@@ -522,3 +522,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-24 ~13:00 UTC: owner team (Mina M. Morcos) published the Ads Manager draft at 10:57 UTC: campaign 52565506125320, ad set 52565506125520 (150/day, Purchase, product set in stock, url_tags OK), live since 11:12. Off vs owner spec: age 18-65 with Advantage+ audience on, all placements (no FB/IG feed limit), locations only Heliopolis + Zamalek cities + 2 mi Rehab circle with travelers included. Fix proposed, awaiting owner OK. API duplicate 52565513827920 stays paused.
 
 - 2026-11-24 owner said "fix it": ad set 52565506125520 now women 20-45, Advantage+ audience off, FB feed + IG feed only, 10 high-end circles residents only. Mobile cart flow tested OK.
+
+- 2026-11-24 owner approved "yes 100": CART RETARGETING ad set 52565583023520 in campaign 52564976948720, 100/day, PURCHASE optimization, audience 52565583013920 (AddToCart or InitiateCheckout 14d, excluding Purchase 14d), women 20-45, high-end circles residents, IG only, Advantage+ off, 25 ads reusing best creatives. Total ~840/day. Owner told to apply Meta music recommendation and dismiss value rules in the app.
