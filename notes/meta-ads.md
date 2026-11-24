@@ -490,4 +490,27 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-23 owner: +70 EGP/day to high-end campaign, keep it running: NEW 300->350, WARM 150->170 (total 520/day). New product ad photos: only purple bomber and burgundy jacket have >=1080 photos (already in both ad sets); black velvet gold 1024 px; other 6 jackets no high-res photos; green cardigan DRAFT.
 - 2026-11-23 11:40 Cairo check: 111 EGP today (NEW 96, WARM 14), 0 ATC yet. No new orders. No issues. New 1080x1080 ad photos arrived (website chat) for black velvet gold, varsity, olive cardigan, colorblock shirt jacket, black blazer; viewed sharp, not upscaled; building carousel + photo ads in both ad sets. Black velvet floral cropped still has no ad photos.
 - 2026-11-23: 5 new jackets live in NEW + WARM (carousel + photo each, product links, EN+AR, 1080 ad photos): black velvet gold (2,200) 52565206850720/878120 + WARM 52565206901920/924520; varsity (2,400) 52565207092520/130120 + 52565207212120/246920; olive cardigan (2,250) 52565207459120/485120 + 52565207512320/549120; colorblock shirt jacket (1,550) 52565207697720/746920 + 52565207790120/824120; black blazer (1,750) 52565208026120/039320 + 52565208067320/081720. Each ad set now 46 ads.
-2026-11-23 12:50 Cairo daily report: Nov 22 already reported in the 09:10 catch-up. Today so far Meta 212 EGP (NEW 159, WARM 53), 0 ATC, 0 orders since #1402. Live 520/day high-end campaign (owner). Google PMax-2 paused, no changes. Nothing paused by this report.
+- 2026-11-23 16:30 Cairo: owner asked to verify ad links. Audited all 92 live ads (NEW + WARM): every ad links to /products/{handle} of the item it shows, 26 products, all ACTIVE, published (onlineStoreUrl) and in stock. Nothing changed.
+- 2026-11-23 17:35 Cairo check: 312 EGP today. NEW 232 (0 ATC, CPM 301), WARM 80 (4 ATC). No orders today. 46 ads each, no issues. Stock OK. NEW kept on per owner (keep campaign running); will propose shifting budget to WARM if still 0 tonight.
+- 2026-11-23 evening (owner: replace outdated images): new product photos 1536x1920 (viewed sharp). Archived 26 old ads for 7 new jackets (13 per set); created carousel v2 (5 photos) + photo v2 per jacket for 8 jackets (incl. new black velvet floral cropped, 2,050) in NEW + WARM = 32 ads. Green cable cardigan still DRAFT. Owner asked why no add-to-carts: site ATC tested OK on iPhone; carts 7/day; sessions ~140/day vs ~400 before (Instagram high-end only); cart rate ~5% unchanged. Proposed NEW 350->250, WARM 170->270 (waiting).
+- 2026-11-23 20:35 Cairo check: 379 EGP today. NEW 272 (0 ATC, CPM 310), WARM 107 (5 ATC). No orders today. 49 active ads per set, no issues, all advertised products in stock. NEW meets pause-losers threshold but owner said keep the campaign running; asked owner again (budget shift 350/170 -> 250/270).
+- 2026-11-23 night (owner: resurface old products in high-end areas): archived 'photo v2' duplicates of new jackets (carousels kept); added IG-post ads (page set) for burgundy velvet mini skirt, maroon corset top, sleeveless red long top, embroidered black vest, boho pom-pom vest, boho embroidered vest, embroidered denim vest to NEW + WARM (see task output).
+
+## 2026-11-23 BAGS, ACCESSORIES & HIGH STOCK ad set (owner approved 70/day)
+- Ad set 52565323029320 in high-end campaign 52564976948720, 70 EGP/day, same targeting as NEW CUSTOMERS (high-end circles, women 21-44 Advantage+, IG only, engagers excluded), ADD_TO_CART.
+- 23 new link ads (bags + accessories, store photos >=1080 px checked sharp at 1:1; OTTO bag skipped as soft; summer motifs skipped: crab, seahorse, starfish, ice cream, watermelon, pineapple, seaside).
+- Plus reused creatives: leopard tote, high-stock skirts/shirts/tops, resurfaced vests/tops, jackets, up to 50 ads.
+- Campaign total now 590/day (NEW 350, WARM 170, BAGS-ACC 70).
+
+- 2026-11-23 owner approved: NEW 52564976960720 350->250/day, WARM 52564976965920 170->270/day (NEW 0 ATC on 282 spend, WARM 11 ATC). Total still 590/day.
+
+- 2026-11-23 21:35 UTC check: NEW 338 spend 1 ATC; WARM 157 spend 15 ATC; BAGS-ACC 0 impressions yet (created 19:31 UTC, ads still in review). No orders today. All advertised bags/accessories in stock, no ad issues. NEW not paused (owner set 250/day minutes earlier).
+
+- 2026-11-24 00:35 UTC check: NEW 362 spend 2 ATC; WARM 173 spend 23 ATC; BAGS-ACC started delivering (8 EGP, 32 imp). No new orders since #1402, so stock unchanged. No ad issues.
+
+- 2026-11-24 03:35 UTC check: Nov 23 final (acct tz): NEW 363 / 2 ATC, WARM 176 / 23 ATC, BAGS-ACC 11 / 0. 0 orders on Nov 23 (23 ATC, 0 checkouts). Overnight quiet, no ad issues, stock unchanged.
+
+- 2026-11-24 06:35 UTC check: today NEW 58 / 5 ATC / 4 IC, WARM 45 / 5 ATC, BAGS-ACC 10 / 0. No orders yet. No ad issues.
+
+- 2026-11-24 09:35 UTC check: today NEW 120 / 9 ATC / 5 IC, WARM 58 / 9 ATC, BAGS-ACC 32 / 3 ATC. No orders since Nov 22. No ad issues.
+2026-11-24 daily report: Nov 23 Meta 550 EGP (NEW 363 / 2 ATC, WARM 176 / 23 ATC, BAGS 11), 0 orders. #1400 (3,769) and #1401 (1,824) from the high-end campaign were CANCELLED (Nov 23 and Nov 24); #1395 also cancelled. Last 7 days Meta 5,342 EGP, Meta counted 11 purchases (16,168) vs 6 kept Shopify Meta-paid orders (7,155) + 3 cancelled (33%); ROAS 1.34. No order since #1402 (Nov 22). Nothing paused by this report.
