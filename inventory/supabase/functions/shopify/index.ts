@@ -269,6 +269,7 @@ async function pull() {
           pageInfo { hasNextPage endCursor }
           nodes {
             id title sku price
+            media(first: 1) { nodes { preview { image { url } } } }
             product { id handle title productType status featuredMedia { preview { image { url } } } translations(locale: "ar") { key value } shein: metafield(namespace: "custom", key: "shein_id") { value } media(first: 6) { nodes { preview { image { url } } } } }
             inventoryItem { id tracked unitCost { amount } inventoryLevel(locationId: $loc) { quantities(names: ["available"]) { quantity } } }
           }
@@ -282,7 +283,7 @@ async function pull() {
 
   const [{ data: products, error: pe }, { data: variants, error: ve }] = await Promise.all([
     admin.from("products").select("id, handle, title, title_ar, product_type, image_url, archived, shopify_product_id, supplier_url, images"),
-    admin.from("variants").select("id, product_id, title, sku, barcode, price, quantity, archived, cost, shopify_dirty, shopify_variant_id, shopify_inventory_item_id"),
+    admin.from("variants").select("id, product_id, title, sku, barcode, price, quantity, archived, cost, shopify_dirty, shopify_variant_id, shopify_inventory_item_id, image_url"),
   ]);
   if (pe || ve) throw pe ?? ve;
   const pByShopify = new Map(products!.filter((p) => p.shopify_product_id).map((p) => [p.shopify_product_id, p]));
@@ -334,6 +335,8 @@ async function pull() {
       shopify_variant_id: svId,
       shopify_inventory_item_id: num(sv.inventoryItem.id),
       archived: sp.status === "ARCHIVED",
+      // the colour's own photo in Shopify (falls back to the product photo in the app)
+      image_url: sv.media?.nodes?.[0]?.preview?.image?.url?.split("?")[0] ?? null,
     };
     if ((!v || v.cost == null) && shopCost) Object.assign(row, { cost: shopCost, cost_currency: "EGP" });
     const changed = !v || Object.entries(row).some(([k, val]) => (k === "price" ? Number((v as any)[k]) !== val : (v as any)[k] !== val));

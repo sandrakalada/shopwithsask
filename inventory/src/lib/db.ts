@@ -62,6 +62,8 @@ export type Variant = {
   /** exact amount paid in SAR, when the cost was entered in SAR */
   cost_sar?: number | null;
   shopify_variant_id?: string | null;
+  /** this size/colour's own photo from Shopify */
+  image_url?: string | null;
 };
 
 export type Address = { name?: string; phone?: string; address1?: string; address2?: string; city?: string; province?: string } | null;

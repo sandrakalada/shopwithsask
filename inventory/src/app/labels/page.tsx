@@ -73,7 +73,7 @@ async function drawSticker(v: Variant, p: Product) {
   ctx.drawImage(logo, x, M + 0.4 * PX, Math.min((logo.width / logo.height) * lh, max), lh);
   ctx.font = font(600, 25);
   let y = M + 4.8 * PX;
-  for (const line of wrap(ctx, p.title, max, 3)) {
+  for (const line of wrap(ctx, stickerTitle(p.title, v.title), max, 3)) {
     ctx.fillText(line, x, y);
     y += 29;
   }
@@ -215,7 +215,7 @@ function Labels() {
                   </svg>
                 )}
               </button>
-              <Thumb src={r.p.image_url} size={44} zoom={r.p.images?.length ? r.p.images : true} />
+              <Thumb src={r.v.image_url ?? r.p.image_url} size={44} zoom={r.p.images?.length ? r.p.images : true} />
               <button className="min-w-0 flex-1 text-left" onClick={() => set(r.key, { selected: !r.selected })}>
                 {r.img ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -244,6 +244,12 @@ function Labels() {
       </div>
     </>
   );
+}
+
+/** "Boho Maxi Skirt in White, Black & Beige" + "Beige / Large" prints just "Boho Maxi Skirt": the colour is on the next line. */
+function stickerTitle(title: string, variant: string) {
+  if (!variant.includes(" / ")) return title;
+  return title.replace(/\s+in\s+[A-Za-z]+(?:\s*(?:,|&|and)\s*[A-Za-z]+)+\s*$/i, "").trim() || title;
 }
 
 function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {

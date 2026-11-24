@@ -76,7 +76,7 @@ function Item() {
       <main className="space-y-5 p-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0">
         <div className="space-y-5">
         <div className="flex gap-4">
-          <Thumb src={product.image_url} size={96} zoom={product.images?.length ? product.images : true} />
+          <Thumb src={(multi && colour !== "all" ? live.find((v) => v.image_url)?.image_url : null) ?? product.image_url} size={96} zoom={product.images?.length ? product.images : true} />
           <div className="min-w-0 flex-1">
             <h2 className="text-[17px] leading-snug font-semibold">{product.title}</h2>
             <p className="text-sm text-taupe">{product.product_type ?? "No type"}{live[0]?.sku ? ` · ${live[0].sku}` : ""}</p>
