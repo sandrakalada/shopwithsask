@@ -516,3 +516,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 
 ## 2026-11-24 FB + IG catalog test (owner asked to run on Facebook)
 - Campaign 52565513827920 "SWS | Sales | IG + FB Feed | Egypt | Nov 2026", ad set 52565513837320 (150/day, Purchase, product set 1646945297477460 SWS in stock, women 20-45, high-end circles residents only, FB feed + IG feed, Advantage+ audience off), ad 52565513871320 catalog creative 1119335180899733 (EN+AR, SHOP_NOW, creative enhancements opted out, owner url_tags with campaign/ad names). Built PAUSED via API because the Ads Manager draft is not reachable; waiting for owner OK on catalog photos (quality rule).
+
+- 2026-11-24 12:35 UTC check: today NEW 157 / 10 ATC / 5 IC, WARM 131 / 13 ATC, BAGS-ACC 53 / 3 ATC. 0 orders since Nov 22. FB catalog test still paused (awaiting photo OK). No ad issues.
