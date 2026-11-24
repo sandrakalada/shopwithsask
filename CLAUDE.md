@@ -33,6 +33,11 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 10. Fabric: set the Shopify Fabric field to the real composition from the Shein product page, never the default list.
 11. Status ACTIVE; publish to Online Store and Google & YouTube; add to its type collection and New Collection; move it to the top of New Collection and Shop All (both MANUAL).
 
+## Orders the owner sends manually (WhatsApp, Instagram, in person)
+- Always create them through the inventory app's Shopify link: POST to the Supabase edge function "shopify" with the x-cron-secret from vault ("sask_cron_secret") and body {"action":"create-order","sale":{items:[{title,quantity,price,shopifyVariantId}],customer:{name,phone,address,city,customerId},payment:"Cash on delivery"|"Instapay",paid,shipping:{title,price},discount,note}} (via net.http_post). The Shopify MCP cannot create orders.
+- Create the Shopify customer first (customerCreate with name and phone) and pass its id as customerId. Use the delivery fee from Store facts unless the owner says otherwise. No receipt emails.
+- If the item is out of stock and the owner says she has another piece, first set stock +1, then create the order (stock goes back to 0, product shows sold out).
+
 ## Reporting
 - Real revenue = orders that are fulfilled AND paid. ShopifyQL filter: `WHERE order_fulfillment_status = 'fulfilled' AND order_payment_status = 'paid'`.
 

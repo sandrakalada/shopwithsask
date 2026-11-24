@@ -978,6 +978,7 @@ Deno.serve(async (req) => {
       if (cb.action === "stock-check") return json(await stockCheck()); // read-only stock audit
       if (cb.action === "fx") return json(await updateRate());
       if (cb.action === "setup") return json(await setup()); // re-creates missing webhooks
+      if (cb.action === "create-order" && cb.sale) return json(await createOfflineOrder(cb.sale)); // orders placed for the owner from chat
       const fx = await updateRate().catch((e) => ({ error: String(e) }));
       const hooks = await setup().catch((e) => ({ error: String(e) })); // re-creates any webhook Shopify removed
       return json({ ...(await daily()), fx, hooks });
