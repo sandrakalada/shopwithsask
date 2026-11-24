@@ -950,14 +950,21 @@ Deno.serve(async (req) => {
       if (!(await verifyHmac(raw, hmac))) return json({ error: "bad signature" }, 401);
       const topic = req.headers.get("x-shopify-topic");
       const body = JSON.parse(raw);
-      if (topic === "inventory_levels/update") return json(await onInventoryLevel(body));
-      if (topic?.startsWith("orders/")) return json(await refreshOrder(body.id));
-      if (topic?.startsWith("customers/")) return json(await refreshCustomer(body.id));
+      // a failure here is logged but answered with 200: the daily sync catches up, and Shopify keeps the webhook
+      const safe = async (f: () => Promise<unknown>) => { try { return json(await f()); } catch (e) { console.error(topic, String(e)); return json({ error: "logged" }); } };
+      if (topic === "inventory_levels/update") return safe(() => onInventoryLevel(body));
+      if (topic?.startsWith("orders/")) return safe(() => refreshOrder(body.id));
+      if (topic?.startsWith("customers/")) return safe(() => refreshCustomer(body.id));
       if (topic?.startsWith("products/")) {
         // new or edited product: re-read the catalogue (adds it, gives it a SKU); at most once a minute
+        // Shopify removes a webhook that keeps failing or timing out, so: answer at once, claim the slot before
+        // starting (a burst of edits runs one pull, not hundreds), and run the pull in the background
         const last = (await getSetting("last_pull")) as string | null;
-        if (topic !== "products/create" && last && Date.now() - new Date(last).getTime() < 60_000) return json({ skipped: "recent pull" });
-        return json(await pull());
+        if (last && Date.now() - new Date(last).getTime() < (topic === "products/create" ? 15_000 : 60_000)) return json({ skipped: "recent pull" });
+        await setSetting("last_pull", new Date().toISOString());
+        const job = pull().catch((e) => console.error("background pull", String(e)));
+        (globalThis as any).EdgeRuntime?.waitUntil?.(job);
+        return json({ queued: "pull" });
       }
       return json({ ignored: topic });
     }
@@ -970,8 +977,10 @@ Deno.serve(async (req) => {
       if (cb.action === "scopes") return json({ scopes: await accessScopes() }); // read-only health check
       if (cb.action === "stock-check") return json(await stockCheck()); // read-only stock audit
       if (cb.action === "fx") return json(await updateRate());
+      if (cb.action === "setup") return json(await setup()); // re-creates missing webhooks
       const fx = await updateRate().catch((e) => ({ error: String(e) }));
-      return json({ ...(await daily()), fx });
+      const hooks = await setup().catch((e) => ({ error: String(e) })); // re-creates any webhook Shopify removed
+      return json({ ...(await daily()), fx, hooks });
     }
 
     const jwt = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
