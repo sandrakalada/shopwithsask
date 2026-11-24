@@ -505,3 +505,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-23 owner approved: NEW 52564976960720 350->250/day, WARM 52564976965920 170->270/day (NEW 0 ATC on 282 spend, WARM 11 ATC). Total still 590/day.
 
 - 2026-11-23 21:35 UTC check: NEW 338 spend 1 ATC; WARM 157 spend 15 ATC; BAGS-ACC 0 impressions yet (created 19:31 UTC, ads still in review). No orders today. All advertised bags/accessories in stock, no ad issues. NEW not paused (owner set 250/day minutes earlier).
+
+- 2026-11-24 00:35 UTC check: NEW 362 spend 2 ATC; WARM 173 spend 23 ATC; BAGS-ACC started delivering (8 EGP, 32 imp). No new orders since #1402, so stock unchanged. No ad issues.
