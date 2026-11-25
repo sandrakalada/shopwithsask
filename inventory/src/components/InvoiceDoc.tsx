@@ -120,12 +120,12 @@ const InvoiceDoc = forwardRef<HTMLDivElement, { inv: Invoice; store: InvoiceStor
         </div>
 
         {/* totals */}
-        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 18 }}>
-          <div style={{ width: 360, fontSize: 14, borderTop: `1px solid ${line}`, paddingTop: 8 }}>
+        <div style={{ marginTop: 18 }}>
+          <div style={{ width: "100%", fontSize: 14, borderTop: `1px solid ${line}`, paddingTop: 8 }}>
             <Line k={t.subtotal} v={money(inv.subtotal)} />
             <Line k={t.delivery} v={inv.shipping ? money(inv.shipping) : t.free} />
             {inv.discount > 0 && <Line k={t.discount} v={`- ${money(inv.discount)}`} />}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: ink, color: "#fff", borderRadius: 12, marginTop: 10, padding: "14px 18px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: ink, color: "#fff", borderRadius: 12, marginTop: 12, padding: "16px 20px" }}>
               <span style={{ fontSize: 15, fontWeight: 600 }}>{t.total}</span>
               <span style={{ fontSize: 22, fontWeight: 700 }}>{money(inv.total)}</span>
             </div>
