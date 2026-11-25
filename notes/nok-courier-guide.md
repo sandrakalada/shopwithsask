@@ -38,4 +38,6 @@ Shipment card and AWB (example order 1410)
 - Card: AWB number (12 digits, e.g. 590064526610), governorate, status (e.g. Transit); Receiver, Address, Description ("Item title x1"), Phone, COD, Weight (1.00 kg), Document Ticket; buttons Details, Print AWB, Track.
 - Print AWB opens the AWB PDF: Nok logo, Ship From: Shop With Sask, description, weight and quantity, AWB barcode and QR, Ship To, address, governorate and zone, receiver contact, notes, COD/Cash/Visa/Inst./Bank table, REF = Shopify order number without #.
 
+Owner's pickup rule: create the pickup first, then the shipments, then the pickup request; all orders of the day go into the same pickup request (one per day).
+
 More steps from the owner will follow.
