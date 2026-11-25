@@ -10,15 +10,19 @@ const W = 1181; // 100 mm at 300 dpi
 const H = 1772; // 150 mm
 
 let lastText = "";
+// the original PDF, so the label can be cut out as vectors (no quality loss at all)
+let lastPdf: { bytes: Uint8Array; toPdf: (x: number, y: number) => number[] } | null = null;
 
 async function fileToCanvas(file: File): Promise<HTMLCanvasElement> {
   const c = document.createElement("canvas");
   lastText = "";
+  lastPdf = null;
   if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
     const pdfjs = await import("pdfjs-dist");
     pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.mjs";
+    const bytes = new Uint8Array(await file.arrayBuffer());
     const doc = await pdfjs.getDocument({
-      data: new Uint8Array(await file.arrayBuffer()),
+      data: bytes.slice(),
       cMapUrl: "/pdfjs/cmaps/",
       cMapPacked: true,
       standardFontDataUrl: "/pdfjs/standard_fonts/",
@@ -30,6 +34,7 @@ async function fileToCanvas(file: File): Promise<HTMLCanvasElement> {
     } catch {}
     const base = page.getViewport({ scale: 1 });
     const vp = page.getViewport({ scale: 2400 / base.width });
+    lastPdf = { bytes, toPdf: (x, y) => vp.convertToPdfPoint(x, y) as number[] };
     c.width = Math.round(vp.width);
     c.height = Math.round(vp.height);
     const ctx = c.getContext("2d")!;
@@ -106,52 +111,124 @@ export function findLabelBox(c: HTMLCanvasElement) {
   return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
 }
 
-/** Returns the 100 x 150 mm label as a JPEG data URL, plus the AWB number when the PDF has it. */
-export async function awbLabelFromFile(file: File) {
-  const src = await fileToCanvas(file);
-  const b = findLabelBox(src);
+const PW = 283.465, PH = 425.197; // 100 x 150 mm in PDF points
+const MARGIN = 8.5; // 3 mm
+
+/** Renders a PDF page to a PNG at print resolution (600 dpi) for the preview and iPhone printing. */
+async function renderPdf(bytes: Uint8Array, dpi = 600) {
+  const pdfjs = await import("pdfjs-dist");
+  pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.mjs";
+  const doc = await pdfjs.getDocument({ data: bytes.slice(), cMapUrl: "/pdfjs/cmaps/", cMapPacked: true, standardFontDataUrl: "/pdfjs/standard_fonts/" }).promise;
+  const page = await doc.getPage(1);
+  const vp = page.getViewport({ scale: dpi / 72 });
+  const c = document.createElement("canvas");
+  c.width = Math.round(vp.width);
+  c.height = Math.round(vp.height);
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, c.width, c.height);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  return c.toDataURL("image/png");
+}
+
+/** PDF from Nok: cut the label out of the original page as vectors and place it on a 100 x 150 mm page.
+ * Nothing is redrawn or compressed, so the barcode and QR code stay exactly as Nok made them. */
+async function vectorLabel(bytes: Uint8Array, toPdf: (x: number, y: number) => number[], b: { x: number; y: number; w: number; h: number }) {
+  const { PDFDocument, degrees } = await import("pdf-lib");
+  const [ax, ay] = toPdf(b.x, b.y);
+  const [bx, by] = toPdf(b.x + b.w, b.y + b.h);
+  const box = { left: Math.min(ax, bx), right: Math.max(ax, bx), bottom: Math.min(ay, by), top: Math.max(ay, by) };
+  const src = await PDFDocument.load(bytes, { ignoreEncryption: true });
+  const out = await PDFDocument.create();
+  const emb = await out.embedPage(src.getPage(0), box);
+  const page = out.addPage([PW, PH]);
+  const bw = box.right - box.left, bh = box.top - box.bottom;
+  const rotate = bw / bh > 1.1;
+  const s = rotate ? Math.min((PW - 2 * MARGIN) / bh, (PH - 2 * MARGIN) / bw) : Math.min((PW - 2 * MARGIN) / bw, (PH - 2 * MARGIN) / bh);
+  const dw = bw * s, dh = bh * s;
+  if (rotate) page.drawPage(emb, { x: (PW - dh) / 2 + dh, y: (PH - dw) / 2, width: dw, height: dh, rotate: degrees(90) });
+  else page.drawPage(emb, { x: (PW - dw) / 2, y: (PH - dh) / 2, width: dw, height: dh });
+  return new Uint8Array(await out.save());
+}
+
+/** Screenshot or photo: crop and scale up to 600 dpi, lossless PNG (no JPEG blur on the barcode). */
+function rasterLabel(src: HTMLCanvasElement, b: { x: number; y: number; w: number; h: number }) {
+  const W2 = W * 2, H2 = H * 2; // 600 dpi
   const out = document.createElement("canvas");
-  out.width = W;
-  out.height = H;
+  out.width = W2;
+  out.height = H2;
   const ctx = out.getContext("2d")!;
   ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, W, H);
-  const m = 35; // ~3 mm margin
-  const rotate = b.w / b.h > 1.1; // wide crop: turn it to use the page
+  ctx.fillRect(0, 0, W2, H2);
+  const m = 70;
+  const rotate = b.w / b.h > 1.1;
   const cw = rotate ? b.h : b.w, ch = rotate ? b.w : b.h;
-  const s = Math.min((W - 2 * m) / cw, (H - 2 * m) / ch);
+  const s = Math.min((W2 - 2 * m) / cw, (H2 - 2 * m) / ch);
+  ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   ctx.save();
   if (rotate) {
-    ctx.translate(W / 2, H / 2);
+    ctx.translate(W2 / 2, H2 / 2);
     ctx.rotate(Math.PI / 2);
     ctx.drawImage(src, b.x, b.y, b.w, b.h, (-b.w * s) / 2, (-b.h * s) / 2, b.w * s, b.h * s);
   } else {
     const dw = b.w * s, dh = b.h * s;
-    ctx.drawImage(src, b.x, b.y, b.w, b.h, (W - dw) / 2, (H - dh) / 2, dw, dh);
+    ctx.drawImage(src, b.x, b.y, b.w, b.h, (W2 - dw) / 2, (H2 - dh) / 2, dw, dh);
   }
   ctx.restore();
+  sharpen(ctx, W2, H2);
+  return out.toDataURL("image/png");
+}
+
+/** Gentle unsharp mask: crisper edges after scaling up, without changing the content. */
+function sharpen(ctx: CanvasRenderingContext2D, w: number, h: number, amount = 0.6) {
+  const img = ctx.getImageData(0, 0, w, h);
+  const d = img.data, o = new Uint8ClampedArray(d);
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+      const i = (y * w + x) * 4;
+      for (let c = 0; c < 3; c++) {
+        const blur = (o[i - 4 + c] + o[i + 4 + c] + o[i - w * 4 + c] + o[i + w * 4 + c]) / 4;
+        d[i + c] = o[i + c] + amount * (o[i + c] - blur);
+      }
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+export type AwbLabel = { url: string; pdf: Blob; awb: string | null; ref: string | null };
+
+/** The 100 x 150 mm label: a vector PDF cut from Nok's PDF (or a sharp 600 dpi image from a screenshot), plus a preview. */
+export async function awbLabelFromFile(file: File): Promise<AwbLabel> {
+  const src = await fileToCanvas(file);
+  const b = findLabelBox(src);
   const awb = lastText.match(/AWB\s*:?\s*(\d{6,})/i)?.[1] ?? null;
   const ref = lastText.match(/REF\s*:?\s*(\d+)/i)?.[1] ?? null;
-  return { url: out.toDataURL("image/jpeg", 0.92), awb, ref };
+  if (lastPdf) {
+    const bytes = await vectorLabel(lastPdf.bytes, lastPdf.toPdf, b);
+    return { url: await renderPdf(bytes), pdf: new Blob([bytes as BlobPart], { type: "application/pdf" }), awb, ref };
+  }
+  const url = rasterLabel(src, b);
+  return { url, pdf: await imagesToPdf([{ url, ratio: H / W }], 100, 150), awb, ref };
 }
 
-export async function awbPdf(url: string) {
-  return imagesToPdf([{ url, ratio: H / W }], 100, 150);
-}
-
-const dataUrlToBlob = async (u: string) => (await fetch(u)).blob();
-
-export async function uploadAwb(shipmentId: string, url: string) {
-  const path = `${shipmentId}.jpg`;
-  const { error } = await supabase!.storage.from("awb").upload(path, await dataUrlToBlob(url), { contentType: "image/jpeg", upsert: true });
+export async function uploadAwb(shipmentId: string, pdf: Blob) {
+  const path = `${shipmentId}.pdf`;
+  const { error } = await supabase!.storage.from("awb").upload(path, pdf, { contentType: "application/pdf", upsert: true });
   if (error) throw error;
-  try { (await caches.open("awb-v1")).put(`/awb-cache/${path}`, new Response(await dataUrlToBlob(url))); } catch {}
+  try { (await caches.open("awb-v1")).put(`/awb-cache/${path}`, new Response(pdf)); } catch {}
   return path;
 }
 
-/** Device copy first (works offline), then the cloud. */
-export async function loadAwb(path: string): Promise<string | null> {
+const blobToDataUrl = (b: Blob) =>
+  new Promise<string>((res) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result as string);
+    r.readAsDataURL(b);
+  });
+
+/** Device copy first (works offline), then the cloud. Returns the preview image and the print PDF. */
+export async function loadAwb(path: string): Promise<{ url: string; pdf: Blob } | null> {
   let blob: Blob | null = null;
   try {
     const hit = await (await caches.open("awb-v1")).match(`/awb-cache/${path}`);
@@ -163,9 +240,10 @@ export async function loadAwb(path: string): Promise<string | null> {
     blob = data;
     try { (await caches.open("awb-v1")).put(`/awb-cache/${path}`, new Response(data)); } catch {}
   }
-  return await new Promise((res) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result as string);
-    r.readAsDataURL(blob!);
-  });
+  if (path.endsWith(".pdf")) {
+    const pdf = new Blob([blob], { type: "application/pdf" });
+    return { url: await renderPdf(new Uint8Array(await pdf.arrayBuffer())), pdf };
+  }
+  const url = await blobToDataUrl(blob);
+  return { url, pdf: await imagesToPdf([{ url, ratio: H / W }], 100, 150) };
 }

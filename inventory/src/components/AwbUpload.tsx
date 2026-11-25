@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { awbLabelFromFile } from "@/lib/awb";
+import { awbLabelFromFile, type AwbLabel } from "@/lib/awb";
 
-export type AwbResult = { url: string; awb: string | null; ref: string | null };
+export type AwbResult = AwbLabel;
 
 /** Pick the Nok Courier AWB (PDF from "Print AWB", or a screenshot of it). It is cropped to the label and sized 100 x 150 mm. */
 export default function AwbUpload({ onReady, label = "Add Nok AWB", orderNumber }: { onReady: (r: AwbResult) => Promise<void> | void; label?: string; orderNumber?: string | null }) {

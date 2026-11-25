@@ -54,7 +54,7 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
     setErr(null);
     try {
       let row = await saveShipment({ ...s, tracking: s.tracking.trim(), cod_amount: Math.max(0, Number(s.cod_amount) || 0), pieces: Math.max(1, Number(s.pieces) || 1) });
-      if (awb) row = await saveShipment({ ...row, awb_path: await uploadAwb(row.id, awb.url) });
+      if (awb) row = await saveShipment({ ...row, awb_path: await uploadAwb(row.id, awb.pdf) });
       if (!editing && row.order_id && toShopify) {
         try {
           await sendToShopify(row, notify);
@@ -314,7 +314,7 @@ function ShipmentView({ id }: { id: string }) {
             label={s.awb_path ? "Replace Nok AWB" : "Add Nok AWB (PDF from Print AWB)"}
             orderNumber={s.order_name}
             onReady={async (a) => {
-              const path = await uploadAwb(s.id, a.url);
+              const path = await uploadAwb(s.id, a.pdf);
               const row = await saveShipment({ ...s, awb_path: path, courier: "Nok Courier", tracking: a.awb ?? s.tracking });
               // the tracking number and Nok link go on the Shopify order
               if (row.order_id) await sendToShopify(row, false).catch(() => {});

@@ -5,7 +5,7 @@ import JsBarcode from "jsbarcode";
 import type { Order, Shipment } from "@/lib/db";
 import { getSetting } from "@/lib/stock";
 import { elementToImage, imagesToPdf, preparePrint, qrDataUrl } from "@/lib/pdf";
-import { awbPdf, loadAwb } from "@/lib/awb";
+import { loadAwb } from "@/lib/awb";
 import ShippingLabel, { shipmentNumber, type LabelStore } from "./ShippingLabel";
 
 /** Draws the 100 x 150 mm label off-screen as soon as the data is there,
@@ -25,10 +25,9 @@ export function useShippingLabel(order: Order | null | undefined, shipment?: Shi
     let cancelled = false;
     setLabel(null);
     (async () => {
-      const url = await loadAwb(awbPath).catch(() => null);
-      if (!url || cancelled) return;
-      const pdf = await awbPdf(url);
-      if (cancelled) return;
+      const got = await loadAwb(awbPath).catch(() => null);
+      if (!got || cancelled) return;
+      const { url, pdf } = got;
       setLabel({ url, pdf });
       preparePrint([url], 100, 150, pdf);
     })();
