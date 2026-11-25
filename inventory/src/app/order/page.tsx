@@ -10,7 +10,7 @@ import { addressLines, egp, printNow, shareFile, waLink } from "@/lib/pdf";
 import { Header, Thumb } from "@/components/ui";
 import { PhoneIcon, PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
 import { useShippingLabel } from "@/components/useShippingLabel";
-import { STATUS_LABEL, STATUS_TONE, openNok } from "@/lib/shipments";
+import { STATUS_LABEL, STATUS_TONE, openNok, trackingMessage } from "@/lib/shipments";
 import { fmtDate, orderCustomerName, orderPhone, paymentLabel, StatusPills } from "@/components/orderUi";
 import { useRole } from "@/components/Shell";
 
@@ -105,7 +105,14 @@ function OrderView() {
               </div>
               <span className="text-[13px] font-semibold text-caramel">Open</span>
             </Link>
-          ) : (
+          ) : null}
+          {shipment?.nok_status && <p className="mt-2 text-sm text-taupe">Nok: <span className="font-semibold text-ink">{shipment.nok_status}</span>{shipment.nok_location ? ` · ${shipment.nok_location}` : ""}</p>}
+          {shipment && (shipment.recipient.phone || order.phone) && (
+            <a className="btn-light mt-3 w-full" href={waLink(shipment.recipient.phone || order.phone, trackingMessage(shipment, order))} target="_blank" rel="noreferrer">
+              <WhatsAppIcon className="h-5 w-5" /> Send tracking to customer on WhatsApp
+            </a>
+          )}
+          {shipment ? null : (
             <div className="mt-2 flex items-center justify-between gap-3">
               <p className="text-sm text-taupe">No shipment yet.</p>
               <Link href={`/shipment?order=${order.id}`} onClick={() => openNok(order)} className="btn-dark px-4">

@@ -777,6 +777,21 @@ async function fulfillOrder(orderId: string, t: { company?: string; number?: str
   );
   const open = (d.order?.fulfillmentOrders?.nodes ?? []).filter((f: any) => f.supportedActions.some((a: any) => a.action === "CREATE_FULFILLMENT"));
   if (!open.length) {
+    // already shipped: put the (new) tracking number on the latest shipment instead
+    if (t.number) {
+      const f = await gql(`query($id: ID!) { order(id: $id) { fulfillments(first: 10) { id status } } }`, { id: `gid://shopify/Order/${orderId}` });
+      const last = (f.order?.fulfillments ?? []).filter((x: any) => x.status === "SUCCESS").pop();
+      if (last) {
+        const u = await gql(
+          `mutation($id: ID!, $t: FulfillmentTrackingInput!, $n: Boolean) { fulfillmentTrackingInfoUpdate(fulfillmentId: $id, trackingInfoInput: $t, notifyCustomer: $n) { fulfillment { id } userErrors { field message } } }`,
+          { id: last.id, n: !!t.notify, t: { number: String(t.number).slice(0, 100), ...(t.company ? { company: String(t.company).slice(0, 100) } : {}), ...(t.url && /^https:\/\//.test(t.url) ? { url: t.url } : {}) } },
+        );
+        const ue = u.fulfillmentTrackingInfoUpdate.userErrors;
+        if (ue?.length) throw new Error(ue.map((e: any) => e.message).join("; "));
+        await refreshOrder(orderId);
+        return { fulfilled: true, trackingUpdated: true };
+      }
+    }
     await refreshOrder(orderId);
     return { fulfilled: false, reason: "Already shipped in Shopify" };
   }
@@ -793,6 +808,75 @@ async function fulfillOrder(orderId: string, t: { company?: string; number?: str
   if (errs?.length) throw new Error(errs.map((e: any) => e.message).join("; "));
   await refreshOrder(orderId);
   return { fulfilled: true };
+}
+
+/* ---------- Nok Courier tracking: every hour, read each open shipment's public status page ---------- */
+
+const NOK_TRACK = "https://ots.nokcourier.com/shipment-status/?q=";
+const NOK_DONE = /settled|returned|lost|damage|cancel/i;
+
+const stripTags = (h: string) => h.replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+
+function parseNok(html: string) {
+  const pill = html.match(/class="status-pill[^"]*"[^>]*>([\s\S]*?)<\/span>/i);
+  if (!pill) return null;
+  const status = stripTags(pill[1]);
+  const loc = html.match(/fa-location-dot[^>]*><\/i>([^<]*)</i)?.[1]?.trim() ?? null;
+  const msg = html.match(/class="alert alert-light[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
+  return { status, location: loc, message: msg ? stripTags(msg[1]) : null };
+}
+
+/** Nok status -> the app's own shipment status */
+function appStatus(nok: string, current: string) {
+  const n = nok.toLowerCase();
+  if (/ready to return|returned|return/.test(n)) return "returned";
+  if (/deliver(ed)?\b/.test(n) && !/out for|undeliver|ready for/.test(n) || /settled|cashier|operation/.test(n)) return "delivered";
+  if (/out for delivery|transit|ready for delivery|hub|picked/.test(n)) return "picked_up";
+  return current;
+}
+
+async function nokStatus() {
+  const since = new Date(Date.now() - 60 * 86400_000).toISOString();
+  const { data: rows, error } = await admin
+    .from("shipments")
+    .select("id, order_id, order_name, tracking, status, cod_amount, recipient, nok_status")
+    .ilike("courier", "nok%")
+    .gte("created_at", since)
+    .not("status", "eq", "cancelled");
+  if (error) throw error;
+  let checked = 0, changed = 0;
+  for (const r of rows ?? []) {
+    if (!/^\d{6,}$/.test(r.tracking ?? "") || (r.nok_status && NOK_DONE.test(r.nok_status))) continue;
+    try {
+      const res = await fetch(NOK_TRACK + encodeURIComponent(r.tracking), { headers: { "user-agent": "Mozilla/5.0 (inventory status check)" } });
+      if (!res.ok) continue;
+      const p = parseNok(await res.text());
+      checked++;
+      if (!p) continue;
+      const now = new Date().toISOString();
+      const patch: Record<string, unknown> = { nok_checked_at: now, nok_location: p.location };
+      if (p.status !== r.nok_status) {
+        patch.nok_status = p.status;
+        patch.status = appStatus(p.status, r.status);
+        patch.updated_at = now;
+        changed++;
+        if (r.nok_status) await admin.from("wa_alerts").insert({
+          order_name: r.order_name ?? r.tracking,
+          order_id: r.order_id,
+          customer: r.recipient?.name ?? null,
+          phone: r.recipient?.phone ?? null,
+          total: r.cod_amount,
+          kind: `Nok: ${p.status}`,
+          detail: [`Was ${r.nok_status}`, p.location, p.message, `AWB ${r.tracking}`].filter(Boolean).join(" · "),
+        });
+      }
+      await admin.from("shipments").update(patch).eq("id", r.id);
+    } catch (e) {
+      console.error("nok", r.tracking, String(e));
+    }
+    await new Promise((ok) => setTimeout(ok, 400)); // gentle on their site
+  }
+  return { checked, changed };
 }
 
 /** Cash collected on delivery: mark the order paid in Shopify. */
@@ -980,6 +1064,7 @@ Deno.serve(async (req) => {
       if (cb.action === "setup") return json(await setup()); // re-creates missing webhooks
       if (cb.action === "create-order" && cb.sale) return json(await createOfflineOrder(cb.sale)); // orders placed for the owner from chat
       if (cb.action === "mark-paid" && cb.orderId) return json(await markOrderPaid(String(cb.orderId)));
+      if (cb.action === "nok-status") return json(await nokStatus()); // hourly courier status check
       if (cb.action === "fulfill-order" && cb.orderId) return json(await fulfillOrder(String(cb.orderId), cb.tracking ?? {}));
       const fx = await updateRate().catch((e) => ({ error: String(e) }));
       const hooks = await setup().catch((e) => ({ error: String(e) })); // re-creates any webhook Shopify removed
@@ -1006,6 +1091,7 @@ Deno.serve(async (req) => {
     if (action === "stock-check") return json(await stockCheck());
     if (action === "fulfill-order") return json(await fulfillOrder(String(body.orderId), body.tracking ?? {}));
     if (action === "mark-paid") return json(await markOrderPaid(String(body.orderId)));
+    if (action === "nok-status") return json(await nokStatus());
     return json({ error: "unknown action" }, 400);
   } catch (e) {
     console.error(e);

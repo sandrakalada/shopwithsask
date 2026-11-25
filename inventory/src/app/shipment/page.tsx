@@ -12,7 +12,7 @@ import { useShippingLabel } from "@/components/useShippingLabel";
 import AwbUpload, { type AwbResult } from "@/components/AwbUpload";
 import { uploadAwb } from "@/lib/awb";
 import {
-  STATUS_LABEL, STATUS_TONE, markPaidInShopify, openNok, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
+  STATUS_LABEL, STATUS_TONE, markPaidInShopify, openNok, trackingMessage, trackingUrl, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
 } from "@/lib/shipments";
 
 const CITIES = ["Cairo", "Giza", "Alexandria", "Qalyubia", "Sharqia", "Dakahlia", "Gharbia", "Monufia", "Beheira", "Kafr El Sheikh", "Damietta", "Port Said", "Ismailia", "Suez", "Fayoum", "Beni Suef", "Minya", "Asyut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "Matrouh", "North Sinai", "South Sinai", "New Valley"];
@@ -211,7 +211,8 @@ function ShipmentView({ id }: { id: string }) {
     setBusy(null);
   };
   const r = s.recipient;
-  const waText = `Hi ${(r.name ?? "").split(" ")[0]}, your Shop With Sask order${s.order_name ? ` ${s.order_name}` : ""} is on its way. Tracking number: ${s.tracking}${s.cod_amount > 0 ? `\nAmount to pay on delivery: ${egp(s.cod_amount)}` : ""}`;
+  const waText = trackingMessage(s, order);
+  const trackLink = trackingUrl(s.courier, s.tracking);
 
   return (
     <>
@@ -240,6 +241,17 @@ function ShipmentView({ id }: { id: string }) {
                     <p className="font-semibold">{s.pieces}</p>
                   </div>
                 </div>
+                {(s.nok_status || trackLink) && (
+                  <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-sand px-3 py-2.5 text-sm">
+                    <div className="min-w-0">
+                      <p className="font-semibold">{s.nok_status ? `Nok: ${s.nok_status}` : "Nok status not checked yet"}</p>
+                      {(s.nok_location || s.nok_checked_at) && (
+                        <p className="text-xs text-taupe">{[s.nok_location, s.nok_checked_at && `checked ${new Date(s.nok_checked_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`].filter(Boolean).join(" · ")}</p>
+                      )}
+                    </div>
+                    {trackLink && <a href={trackLink} target="_blank" rel="noreferrer" className="shrink-0 font-semibold text-caramel underline">Track</a>}
+                  </div>
+                )}
                 {s.order_id && (
                   <p className="mt-3 text-sm">
                     <Link href={`/order?id=${s.order_id}`} className="font-semibold underline">Order {s.order_name}</Link>
@@ -276,7 +288,7 @@ function ShipmentView({ id }: { id: string }) {
                 {s.note && <p className="mt-1 text-taupe">Note: {s.note}</p>}
                 {r.phone && (
                   <a className="btn-light mt-3 w-full" href={waLink(r.phone, waText)} target="_blank" rel="noreferrer">
-                    <WhatsAppIcon className="h-5 w-5" /> Send tracking on WhatsApp
+                    <WhatsAppIcon className="h-5 w-5" /> Send tracking to customer on WhatsApp
                   </a>
                 )}
               </section>
@@ -303,7 +315,9 @@ function ShipmentView({ id }: { id: string }) {
             orderNumber={s.order_name}
             onReady={async (a) => {
               const path = await uploadAwb(s.id, a.url);
-              await saveShipment({ ...s, awb_path: path, courier: "Nok Courier", tracking: a.awb ?? s.tracking });
+              const row = await saveShipment({ ...s, awb_path: path, courier: "Nok Courier", tracking: a.awb ?? s.tracking });
+              // the tracking number and Nok link go on the Shopify order
+              if (row.order_id) await sendToShopify(row, false).catch(() => {});
             }}
           />
           <div className="grid grid-cols-2 gap-2">

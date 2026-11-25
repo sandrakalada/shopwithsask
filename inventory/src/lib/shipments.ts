@@ -24,6 +24,7 @@ export const STATUS_TONE: Record<ShipmentStatus, string> = {
 /** Courier tracking pages, so the tracking number can be sent to Shopify as a link. */
 export function trackingUrl(courier: string, tracking: string) {
   const t = encodeURIComponent(tracking);
+  if (/nok/i.test(courier)) return `https://ots.nokcourier.com/shipment-status/?q=${t}`;
   if (courier === "Bosta") return `https://bosta.co/tracking-shipments?shipment-number=${t}`;
   if (courier === "Aramex") return `https://www.aramex.com/track/results?ShipmentNumber=${t}`;
   return undefined;
@@ -156,4 +157,30 @@ export function nokDetails(o: Order) {
 export function openNok(o: Order) {
   try { void navigator.clipboard?.writeText(nokDetails(o)).catch(() => {}); } catch {}
   window.open(NOK_URL, "_blank", "noopener");
+}
+
+/** WhatsApp message for the customer: name, order, items, total, tracking number and link. English and Arabic. */
+export function trackingMessage(s: Shipment, o?: Order | null) {
+  const first = (s.recipient.name ?? "").trim().split(/\s+/)[0] || "there";
+  const items = o ? contentsFor(o) : s.contents ?? "";
+  const total = Math.round(Number(o?.total ?? s.cod_amount ?? 0)).toLocaleString("en-US");
+  const link = trackingUrl(s.courier, s.tracking);
+  const cod = s.cod_amount > 0 ? Math.round(s.cod_amount).toLocaleString("en-US") : null;
+  const en = [
+    `Hi ${first}, your Shop With Sask order ${s.order_name ?? ""} is on its way.`.replace(/\s+\./, "."),
+    items && `Items: ${items}`,
+    `Total: ${total} EGP`,
+    cod ? `To pay on delivery: ${cod} EGP` : "Paid, nothing to pay on delivery",
+    `Tracking number: ${s.tracking}`,
+    link && `Track your order: ${link}`,
+  ].filter(Boolean).join("\n");
+  const ar = [
+    `أهلاً ${first}، طلبك من Shop With Sask ${s.order_name ?? ""} في الطريق إليكِ.`,
+    items && `المنتجات: ${items}`,
+    `الإجمالي: ${total} جنيه`,
+    cod ? `المطلوب عند الاستلام: ${cod} جنيه` : "مدفوع، لا يوجد مبلغ عند الاستلام",
+    `رقم الشحنة: ${s.tracking}`,
+    link && `تتبعي طلبك: ${link}`,
+  ].filter(Boolean).join("\n");
+  return `${en}\n\n${ar}`;
 }

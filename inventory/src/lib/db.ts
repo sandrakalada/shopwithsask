@@ -165,6 +165,10 @@ export type Shipment = {
   shopify_fulfilled: boolean;
   /** Nok Courier AWB label (100 x 150 mm JPEG) in storage bucket awb */
   awb_path?: string | null;
+  /** Nok Courier status from their public tracking page, checked every hour */
+  nok_status?: string | null;
+  nok_location?: string | null;
+  nok_checked_at?: string | null;
   created_by?: string | null;
   created_at: string;
   updated_at: string;
