@@ -16,7 +16,10 @@ import { FLAG, shipmentProblem } from "@/lib/problems";
 import { orderStage } from "@/lib/orderSteps";
 import type { Order, Shipment } from "@/lib/db";
 
-type F = "all" | "open" | "unpaid" | "fulfilled" | "cancelled";
+type F = "all" | "open" | "unpaid" | "fulfilled" | "changed" | "cancelled";
+
+/** customer edited, asked for a change, or cancelled (WhatsApp replies and Shopify tags) */
+const isChanged = (o: { cancelled_at: string | null; tags?: string[] }) => !!o.cancelled_at || (o.tags ?? []).some((t) => /change|edit|amend|cancel|reject/i.test(t));
 
 export default function OrdersPage() {
   return (
@@ -63,6 +66,7 @@ function Orders() {
       if (f === "unpaid" && (o.cancelled_at || o.financial_status !== "PENDING")) return false;
       if (f === "fulfilled" && o.fulfillment_status !== "FULFILLED") return false;
       if (f === "cancelled" && !o.cancelled_at) return false;
+      if (f === "changed" && !isChanged(o)) return false;
       if (!t) return true;
       return (
         o.name.toLowerCase().includes(t) ||
@@ -73,6 +77,10 @@ function Orders() {
     });
   }, [orders, q, f, month]);
 
+  const changedCount = useMemo(() => {
+    const since = new Date(Date.now() - 30 * 86400_000).toISOString();
+    return orders.filter((o) => o.created_at >= since && isChanged(o)).length;
+  }, [orders]);
   const { count, Sentinel } = useIncremental(rows.length, 40, `${q}|${f}|${month}`);
 
   return (
@@ -93,9 +101,10 @@ function Orders() {
           <input className="field pl-10" placeholder="Order number, name or phone" value={q} onChange={(e) => setQ(e.target.value)} type="search" />
         </label>
         <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4">
-          {(role === "shipping" ? ([["open", "To ship"], ["all", "All"]] as [F, string][]) : ([["all", "All"], ["open", "To ship"], ["unpaid", "Unpaid"], ["fulfilled", "Fulfilled"], ["cancelled", "Cancelled"]] as [F, string][])).map(([k, l]) => (
+          {(role === "shipping" ? ([["open", "To ship"], ["all", "All"]] as [F, string][]) : ([["all", "All"], ["open", "To ship"], ["unpaid", "Unpaid"], ["fulfilled", "Fulfilled"], ["changed", "Changed or cancelled"], ["cancelled", "Cancelled"]] as [F, string][])).map(([k, l]) => (
             <button key={k} onClick={() => setF(k)} className={`chip ${f === k ? "chip-on" : ""}`}>
               {l}
+              {k === "changed" && changedCount > 0 && <span className="ml-1.5 rounded-full bg-amber-100 px-1.5 text-[12px] text-amber-800">{changedCount}</span>}
             </button>
           ))}
         </div>

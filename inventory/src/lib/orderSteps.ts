@@ -29,7 +29,7 @@ export function orderSteps(o: Order, sh?: Shipment | null): Step[] {
       state: refused ? "bad" : confirmed ? "done" : change ? "now" : sent ? "now" : "todo",
       note: change ? "Change requested" : undefined,
     },
-    { key: "shipment", label: "Shipment created in Nok", state: shipped ? "done" : "todo", note: sh?.tracking ? `AWB ${sh.tracking}` : undefined, at: sh?.created_at },
+    { key: "shipment", label: "Shipment created in Nok", state: shipped ? "done" : confirmed || paid ? "now" : "todo", note: sh?.tracking ? `AWB ${sh.tracking}` : undefined, at: sh?.created_at },
     { key: "transit", label: "In transit", state: moving ? "done" : shipped ? "now" : "todo" },
     { key: "out", label: "Out for delivery", state: outFor ? "done" : moving ? "now" : "todo" },
     returned
@@ -38,6 +38,13 @@ export function orderSteps(o: Order, sh?: Shipment | null): Step[] {
     { key: "paid", label: /settled/.test(n) ? "Paid to you by Nok" : "Paid", state: paid ? "done" : delivered ? "now" : "todo" },
   ];
   if (cancelled) return [steps[0], { key: "cancelled", label: "Order cancelled", state: "bad", at: o.cancelled_at }];
+  // paid upfront (Instapay): no WhatsApp confirmation needed
+  if (paid && !sent) {
+    steps[1] = { ...steps[1], state: "skip", note: "Paid upfront, not needed" };
+    steps[2] = { ...steps[2], state: "skip", note: "Paid upfront, not needed" };
+    steps[7] = { ...steps[7], note: "Paid upfront" };
+  }
+  if (has(o, /edit|amend/i)) steps.splice(3, 0, { key: "edited", label: "Order edited", state: "done", note: (o.tags ?? []).filter((t) => /edit|amend/i.test(t)).join(", ") });
   // a step that was not needed (e.g. paid by Instapay, no WhatsApp confirmation) before one that is done
   const lastDone = steps.map((x) => x.state).lastIndexOf("done");
   const lastChain = Math.max(...["shipment", "transit", "out", "delivered"].map((k) => (steps.find((x) => x.key === k)?.state === "done" ? steps.findIndex((x) => x.key === k) : -1)));
