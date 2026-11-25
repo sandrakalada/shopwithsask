@@ -14,7 +14,7 @@ export function shipmentProblem(s: Shipment): string | null {
   const n = (s.nok_status ?? "").toLowerCase();
   if (/lost|damage/.test(n)) return s.nok_status!;
   if (/undeliver|pending|refus/.test(n)) return `${s.nok_status}: needs your answer to Nok`;
-  if (isNok(s) && !s.awb_path) return "No Nok label yet";
+  if (isNok(s) && !s.awb_path) return "No shipping label yet";
   if (isNok(s) && !s.nok_status && Date.now() - new Date(s.created_at).getTime() > 3 * 3600_000) return "Nok status not read yet";
   if (s.order_id && !s.shopify_fulfilled) return "Not marked shipped in Shopify";
   return null;

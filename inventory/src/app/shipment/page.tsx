@@ -396,7 +396,7 @@ function ShipmentView({ id }: { id: string }) {
           />
           <div className={`grid grid-cols-2 gap-2 ${!label && !labelWaiting ? "hidden" : ""}`}>
             <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
-              <PrintIcon className="h-5 w-5" /> {label ? "Print label" : labelWaiting ? "Preparing" : "No Nok label yet"}
+              <PrintIcon className="h-5 w-5" /> {label ? "Print label" : labelWaiting ? "Preparing" : "No shipping label yet"}
             </button>
             <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${s.tracking}.pdf`)}>
               Share label
@@ -404,12 +404,12 @@ function ShipmentView({ id }: { id: string }) {
           </div>
           {label ? (
             <section className="card p-3">
-              <p className="mb-2 text-xs text-taupe">{s.awb_path ? "Nok AWB" : "Shipping label"} (100 x 150 mm)</p>
+              <p className="mb-2 text-xs text-taupe">Shipping label (100 x 150 mm)</p>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={label.url} alt="Shipping label preview" className="mx-auto w-56 rounded border border-line lg:w-full" />
             </section>
           ) : (
-            labelWaiting ? <div className="mx-auto aspect-[2/3] w-56 animate-pulse rounded-[14px] bg-sand lg:w-full" /> : <p className="card p-4 text-center text-sm text-taupe">No Nok label yet. Create it in Nok above, or add the AWB.</p>
+            labelWaiting ? <div className="mx-auto aspect-[2/3] w-56 animate-pulse rounded-[14px] bg-sand lg:w-full" /> : <p className="card p-4 text-center text-sm text-taupe">No shipping label yet. Create the shipment above, or add the label.</p>
           )}
         </aside>
       </main>
