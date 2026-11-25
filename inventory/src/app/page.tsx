@@ -7,7 +7,7 @@ import { productMatcher } from "@/lib/lines";
 import { costInEgp } from "@/lib/stock";
 import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
-import { ReceiptIcon, ScanIcon, SearchIcon, WalletIcon } from "@/components/Icons";
+import { ReceiptIcon, ScanIcon, SearchIcon, TruckIcon, WalletIcon } from "@/components/Icons";
 import { useEffect, useState } from "react";
 import { signedInUser } from "@/lib/supabase";
 
@@ -121,14 +121,15 @@ export default function Home() {
           <h1 className="text-[30px] font-bold tracking-tight">{firstName ? `Hi ${firstName}` : "Hi"}</h1>
         </div>
         {/* the four jobs done most often, one tap away */}
-        <nav aria-label="Quick actions" className="grid grid-cols-4 gap-2">
+        <nav aria-label="Quick actions" className="grid grid-cols-5 gap-2">
           {[
             { href: "/scan", label: "Scan", Icon: ScanIcon },
             { href: "/find", label: "Find item", Icon: SearchIcon },
             { href: "/invoice?new=1", label: "New sale", Icon: ReceiptIcon },
+            { href: "/shipments", label: "Order tracking", Icon: TruckIcon },
             { href: "/settlement", label: "Settlement", Icon: WalletIcon },
           ].map(({ href, label, Icon }) => (
-            <Link key={href} href={href} className="card flex min-h-[72px] flex-col items-center justify-center gap-1.5 text-[12.5px] font-semibold active:bg-sand">
+            <Link key={href} href={href} className="card flex min-h-[72px] flex-col items-center justify-center gap-1.5 px-1 text-center text-[12px] leading-tight font-semibold active:bg-sand">
               <Icon className="h-6 w-6 text-caramel" />
               {label}
             </Link>
