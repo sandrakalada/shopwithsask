@@ -550,3 +550,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-25 15:35 UTC check: #1413 1,015 boho maxi skirt and #1414 1,015 colorblock windbreaker, both FB catalog. Today 5 orders 5,075, 4 from FB catalog (174 EGP spend). Windbreaker sold out (checked ads). BAGS-ACC 8 and CART RT 17 still barely delivering (decision pending with owner).
 
 - 2026-11-25 owner "yes": paused BAGS-ACC 52565323029320 and CART RT 52565583023520 (barely delivering); FB catalog campaign 52565506125320 250 -> 420/day. Total still 840/day (NEW 150, WARM 270, FB catalog 420).
+
+- 2026-11-25 18:35 UTC check: no new orders since #1414. Today NEW 89 / 5 ATC, WARM 220 / 6 ATC, FB catalog 235 / 18 ATC / 4 pur. No ad issues.
