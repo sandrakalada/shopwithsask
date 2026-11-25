@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { db } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 import { Header, timeAgo } from "@/components/ui";
 import { checkAlerts, clearUnseen } from "@/lib/alerts";
@@ -44,6 +45,18 @@ export default function AlertsPage() {
   }, [load]);
 
   const unseen = rows?.filter((r) => !r.seen).length ?? 0;
+  const router = useRouter();
+  // tap an alert: mark it read and open its order (by id, or by the order number on this phone)
+  const open = async (a: Alert) => {
+    if (!a.seen && supabase) {
+      setRows((rs) => rs!.map((r) => (r.id === a.id ? { ...r, seen: true } : r)));
+      void supabase.from("wa_alerts").update({ seen: true }).eq("id", a.id).then(() => checkAlerts());
+    }
+    const name = a.order_name.startsWith("#") ? a.order_name : `#${a.order_name}`;
+    const o = (a.order_id ? await db.orders.get(String(a.order_id)) : undefined) ?? (await db.orders.where("name").equals(name).first());
+    if (o) router.push(`/order?id=${o.id}`);
+    else router.push(`/orders?q=${encodeURIComponent(name)}`);
+  };
 
   const markAllSeen = async () => {
     if (!supabase || !unseen) return;
@@ -83,26 +96,28 @@ export default function AlertsPage() {
             <h2 className="mb-2 text-sm font-semibold">{day}</h2>
             <ul className="card divide-y divide-line">
               {list.map((a) => (
-                <li key={a.id} className={`px-4 py-3 text-sm ${a.seen ? "" : "bg-sand/50"}`}>
+                <li
+                  key={a.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => void open(a)}
+                  onKeyDown={(e) => e.key === "Enter" && void open(a)}
+                  className={`cursor-pointer px-4 py-3 text-sm hover:bg-sand active:bg-sand ${a.seen ? "" : "bg-sand/50"}`}
+                  aria-label={`Open order ${a.order_name}`}
+                >
                   <div className="flex items-center gap-2">
                     {!a.seen && <span className="h-2 w-2 shrink-0 rounded-full bg-danger" aria-label="New" />}
                     <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${tone(a.kind)}`}>{a.kind}</span>
                     <span className="ml-auto shrink-0 text-xs text-taupe">{timeAgo(a.created_at)}</span>
                   </div>
                   <p className="mt-1.5">
-                    {a.order_id ? (
-                      <Link href={`/order?id=${a.order_id}`} className="font-semibold underline-offset-2 hover:underline">
-                        {a.order_name}
-                      </Link>
-                    ) : (
-                      <span className="font-semibold">{a.order_name}</span>
-                    )}
+                    <span className="font-semibold">{a.order_name}</span>
                     {a.customer ? ` · ${a.customer}` : ""}
                     {a.total != null ? ` · EGP ${Number(a.total).toLocaleString("en-US")}` : ""}
                   </p>
                   {a.detail && <p className="mt-1 whitespace-pre-wrap text-taupe">{a.detail}</p>}
                   {a.phone && (
-                    <a href={`https://wa.me/${a.phone.replace(/\D/g, "").replace(/^0/, "20")}`} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-taupe underline">
+                    <a href={`https://wa.me/${a.phone.replace(/\D/g, "").replace(/^0/, "20")}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="-my-2 inline-block py-2 text-xs text-taupe underline">
                       Message {a.phone}
                     </a>
                   )}

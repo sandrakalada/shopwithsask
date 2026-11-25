@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
+import { alertStore } from "@/lib/alerts";
 import type { Product, Reason, Variant } from "@/lib/db";
 import { recordMovement, setCount, thumb, variantLabel } from "@/lib/stock";
 import { BackIcon, MinusIcon, PlusIcon } from "./Icons";
-import { SyncBadge } from "./Shell";
+import { SyncBadge, useRole } from "./Shell";
 import SideMenu from "./SideMenu";
 import Lightbox from "./Lightbox";
 
@@ -39,6 +40,7 @@ export function Header({ title, back, right, logo }: { title: string; back?: boo
           <h1 className="min-w-0 flex-1 truncate pl-1 text-[17px] font-semibold tracking-tight lg:text-[20px]">{title}</h1>
         )}
         {right}
+        <AlertsBell />
         <SyncBadge />
       </div>
     </header>
@@ -270,5 +272,22 @@ export function Stepper({ value, onChange, highlight, label }: { value: number; 
         <PlusIcon className="h-[18px] w-[18px]" />
       </button>
     </div>
+  );
+}
+
+/** Bell in the top bar: opens WhatsApp alerts, red count when there are new ones. */
+function AlertsBell() {
+  const { unseen } = useSyncExternalStore(alertStore.subscribe, alertStore.get, alertStore.server);
+  const role = useRole();
+  if (role === "shipping") return null;
+  return (
+    <Link href="/alerts" className="relative flex h-11 min-w-11 items-center justify-center rounded-full text-ink active:bg-sand" aria-label={unseen ? `WhatsApp alerts, ${unseen} new` : "WhatsApp alerts"}>
+      <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15L6 16ZM10 20.5a2 2 0 0 0 4 0" />
+      </svg>
+      {unseen > 0 && (
+        <span className="absolute top-1 right-0.5 min-w-[18px] rounded-full bg-danger px-1 text-center text-[11px] leading-[18px] font-semibold text-white ring-2 ring-canvas">{unseen > 9 ? "9+" : unseen}</span>
+      )}
+    </Link>
   );
 }

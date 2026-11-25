@@ -26,7 +26,7 @@ function Orders() {
   const role = useRole();
   const router = useRouter();
   const params = useSearchParams();
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(params.get("q") ?? "");
   const [f, setF] = useState<F>((params.get("f") as F) ?? (role === "shipping" ? "open" : "all"));
   const [month, setMonth] = useState(params.get("since") === "month");
   const orders = useLiveQuery(() => db.orders.orderBy("created_at").reverse().toArray(), [], []);
