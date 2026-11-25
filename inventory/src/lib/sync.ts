@@ -116,15 +116,27 @@ async function pullTable<T extends { updated_at: string }>(table: "products" | "
 }
 
 async function pull() {
-  const p = await pullTable<Product>("products");
-  const v = await pullTable<Variant>("variants");
-
-  const { data: moves, error } = await supabase!
-    .from("stock_movements")
-    .select("id, variant_id, delta, reason, note, created_at, user_email, synced_at")
-    .gt("synced_at", (await getMeta("cursor:movements")) ?? EPOCH)
-    .order("synced_at", { ascending: true })
-    .limit(PAGE);
+  // all downloads at once (one round trip of waiting instead of ten)
+  const movesCursor = (await getMeta("cursor:movements")) ?? EPOCH;
+  const syncedTables = Promise.all([
+    pullSynced("orders", db.orders),
+    pullSynced("customers", db.customers),
+    pullSynced("invoices", db.invoices),
+    pullSynced("shipments", db.shipments).then(dropDeletedShipments),
+    pullSynced("app_settings", db.settings),
+  ]);
+  syncedTables.catch(() => {}); // awaited below; avoids an unhandled warning if products fail first
+  const [p, v, mv] = await Promise.all([
+    pullTable<Product>("products"),
+    pullTable<Variant>("variants"),
+    supabase!
+      .from("stock_movements")
+      .select("id, variant_id, delta, reason, note, created_at, user_email, synced_at")
+      .gt("synced_at", movesCursor)
+      .order("synced_at", { ascending: true })
+      .limit(PAGE),
+  ]);
+  const { data: moves, error } = mv;
   if (error) throw error;
 
   await db.transaction("rw", [db.products, db.variants, db.movements, db.outbox, db.meta], async () => {
@@ -152,12 +164,7 @@ async function pull() {
     await setMeta(p.key, p.cursor);
     await setMeta(v.key, v.cursor);
   });
-  await pullSynced("orders", db.orders);
-  await pullSynced("customers", db.customers);
-  await pullSynced("invoices", db.invoices);
-  await pullSynced("shipments", db.shipments);
-  await dropDeletedShipments();
-  await pullSynced("app_settings", db.settings);
+  await syncedTables;
 }
 
 /** Shipments deleted on another device disappear here too. */
@@ -219,10 +226,11 @@ export async function syncNow() {
     if (shippingOnly) {
       // labels-only accounts never run Shopify syncs
     } else if (due) {
-      const ok = await shopify("pull")
-        .then(() => setMeta("shopifyPull", new Date().toISOString()).then(() => true))
-        .catch((e) => setMeta("shopifyError", String(e.message)).then(() => false));
-      if (ok) await pull();
+      // the twice-a-day full check with Shopify takes a while: run it in the background, the app is ready already
+      await setMeta("shopifyPull", new Date().toISOString());
+      void shopify("pull")
+        .then(() => pull())
+        .catch((e) => setMeta("shopifyError", String(e.message)));
     } else if (pushedMovements) {
       await shopify("push").catch((e) => setMeta("shopifyError", String(e.message)));
     }

@@ -242,7 +242,15 @@ export async function loadAwb(path: string): Promise<{ url: string; pdf: Blob } 
   }
   if (path.endsWith(".pdf")) {
     const pdf = new Blob([blob], { type: "application/pdf" });
-    return { url: await renderPdf(new Uint8Array(await pdf.arrayBuffer())), pdf };
+    // the preview picture is drawn once and kept, so the label shows instantly next time
+    const key = `/awb-cache/${path}.png`;
+    try {
+      const hit = await (await caches.open("awb-v1")).match(key);
+      if (hit) return { url: await blobToDataUrl(await hit.blob()), pdf };
+    } catch {}
+    const url = await renderPdf(new Uint8Array(await pdf.arrayBuffer()));
+    try { (await caches.open("awb-v1")).put(key, new Response(await (await fetch(url)).blob())); } catch {}
+    return { url, pdf };
   }
   const url = await blobToDataUrl(blob);
   return { url, pdf: await imagesToPdf([{ url, ratio: H / W }], 100, 150) };
