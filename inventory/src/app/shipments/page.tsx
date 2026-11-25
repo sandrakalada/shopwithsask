@@ -23,13 +23,6 @@ export default function ShipmentsPage() {
   const [q, setQ] = useState("");
   const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);
   const all = useLiveQuery(() => db.shipments.orderBy("created_at").reverse().toArray(), []);
-  // orders still to ship this month that have no shipment yet
-  const waiting = useLiveQuery(async () => {
-    const since = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
-    const [orders, ships] = await Promise.all([db.orders.where("created_at").aboveOrEqual(since).toArray(), db.shipments.toArray()]);
-    const shipped = new Set(ships.filter((s) => s.status !== "cancelled").map((s) => s.order_id));
-    return orders.filter((o) => !o.cancelled_at && o.fulfillment_status !== "FULFILLED" && !shipped.has(o.id)).sort((a, b) => b.created_at.localeCompare(a.created_at));
-  }, []);
 
   const rows = useMemo(() => {
     const t = q.trim().toLowerCase();
@@ -46,33 +39,12 @@ export default function ShipmentsPage() {
     <>
       <Header title="Order tracking" />
       <main className="space-y-4 p-4">
-        <div className="flex justify-end">
-          <Link href="/orders?f=open&since=month" className="btn-light w-full lg:w-auto">Orders to ship</Link>
-        </div>
-
         <NokProblems />
         {note && (
           <p role="status" className={`card flex items-start justify-between gap-3 p-3 text-sm ${note.ok ? "text-emerald-800" : "text-amber-800"}`}>
             <span>{note.text}</span>
             <button className="btn-plain min-h-9 px-3 text-[13px]" onClick={() => setNote(null)}>OK</button>
           </p>
-        )}
-        {!!waiting?.length && (
-          <section>
-            <p className="section-title">Waiting for a shipment ({waiting.length})</p>
-            <ul className="card divide-y divide-line overflow-hidden lg:grid lg:grid-cols-2 lg:divide-y-0 lg:gap-px lg:bg-line lg:[&>li:last-child:nth-child(odd)]:col-span-2">
-              {waiting.slice(0, 12).map((o) => (
-                <li key={o.id} className="flex items-center gap-3 bg-surface px-4 py-3">
-                  <Link href={`/order?id=${o.id}`} className="min-w-0 flex-1 rounded-lg hover:opacity-70">
-                    <p className="text-sm font-semibold">{o.name} · {o.shipping_address?.name ?? "Customer"}</p>
-                    <p className="truncate text-xs text-taupe">{[o.shipping_address?.city, egp(o.total)].filter(Boolean).join(" · ")}</p>
-                    {showTags(o).length > 0 && <p className="mt-1 flex flex-wrap gap-1">{showTags(o).map((t) => <span key={t} className="rounded-full bg-sand px-2 py-0.5 text-[11px] font-semibold text-taupe">{t}</span>)}</p>}
-                  </Link>
-                  <CreateShipmentButton order={o} onDone={setNote} />
-                </li>
-              ))}
-            </ul>
-          </section>
         )}
 
         <input className="field" type="search" placeholder="Tracking, order, name or phone" value={q} onChange={(e) => setQ(e.target.value)} />
