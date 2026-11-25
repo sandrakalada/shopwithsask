@@ -12,8 +12,8 @@ import { fmtDate, orderCustomerName, orderPhone, StatusPills } from "@/component
 import { useRole } from "@/components/Shell";
 import { useIncremental } from "@/components/useIncremental";
 import CreateShipmentButton from "@/components/CreateShipmentButton";
-import { STATUS_TONE, statusText } from "@/lib/shipments";
 import { FLAG, shipmentProblem } from "@/lib/problems";
+import { orderStage } from "@/lib/orderSteps";
 import type { Order, Shipment } from "@/lib/db";
 
 type F = "all" | "open" | "unpaid" | "fulfilled" | "cancelled";
@@ -47,7 +47,6 @@ function Orders() {
     if (sh)
       return (
         <span className="inline-flex items-center gap-1.5">
-          <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_TONE[sh.status]}`}>{statusText(sh)}</span>
           {shipmentProblem(sh) && <span className={FLAG} title={shipmentProblem(sh)!}>!</span>}
           <span className="hidden text-xs text-taupe sm:inline" dir="ltr">{sh.tracking}</span>
         </span>
@@ -130,7 +129,7 @@ function Orders() {
                   </td>
                   <td className="max-w-[220px] truncate px-3 py-3">{orderCustomerName(o)}</td>
                   <td className="px-3 py-3 whitespace-nowrap text-taupe">{fmtDate(o.created_at)}</td>
-                  <td className="px-3 py-3"><StatusPills o={o} /></td>
+                  <td className="px-3 py-3"><span className="flex flex-wrap items-center gap-1">{(() => { const st = orderStage(o, ships.get(o.id)); return <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${st.tone}`}>{st.text}</span>; })()}<StatusPills o={o} /></span></td>
                   <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}><Ship o={o} /></td>
                   {role !== "shipping" && <td className="px-5 py-3 text-right font-semibold whitespace-nowrap">{egp(o.total)}</td>}
                 </tr>
@@ -150,7 +149,10 @@ function Orders() {
                   </p>
                   {role !== "shipping" && <p className="shrink-0 text-sm font-semibold">{egp(o.total)}</p>}
                 </div>
-                <p className="mt-0.5 text-xs text-taupe">{fmtDate(o.created_at)}</p>
+                <div className="mt-1 flex items-center justify-between gap-2">
+                  <p className="text-xs text-taupe">{fmtDate(o.created_at)}</p>
+                  {(() => { const st = orderStage(o, ships.get(o.id)); return <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${st.tone}`}>{st.text}</span>; })()}
+                </div>
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <div className="min-w-0 flex-1"><StatusPills o={o} /></div>
                   {(ships.get(o.id) || canShip(o)) && <div className="shrink-0"><Ship o={o} /></div>}

@@ -11,6 +11,7 @@ import { Header, Thumb } from "@/components/ui";
 import { PhoneIcon, PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
 import { useShippingLabel } from "@/components/useShippingLabel";
 import CreateShipmentButton from "@/components/CreateShipmentButton";
+import OrderTimeline from "@/components/OrderTimeline";
 import { STATUS_LABEL, STATUS_TONE, statusText, trackingMessage } from "@/lib/shipments";
 import { fmtDate, orderCustomerName, orderPhone, paymentLabel, StatusPills } from "@/components/orderUi";
 import { useRole } from "@/components/Shell";
@@ -89,6 +90,8 @@ function OrderView() {
           </div>
         </section>
 
+        <OrderTimeline order={order} shipment={shipment} />
+
         <section className="card p-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs uppercase tracking-wide text-taupe">Shipping</p>
@@ -122,7 +125,7 @@ function OrderView() {
         </section>
 
         <div className="lg:hidden">
-        <div className="grid grid-cols-2 gap-2">
+        <div className={`grid grid-cols-2 gap-2 ${!label && !labelWaiting ? "hidden" : ""}`}>
             <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
               <PrintIcon className="h-5 w-5" /> {label ? "Print label" : labelWaiting ? "Preparing" : "No Nok label yet"}
             </button>
@@ -201,7 +204,7 @@ function OrderView() {
 
         <aside className="mt-4 space-y-4 lg:sticky lg:top-24 lg:mt-0">
           <div className="hidden lg:block">
-        <div className="grid grid-cols-2 gap-2">
+        <div className={`grid grid-cols-2 gap-2 ${!label && !labelWaiting ? "hidden" : ""}`}>
               <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
                 <PrintIcon className="h-5 w-5" /> {label ? "Print label" : labelWaiting ? "Preparing" : "No Nok label yet"}
               </button>
