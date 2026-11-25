@@ -915,6 +915,100 @@ class NokSession {
   }
 }
 
+/** Nok REST API (key saved as server secret NOK_API_KEY; never returned). */
+async function nokApi(path: string, init: { method?: string; body?: unknown } = {}) {
+  const key = Deno.env.get("NOK_API_KEY");
+  if (!key) throw new Error("NOK_API_KEY not saved");
+  const res = await fetch(NOK + path, {
+    method: init.method ?? "GET",
+    headers: { authorization: `Bearer ${key}`, "content-type": "application/json", accept: "application/json" },
+    body: init.body === undefined ? undefined : JSON.stringify(init.body),
+  });
+  const text = await res.text();
+  let data: any = text;
+  try { data = JSON.parse(text); } catch {}
+  if (!res.ok) throw new Error(`Nok ${path} ${res.status}: ${typeof data === "string" ? data.slice(0, 200) : JSON.stringify(data).slice(0, 300)}`);
+  return data;
+}
+
+const NOK_SUBACCOUNT = 275; // Shop With Sask
+const NOK_PRODUCT_TYPE = 1; // Lines
+
+async function nokZones(governorateId: number) {
+  const d = await nokApi(`/governorates/${Number(governorateId)}/zones/`);
+  return d.results ?? [];
+}
+
+const b64 = (buf: ArrayBuffer) => {
+  let s = "";
+  const a = new Uint8Array(buf);
+  for (let i = 0; i < a.length; i += 0x8000) s += String.fromCharCode(...a.subarray(i, i + 0x8000));
+  return btoa(s);
+};
+
+/** The AWB PDF from the portal (the same file as "Print AWB"). */
+async function nokAwbPdf(shipmentId: number) {
+  const ses = new NokSession();
+  await ses.login();
+  const res = await fetch(`${NOK}/sender/shipment/${Number(shipmentId)}/awb/`, { headers: { cookie: ses.cookie(), "user-agent": "Mozilla/5.0" } });
+  const buf = await res.arrayBuffer();
+  if (!res.ok || !(res.headers.get("content-type") ?? "").includes("pdf")) throw new Error(`AWB PDF not available (${res.status})`);
+  return b64(buf);
+}
+
+type NokShipmentInput = {
+  orderName: string; description: string; quantity?: number; governorateId: number; zoneId: number;
+  name: string; address: string; phone: string; phone2?: string; cod: number; comment?: string;
+};
+
+/** One tap: create the shipment (AWB right away), put it into today's open pickup (Nok opens a new one
+ * only when none is open), then fetch the AWB PDF. Never creates the same order twice. */
+async function nokCreate(i: NokShipmentInput) {
+  const ref = String(i.orderName ?? "").replace(/\D/g, "");
+  if (!ref || !i.governorateId || !i.zoneId || !i.name || !i.phone || !i.address) throw new Error("Missing name, phone, address, governorate or zone");
+  // already in Nok? reuse it
+  const drafts = (await nokApi("/draft-shipments/")).results ?? [];
+  let draft = drafts.find((d: any) => String(d.reference_number) === ref);
+  if (!draft) {
+    const r = await nokApi("/draft-shipments/", {
+      method: "POST",
+      body: {
+        item_description: String(i.description).slice(0, 250), quantity: Math.max(1, Number(i.quantity) || 1), weight: 1,
+        governorate_id: Number(i.governorateId), zone_id: Number(i.zoneId), billing_product_type: NOK_PRODUCT_TYPE,
+        Receiver_name: i.name, Receiver_company_name: "", Receiver_address: i.address, Receiver_contact_1: i.phone,
+        Receiver_contact_2: i.phone2 ?? "", Receiver_email: "", initial_cash: Math.max(0, Math.round(Number(i.cod) || 0)),
+        visa: 0, visa_installment: 0, bank_name: null, comment: i.comment ?? "", reference_number: ref,
+      },
+    });
+    draft = { id: r.data.id, air_way_bill: r.data.air_way_bill, converted: false, converted_shipment_id: null };
+  }
+  let shipmentId = draft.converted_shipment_id as number | null;
+  let pickupId: number | null = null;
+  let pickupError: string | null = null;
+  if (!draft.converted) {
+    try {
+      const c = await nokApi("/draft-shipments/bulk-convert/", { method: "POST", body: { draft_ids: [draft.id], subaccount_id: NOK_SUBACCOUNT } });
+      pickupId = c.data?.pickup_id ?? null;
+      shipmentId = c.data?.shipments?.[0]?.shipment_id ?? null;
+      if (!shipmentId) pickupError = (c.data?.errors ?? []).map((e: any) => (typeof e === "string" ? e : JSON.stringify(e))).join("; ") || c.message || "not added to pickup";
+    } catch (e) {
+      pickupError = String((e as Error).message);
+    }
+  }
+  let pdf: string | null = null;
+  let pdfError: string | null = null;
+  if (shipmentId) {
+    try { pdf = await nokAwbPdf(shipmentId); } catch (e) { pdfError = String((e as Error).message); }
+  }
+  return { awb: String(draft.air_way_bill), draftId: draft.id, shipmentId, pickupId, pickupError, pdf, pdfError, existed: drafts.some((d: any) => d.id === draft.id) };
+}
+
+/** Read-only check of the API key: subaccounts, product types, governorates. */
+async function nokApiCheck() {
+  const [sub, types, gov] = await Promise.all([nokApi("/subaccounts/"), nokApi("/product-types/"), nokApi("/governorates/")]);
+  return { key: true, subaccounts: sub.results ?? sub, productTypes: types.results ?? types, governorates: gov.results ?? gov };
+}
+
 /** Read-only look at a portal page (forms, fields, links) to build the automation. */
 async function nokPage(path: string, from = 0, len = 3000) {
   const s = new NokSession();
@@ -1149,6 +1243,13 @@ Deno.serve(async (req) => {
       if (cb.action === "create-order" && cb.sale) return json(await createOfflineOrder(cb.sale)); // orders placed for the owner from chat
       if (cb.action === "mark-paid" && cb.orderId) return json(await markOrderPaid(String(cb.orderId)));
       if (cb.action === "nok-status") return json(await nokStatus()); // hourly courier status check
+      if (cb.action === "nok-api-get" && typeof cb.path === "string" && /^\/(governorates|product-types|subaccounts|draft-shipments|shipment)\b/.test(cb.path)) return json(await nokApi(cb.path)); // read-only
+      if (cb.action === "awb-upload-url" && /^[0-9a-f-]{36}$/.test(String(cb.id))) {
+        const { data, error } = await admin.storage.from("awb").createSignedUploadUrl(`${cb.id}.pdf`, { upsert: true });
+        if (error) throw error;
+        return json({ url: data.signedUrl });
+      }
+      if (cb.action === "nok-api-check") return json(await nokApiCheck().catch((e) => ({ key: !!Deno.env.get("NOK_API_KEY"), error: String(e.message) })));
       if (cb.action === "nok-check") return json({ username: !!Deno.env.get("NOK_USERNAME"), password: !!Deno.env.get("NOK_PASSWORD"), login: await new NokSession().login().then(() => "ok", (e) => String(e.message)) });
       if (cb.action === "nok-page" && typeof cb.path === "string" && cb.path.startsWith("/")) return json(await nokPage(cb.path, Number(cb.from ?? 0), Number(cb.len ?? 3000)));
       if (cb.action === "settlement-reminder") return json(await settlementReminder()); // Monday transfer reminder
@@ -1179,6 +1280,10 @@ Deno.serve(async (req) => {
     if (action === "fulfill-order") return json(await fulfillOrder(String(body.orderId), body.tracking ?? {}));
     if (action === "mark-paid") return json(await markOrderPaid(String(body.orderId)));
     if (action === "nok-status") return json(await nokStatus());
+    if (action === "nok-governorates") return json((await nokApi("/governorates/")).results ?? []);
+    if (action === "nok-zones") return json(await nokZones(Number(body.governorateId)));
+    if (action === "nok-create") return json(await nokCreate(body.shipment));
+    if (action === "nok-awb") return json({ pdf: await nokAwbPdf(Number(body.shipmentId)) });
     return json({ error: "unknown action" }, 400);
   } catch (e) {
     console.error(e);

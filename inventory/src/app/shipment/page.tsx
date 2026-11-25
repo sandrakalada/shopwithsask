@@ -10,9 +10,10 @@ import { Header } from "@/components/ui";
 import { PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
 import { useShippingLabel } from "@/components/useShippingLabel";
 import AwbUpload, { type AwbResult } from "@/components/AwbUpload";
+import NokPanel from "@/components/NokPanel";
 import { uploadAwb } from "@/lib/awb";
 import {
-  STATUS_LABEL, STATUS_TONE, markPaidInShopify, openNok, trackingMessage, trackingUrl, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
+  STATUS_LABEL, STATUS_TONE, markPaidInShopify, trackingMessage, trackingUrl, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
 } from "@/lib/shipments";
 
 const CITIES = ["Cairo", "Giza", "Alexandria", "Qalyubia", "Sharqia", "Dakahlia", "Gharbia", "Monufia", "Beheira", "Kafr El Sheikh", "Damietta", "Port Said", "Ismailia", "Suez", "Fayoum", "Beni Suef", "Minya", "Asyut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "Matrouh", "North Sinai", "South Sinai", "New Valley"];
@@ -80,16 +81,23 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
       {!editing && <Header title={title} back="/shipments" />}
       <main className={editing ? "space-y-4" : "space-y-4 p-4 pb-32 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0"}>
         <div className="space-y-4">
+          {!editing && order && (
+            <NokPanel
+              s={s}
+              order={order}
+              onDone={async (row, note) => {
+                const saved = await saveShipment(row);
+                try { await sendToShopify(saved, false); } catch (e) { note = [note, `Shopify not updated: ${(e as Error).message}`].filter(Boolean).join(" "); }
+                if (note) sessionStorage.setItem(`ship-note-${saved.id}`, note);
+                router.replace(`/shipment?id=${saved.id}`);
+              }}
+            />
+          )}
           <section className="card space-y-3 p-4">
             <p className="section-title px-0">Shipment</p>
-            {!editing && order && (
-              <p className="rounded-xl bg-sand px-3 py-2.5 text-sm text-espresso">
-                Nok Courier opened in a new tab and the order details are copied. Create the shipment there, tap Print AWB, save the PDF, then add it here. The AWB number fills in by itself.{" "}
-                <button type="button" onClick={() => openNok(order)} className="font-semibold text-caramel underline">Open Nok again</button>
-              </p>
-            )}
             {!editing && (
-              <div className="space-y-2">
+              <details className="space-y-2 rounded-xl bg-sand/60 px-3 py-2 text-sm" open={!order}>
+                <summary className="font-semibold">Already have the Nok AWB? Add it</summary>
                 <AwbUpload
                   label={awb ? "Replace Nok AWB" : "Add Nok AWB (PDF from Print AWB)"}
                   orderNumber={s.order_name}
@@ -99,7 +107,7 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={awb.url} alt="Nok AWB label" className="mx-auto w-40 rounded border border-line" />
                 )}
-              </div>
+              </details>
             )}
             <label className="block text-sm">
               <span className="text-taupe">Tracking number</span>
@@ -170,8 +178,8 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
           {err && <p className="card p-4 text-sm text-red-700">{err}</p>}
           <div className="grid grid-cols-2 gap-2">
             {editing && <button className="btn-light" onClick={onDone}>Cancel</button>}
-            <button className={`btn-dark ${editing ? "" : "col-span-2"}`} disabled={!valid || busy} onClick={save}>
-              <TruckIcon className="h-5 w-5" /> {busy ? "Saving" : editing ? "Save changes" : "Create shipment"}
+            <button className={`${order && !editing ? "btn-light" : "btn-dark"} ${editing ? "" : "col-span-2"}`} disabled={!valid || busy} onClick={save}>
+              <TruckIcon className="h-5 w-5" /> {busy ? "Saving" : editing ? "Save changes" : order ? "Save without Nok" : "Create shipment"}
             </button>
           </div>
           {!valid && <p className="text-xs text-taupe">Name, phone, address and tracking number are needed.</p>}
@@ -194,6 +202,11 @@ function ShipmentView({ id }: { id: string }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [notify, setNotify] = useState(false);
+  useEffect(() => {
+    const k = `ship-note-${id}`;
+    const n = sessionStorage.getItem(k);
+    if (n) { setMsg({ ok: false, text: n }); sessionStorage.removeItem(k); }
+  }, [id]);
 
   if (s === undefined) return <Header title="" back="/shipments" />;
   if (!s) return (<><Header title="Shipment" back="/shipments" /><p className="p-4 text-sm text-taupe">This shipment is not on this device yet.</p></>);
