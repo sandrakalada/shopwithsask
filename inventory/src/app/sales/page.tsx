@@ -74,9 +74,9 @@ function SalesList() {
       <main className="space-y-4 p-4 pb-28">
         <section className="card p-4">
           <div className="flex items-center justify-between">
-            {!year && <button className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-sand" aria-label="Previous month" onClick={() => setOffset((m) => m - 1)}>‹</button>}
+            {!year && <button className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-sand active:bg-sand" aria-label="Previous month" onClick={() => setOffset((m) => m - 1)}><svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m15 18-6-6 6-6" /></svg></button>}
             <p className="flex-1 text-center font-semibold">{title}</p>
-            {!year && <button className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-sand disabled:opacity-25" aria-label="Next month" disabled={offset >= 0} onClick={() => setOffset((m) => Math.min(0, m + 1))}>›</button>}
+            {!year && <button className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-sand disabled:opacity-25" aria-label="Next month" disabled={offset >= 0} onClick={() => setOffset((m) => Math.min(0, m + 1))}><svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m9 6 6 6-6 6" /></svg></button>}
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2 text-sm">
             <div><p className="text-xs text-taupe">Sales</p><p className="font-semibold">{egp(sales)}</p></div>
@@ -102,7 +102,7 @@ function SalesList() {
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">{o.name} <span className="font-normal text-taupe">· {orderCustomerName(o)}</span></p>
                     <p className="truncate text-xs text-taupe">
-                      {new Date(o.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} · {ok ? "Delivered and paid" : "Not delivered and paid yet"}{noCost ? ` · ${noCost} pcs no cost` : ""}
+                      {new Date(o.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} · {ok ? "Completed" : "In progress"}{noCost ? ` · ${noCost} pcs no cost` : ""}
                     </p>
                   </div>
                   <span className="w-[78px] text-right sm:w-28 text-sm font-semibold">{egp(total)}</span>
@@ -119,7 +119,7 @@ function SalesList() {
             </div>
           )}
         </section>
-        <p className="px-1 text-xs text-taupe">Totals count delivered and paid orders only; faded orders are not delivered and paid yet. Net profit = items sold minus purchase cost (delivery fees not counted).</p>
+        <p className="px-1 text-xs text-taupe">Totals count delivered and paid orders only; faded orders are in progress (not delivered and paid yet). Net profit = items sold minus purchase cost (delivery fees not counted).</p>
       </main>
     </>
   );

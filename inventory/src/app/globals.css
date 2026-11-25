@@ -83,7 +83,7 @@ textarea {
 
 /* buttons: 44pt tall, one primary per screen */
 @utility btn {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-[15px] font-semibold transition-[opacity,background-color] duration-150 select-none active:opacity-70 disabled:opacity-40;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-[15px] font-semibold transition-[opacity,background-color,transform,box-shadow] duration-150 select-none active:scale-[0.97] active:opacity-80 disabled:opacity-40 disabled:active:scale-100;
 }
 @utility btn-dark {
   @apply btn bg-ink text-white hover:bg-espresso;
@@ -151,6 +151,12 @@ textarea {
 .confetti span { position: absolute; top: 0; width: 9px; height: 14px; border-radius: 2px; animation: confetti-fall 2.6s ease-in forwards; }
 @keyframes pop-in { 0% { transform: scale(0.85); opacity: 0; } 60% { transform: scale(1.04); opacity: 1; } 100% { transform: scale(1); } }
 .pop-in { animation: pop-in 0.45s ease-out; }
+
+/* press feedback on every tappable thing (phone and desktop) */
+:where(button, a[href], [role="button"], summary, select):not(:disabled):active { transform: scale(0.97); }
+:where(.row, li > a.row, nav a):not(:disabled):active { transform: scale(0.99); }
+:where(button, a[href], [role="button"], summary) { transition: transform 120ms ease, opacity 150ms, background-color 150ms, box-shadow 150ms; }
+.card:is(a, button):hover { transform: translateY(-1px); }
 
 /* mouse and trackpad: everything you can click shows it */
 button:not(:disabled), a[href], select, summary, label:has(> input[type="checkbox"]), [role="button"] { cursor: pointer; }

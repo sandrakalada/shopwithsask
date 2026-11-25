@@ -109,7 +109,7 @@ function OrderView() {
           {shipment?.nok_status && <p className="mt-2 text-sm text-taupe">Nok: <span className="font-semibold text-ink">{shipment.nok_status}</span>{shipment.nok_location ? ` · ${shipment.nok_location}` : ""}</p>}
           {shipment && (shipment.recipient.phone || order.phone) && (
             <a className="btn-light mt-3 w-full" href={waLink(shipment.recipient.phone || order.phone, trackingMessage(shipment, order))} target="_blank" rel="noreferrer">
-              <WhatsAppIcon className="h-5 w-5" /> Send tracking to customer on WhatsApp
+              <WhatsAppIcon className="h-5 w-5" /> Send tracking on WhatsApp
             </a>
           )}
           {shipment ? null : (

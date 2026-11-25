@@ -262,7 +262,7 @@ function ShipmentView({ id }: { id: string }) {
                         <p className="text-xs text-taupe">{[s.nok_location, s.nok_checked_at && `checked ${new Date(s.nok_checked_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`].filter(Boolean).join(" · ")}</p>
                       )}
                     </div>
-                    {trackLink && <a href={trackLink} target="_blank" rel="noreferrer" className="shrink-0 font-semibold text-caramel underline">Track</a>}
+                    {trackLink && <a href={trackLink} target="_blank" rel="noreferrer" className="btn-light min-h-10 shrink-0 px-3 text-[14px]">Track</a>}
                   </div>
                 )}
                 {s.order_id && (
@@ -292,7 +292,7 @@ function ShipmentView({ id }: { id: string }) {
               <section className="card p-4 text-sm">
                 <div className="flex items-center justify-between">
                   <p className="section-title px-0">Deliver to</p>
-                  <button className="text-[13px] font-semibold text-caramel" onClick={() => setEdit(true)}>Edit</button>
+                  <button className="btn-plain min-h-10 px-3 text-[14px]" onClick={() => setEdit(true)}>Edit</button>
                 </div>
                 <p className="font-semibold">{r.name}</p>
                 {r.phone && <p dir="ltr">{r.phone}</p>}
@@ -301,7 +301,7 @@ function ShipmentView({ id }: { id: string }) {
                 {s.note && <p className="mt-1 text-taupe">Note: {s.note}</p>}
                 {r.phone && (
                   <a className="btn-light mt-3 w-full" href={waLink(r.phone, waText)} target="_blank" rel="noreferrer">
-                    <WhatsAppIcon className="h-5 w-5" /> Send tracking to customer on WhatsApp
+                    <WhatsAppIcon className="h-5 w-5" /> Send tracking on WhatsApp
                   </a>
                 )}
               </section>
@@ -323,6 +323,17 @@ function ShipmentView({ id }: { id: string }) {
         </div>
 
         <aside className="mt-4 space-y-3 lg:sticky lg:top-24 lg:mt-0">
+          {!s.awb_path && order && (
+            <NokPanel
+              s={s}
+              order={order}
+              onDone={async (row, note) => {
+                const saved = await saveShipment(row);
+                try { await sendToShopify(saved, false); } catch (e) { note = [note, `Shopify not updated: ${(e as Error).message}`].filter(Boolean).join(" "); }
+                setMsg(note ? { ok: false, text: note } : { ok: true, text: "Created in Nok. The label is ready." });
+              }}
+            />
+          )}
           <AwbUpload
             label={s.awb_path ? "Replace Nok AWB" : "Add Nok AWB (PDF from Print AWB)"}
             orderNumber={s.order_name}
@@ -333,7 +344,7 @@ function ShipmentView({ id }: { id: string }) {
               if (row.order_id) await sendToShopify(row, false).catch(() => {});
             }}
           />
-          <div className="grid grid-cols-2 gap-2">
+          <div className={`grid grid-cols-2 gap-2 ${!label && !labelWaiting ? "hidden" : ""}`}>
             <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
               <PrintIcon className="h-5 w-5" /> {label ? "Print label" : labelWaiting ? "Preparing" : "No Nok label yet"}
             </button>
@@ -348,7 +359,7 @@ function ShipmentView({ id }: { id: string }) {
               <img src={label.url} alt="Shipping label preview" className="mx-auto w-56 rounded border border-line lg:w-full" />
             </section>
           ) : (
-            labelWaiting ? <div className="mx-auto aspect-[2/3] w-56 animate-pulse rounded-[14px] bg-sand lg:w-full" /> : <p className="card p-4 text-center text-sm text-taupe">No Nok label yet. Add the Nok AWB above.</p>
+            labelWaiting ? <div className="mx-auto aspect-[2/3] w-56 animate-pulse rounded-[14px] bg-sand lg:w-full" /> : <p className="card p-4 text-center text-sm text-taupe">No Nok label yet. Create it in Nok above, or add the AWB.</p>
           )}
         </aside>
       </main>

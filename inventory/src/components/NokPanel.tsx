@@ -21,7 +21,12 @@ export default function NokPanel({ s, order, onDone }: { s: Shipment; order: Ord
     setZones(null);
     setZone(null);
     nokZones(gov)
-      .then((z) => { if (off) return; setZones(z); setZone(guessZone(z, s.recipient)); })
+      .then((z) => {
+        if (off) return;
+        if (!Array.isArray(z)) { setZones([]); setErr("Could not load Nok areas. Check the connection and try again."); return; }
+        setZones(z);
+        setZone(guessZone(z, s.recipient));
+      })
       .catch((e) => !off && setErr(`Could not load Nok areas: ${(e as Error).message}`));
     return () => { off = true; };
   }, [gov]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -63,7 +68,7 @@ export default function NokPanel({ s, order, onDone }: { s: Shipment; order: Ord
         </label>
         <label className="block text-[13px] text-taupe">Area
           <select className="field mt-1 text-ink" value={zone ?? ""} onChange={(e) => setZone(Number(e.target.value) || null)} disabled={!zones}>
-            <option value="">{zones ? "Choose the area" : "Loading"}</option>
+            <option value="">{zones ? "Choose area" : "Loading"}</option>
             {zones?.map((z) => <option key={z.id} value={z.id}>{z.name}</option>)}
           </select>
         </label>

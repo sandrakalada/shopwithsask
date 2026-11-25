@@ -7,7 +7,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db, type ShipmentStatus } from "@/lib/db";
 import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
-import { PlusIcon, TruckIcon } from "@/components/Icons";
+import { TruckIcon } from "@/components/Icons";
 import { STATUS_TONE, statusText } from "@/lib/shipments";
 
 type Filter = "active" | ShipmentStatus | "all";
@@ -39,13 +39,10 @@ export default function ShipmentsPage() {
 
   return (
     <>
-      <Header title="Shipments" />
+      <Header title="Order tracking" />
       <main className="space-y-4 p-4">
-        <div className="grid grid-cols-2 gap-2 lg:flex lg:justify-end">
-          <Link href="/shipment?new=1" className="btn-dark">
-            <PlusIcon className="h-5 w-5" /> New shipment
-          </Link>
-          <Link href="/orders?f=open&since=month" className="btn-light">Orders to ship</Link>
+        <div className="flex justify-end">
+          <Link href="/orders?f=open&since=month" className="btn-light w-full lg:w-auto">Orders to ship</Link>
         </div>
 
         {!!waiting?.length && (
@@ -59,7 +56,7 @@ export default function ShipmentsPage() {
                     <p className="truncate text-xs text-taupe">{[o.shipping_address?.city, egp(o.total)].filter(Boolean).join(" · ")}</p>
                   </div>
                   <Link href={`/shipment?order=${o.id}`} className="btn-light min-h-10 px-3 text-[14px]">
-                    <TruckIcon className="h-4 w-4" /> Ship
+                    <TruckIcon className="h-4 w-4" /> Create shipment
                   </Link>
                 </li>
               ))}

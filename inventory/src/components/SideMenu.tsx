@@ -55,7 +55,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; Icon: (p:
     items: [
       { href: "/orders", label: "Orders", Icon: ReceiptIcon },
       { href: "/alerts", label: "WhatsApp alerts", Icon: BellIcon },
-      { href: "/shipments", label: "Shipments", Icon: TruckIcon },
+      { href: "/shipments", label: "Order tracking", Icon: TruckIcon },
       { href: "/settlement", label: "Settlement", Icon: WalletIcon },
       { href: "/invoice?new=1", label: "New invoice", Icon: DocIcon },
       { href: "/customers", label: "Customers", Icon: UsersIcon },

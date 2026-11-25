@@ -77,9 +77,9 @@ export default function SettlementPage() {
 
         <section className="card p-4">
           <div className="flex items-center justify-between">
-            <button className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-sand" aria-label="Previous month" onClick={() => setMonth((m) => m - 1)}>‹</button>
+            <button className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-sand active:bg-sand" aria-label="Previous month" onClick={() => setMonth((m) => m - 1)}><svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m15 18-6-6 6-6" /></svg></button>
             <p className="font-semibold">{start.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</p>
-            <button className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-sand disabled:opacity-30" aria-label="Next month" disabled={month >= 0} onClick={() => setMonth((m) => Math.min(0, m + 1))}>›</button>
+            <button className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-sand active:bg-sand disabled:opacity-30" aria-label="Next month" disabled={month >= 0} onClick={() => setMonth((m) => Math.min(0, m + 1))}><svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m9 6 6 6-6 6" /></svg></button>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-3 text-sm lg:grid-cols-4">
             <div><p className="text-xs text-taupe">Shipments</p><p className="font-semibold">{mRows.length}</p></div>
@@ -101,7 +101,7 @@ export default function SettlementPage() {
                     <Link href={`/shipment?id=${r.id}`} className="row">
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold">{r.order_name ?? r.tracking} · {r.recipient.name ?? "Customer"}</p>
-                        <p className="truncate text-xs text-taupe">
+                        <p className="text-xs text-taupe">
                           {[r.nok_status ?? "Not checked yet", NOK_ZONES[r.zone].label, r.stage === "returned" ? `return fee ${egp(r.fee)}` : `COD ${egp(r.cod)} · fee ${egp(r.fee)}`, r.overdue ? "overdue" : ""].filter(Boolean).join(" · ")}
                         </p>
                       </div>
