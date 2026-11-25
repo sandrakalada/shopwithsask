@@ -85,9 +85,7 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
             <NokPanel
               s={s}
               order={order}
-              onDone={async (row, note) => {
-                const saved = await saveShipment(row);
-                try { await sendToShopify(saved, false); } catch (e) { note = [note, `Shopify not updated: ${(e as Error).message}`].filter(Boolean).join(" "); }
+              onDone={async (saved, note) => {
                 if (note) sessionStorage.setItem(`ship-note-${saved.id}`, note);
                 router.replace(`/shipment?id=${saved.id}`);
               }}
@@ -327,9 +325,7 @@ function ShipmentView({ id }: { id: string }) {
             <NokPanel
               s={s}
               order={order}
-              onDone={async (row, note) => {
-                const saved = await saveShipment(row);
-                try { await sendToShopify(saved, false); } catch (e) { note = [note, `Shopify not updated: ${(e as Error).message}`].filter(Boolean).join(" "); }
+              onDone={async (_saved, note) => {
                 setMsg(note ? { ok: false, text: note } : { ok: true, text: "Created in Nok. The label is ready." });
               }}
             />

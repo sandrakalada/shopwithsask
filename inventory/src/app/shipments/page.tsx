@@ -10,6 +10,7 @@ import { Header } from "@/components/ui";
 import { TruckIcon } from "@/components/Icons";
 import { STATUS_TONE, statusText } from "@/lib/shipments";
 import { showTags } from "@/components/orderUi";
+import CreateShipmentButton from "@/components/CreateShipmentButton";
 
 type Filter = "active" | ShipmentStatus | "all";
 const FILTERS: [Filter, string][] = [["active", "Open"], ["ready", "Created"], ["picked_up", "In transit"], ["delivered", "Delivered"], ["returned", "Returned"], ["all", "All"]];
@@ -18,6 +19,7 @@ export default function ShipmentsPage() {
   const router = useRouter();
   const [f, setF] = useState<Filter>("active");
   const [q, setQ] = useState("");
+  const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);
   const all = useLiveQuery(() => db.shipments.orderBy("created_at").reverse().toArray(), []);
   // orders still to ship this month that have no shipment yet
   const waiting = useLiveQuery(async () => {
@@ -46,6 +48,12 @@ export default function ShipmentsPage() {
           <Link href="/orders?f=open&since=month" className="btn-light w-full lg:w-auto">Orders to ship</Link>
         </div>
 
+        {note && (
+          <p role="status" className={`card flex items-start justify-between gap-3 p-3 text-sm ${note.ok ? "text-emerald-800" : "text-amber-800"}`}>
+            <span>{note.text}</span>
+            <button className="btn-plain min-h-9 px-3 text-[13px]" onClick={() => setNote(null)}>OK</button>
+          </p>
+        )}
         {!!waiting?.length && (
           <section>
             <p className="section-title">Waiting for a shipment ({waiting.length})</p>
@@ -57,9 +65,7 @@ export default function ShipmentsPage() {
                     <p className="truncate text-xs text-taupe">{[o.shipping_address?.city, egp(o.total)].filter(Boolean).join(" · ")}</p>
                     {showTags(o).length > 0 && <p className="mt-1 flex flex-wrap gap-1">{showTags(o).map((t) => <span key={t} className="rounded-full bg-sand px-2 py-0.5 text-[11px] font-semibold text-taupe">{t}</span>)}</p>}
                   </Link>
-                  <Link href={`/shipment?order=${o.id}`} className="btn-light min-h-10 px-3 text-[14px]">
-                    <TruckIcon className="h-4 w-4" /> Create shipment
-                  </Link>
+                  <CreateShipmentButton order={o} onDone={setNote} />
                 </li>
               ))}
             </ul>

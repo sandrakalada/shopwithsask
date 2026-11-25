@@ -30,8 +30,25 @@ const IMG = "img-v1";
 const AI = "ai-v1";
 const PRECACHE = ${JSON.stringify(precache)};
 
+// files whose name changes when their content changes: copy them from the previous version instead of downloading again
+const SAME_NAME_SAME_FILE = (u) => u.startsWith("/_next/static/") || /\.(wasm|woff2?|png|jpg|svg|ico)$/.test(u);
+
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(APP).then((c) => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
+  e.waitUntil((async () => {
+    const cache = await caches.open(APP);
+    const old = (await caches.keys()).filter((k) => k.startsWith("app-") && k !== APP);
+    const olds = await Promise.all(old.map((k) => caches.open(k)));
+    const todo = [];
+    for (const u of PRECACHE) {
+      let hit = null;
+      if (SAME_NAME_SAME_FILE(u)) for (const c of olds) { hit = await c.match(u); if (hit) break; }
+      if (hit) await cache.put(u, hit);
+      else todo.push(u);
+    }
+    // the rest (pages and new files), a few at a time
+    for (let i = 0; i < todo.length; i += 12) await cache.addAll(todo.slice(i, i + 12));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener("activate", (e) => {

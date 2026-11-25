@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import type { Order, Shipment } from "@/lib/db";
-import { NOK_GOVS, guessGovernorate, guessZone, nokCreate, nokDescription, nokZones, pdfFile } from "@/lib/nok";
-import { awbLabelFromFile, uploadAwb } from "@/lib/awb";
+import { NOK_GOVS, guessGovernorate, guessZone, nokDescription, nokZones } from "@/lib/nok";
+import { createNokShipment } from "@/lib/nokShip";
 import { egp } from "@/lib/pdf";
 import { TruckIcon } from "./Icons";
 
@@ -39,18 +39,8 @@ export default function NokPanel({ s, order, onDone }: { s: Shipment; order: Ord
     if (!ready || !zone) return;
     setErr(null);
     try {
-      setStep("Creating the shipment in Nok");
-      const qty = order ? order.line_items.reduce((t, l) => t + l.quantity, 0) : s.pieces;
-      const c = await nokCreate({ orderName: s.order_name!, description: desc, quantity: qty || 1, governorateId: gov, zoneId: zone, name: r.name!, address, phone: r.phone!, cod: s.cod_amount, comment: s.note ?? "" });
-      let row: Shipment = { ...s, courier: "Nok Courier", tracking: c.awb };
-      if (c.pdf) {
-        setStep("Preparing the label");
-        const label = await awbLabelFromFile(pdfFile(c.pdf, `awb-${c.awb}.pdf`));
-        row = { ...row, awb_path: await uploadAwb(row.id, label.pdf) };
-      }
-      setStep("Adding the tracking to Shopify");
-      const notes = [c.pickupError && `Not added to the pickup: ${c.pickupError}`, c.pdfError && `Label not ready yet: ${c.pdfError}`].filter(Boolean).join(" ");
-      await onDone(row, notes || undefined);
+      const { saved, note } = await createNokShipment(s, order, { governorateId: gov, zoneId: zone, description: desc }, setStep);
+      await onDone(saved, note ?? undefined);
     } catch (e) {
       setErr((e as Error).message);
     }

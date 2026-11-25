@@ -101,8 +101,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     window.addEventListener("focus", onShow);
     if (!supabase) return;
     // offline, Supabase keeps retrying the renewal for about 30 seconds before answering: open straight away instead
+    // open straight away with the saved sign-in; renewing it online happens in the background
     const saved = savedSession();
-    if (saved && !navigator.onLine) setSession(saved);
+    if (saved) setSession(saved);
     const timer = setTimeout(() => setSession((cur) => (cur === undefined ? savedSession() : cur)), 2500);
     supabase.auth.getSession().then(({ data }) => {
       clearTimeout(timer);
