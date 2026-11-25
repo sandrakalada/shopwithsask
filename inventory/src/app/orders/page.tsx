@@ -49,10 +49,10 @@ function Orders() {
         <span className="inline-flex items-center gap-1.5">
           <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_TONE[sh.status]}`}>{statusText(sh)}</span>
           {shipmentProblem(sh) && <span className={FLAG} title={shipmentProblem(sh)!}>!</span>}
-          <span className="text-xs text-taupe" dir="ltr">{sh.tracking}</span>
+          <span className="hidden text-xs text-taupe sm:inline" dir="ltr">{sh.tracking}</span>
         </span>
       );
-    return canShip(o) ? <CreateShipmentButton order={o} onDone={setNote} /> : null;
+    return canShip(o) ? <CreateShipmentButton order={o} onDone={setNote} className="btn-light min-h-10 rounded-full px-3.5 text-[13px]" /> : null;
   };
 
   const rows = useMemo(() => {
@@ -144,17 +144,17 @@ function Orders() {
             <li key={o.id}>
               <Link href={`/order?id=${o.id}`} className="block px-4 py-3 active:bg-sand">
                 <div className="flex items-baseline justify-between gap-3">
-                  <p className="font-semibold">{o.name}</p>
-                  {role !== "shipping" && <p className="text-sm font-semibold">{egp(o.total)}</p>}
+                  <p className="min-w-0 truncate">
+                    <span className="font-semibold">{o.name}</span>
+                    <span className="text-sm text-taupe"> · {orderCustomerName(o)}</span>
+                  </p>
+                  {role !== "shipping" && <p className="shrink-0 text-sm font-semibold">{egp(o.total)}</p>}
                 </div>
-                <div className="mt-0.5 flex items-center justify-between gap-3">
-                  <p className="truncate text-sm text-taupe">{orderCustomerName(o)}</p>
-                  <p className="shrink-0 text-xs text-taupe">{fmtDate(o.created_at)}</p>
+                <p className="mt-0.5 text-xs text-taupe">{fmtDate(o.created_at)}</p>
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <div className="min-w-0 flex-1"><StatusPills o={o} /></div>
+                  {(ships.get(o.id) || canShip(o)) && <div className="shrink-0"><Ship o={o} /></div>}
                 </div>
-                <div className="mt-1.5">
-                  <StatusPills o={o} />
-                </div>
-                {(ships.get(o.id) || canShip(o)) && <div className="mt-2 flex justify-end"><Ship o={o} /></div>}
               </Link>
             </li>
           ))}
