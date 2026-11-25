@@ -6,7 +6,7 @@ import { awbLabelFromFile, type AwbLabel } from "@/lib/awb";
 export type AwbResult = AwbLabel;
 
 /** Pick the Nok Courier AWB (PDF from "Print AWB", or a screenshot of it). It is cropped to the label and sized 100 x 150 mm. */
-export default function AwbUpload({ onReady, label = "Add Nok AWB", orderNumber }: { onReady: (r: AwbResult) => Promise<void> | void; label?: string; orderNumber?: string | null }) {
+export default function AwbUpload({ onReady, label = "Add shipping label", orderNumber }: { onReady: (r: AwbResult) => Promise<void> | void; label?: string; orderNumber?: string | null }) {
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -22,7 +22,7 @@ export default function AwbUpload({ onReady, label = "Add Nok AWB", orderNumber 
       const mismatch = num && r.ref && r.ref !== num;
       setMsg(mismatch
         ? { ok: false, text: `Check: this AWB is for REF ${r.ref}, not ${orderNumber}.` }
-        : { ok: true, text: r.awb ? `Nok AWB ${r.awb} saved as the label.` : "Nok AWB saved as the label." });
+        : { ok: true, text: r.awb ? `Shipping label saved (AWB ${r.awb}).` : "Shipping label saved." });
     } catch (e) {
       setMsg({ ok: false, text: `Could not read the AWB: ${(e as Error).message}` });
     }

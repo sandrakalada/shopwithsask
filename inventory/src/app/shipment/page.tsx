@@ -98,9 +98,9 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
             <p className="section-title px-0">Shipment</p>
             {!editing && (
               <details className="space-y-2 rounded-xl bg-sand/60 px-3 py-2 text-sm" open={!order}>
-                <summary className="font-semibold">Already have the Nok AWB? Add it</summary>
+                <summary className="font-semibold">Already have the shipping label? Add it</summary>
                 <AwbUpload
-                  label={awb ? "Replace Nok AWB" : "Add Nok AWB (PDF from Print AWB)"}
+                  label={awb ? "Replace shipping label" : "Add shipping label (PDF)"}
                   orderNumber={s.order_name}
                   onReady={(r) => { setAwb(r); setS((cur) => cur && ({ ...cur, courier: "Nok Courier", tracking: r.awb ?? cur.tracking })); }}
                 />
@@ -385,7 +385,7 @@ function ShipmentView({ id }: { id: string }) {
             />
           )}
           <AwbUpload
-            label={s.awb_path ? "Replace Nok AWB" : "Add Nok AWB (PDF from Print AWB)"}
+            label={s.awb_path ? "Replace shipping label" : "Add shipping label (PDF)"}
             orderNumber={s.order_name}
             onReady={async (a) => {
               const path = await uploadAwb(s.id, a.pdf);
