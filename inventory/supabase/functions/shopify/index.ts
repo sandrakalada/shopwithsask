@@ -1126,6 +1126,29 @@ async function settlementReminder() {
   return { amount, shipments: n };
 }
 
+/** Owner-confirmed: cancel (stock back, no email, no refund) then delete an order. */
+async function cancelAndDeleteOrder(orderId: string) {
+  if (!/^\d+$/.test(orderId)) throw new Error("bad order id");
+  const gid = `gid://shopify/Order/${orderId}`;
+  const c = await gql(
+    `mutation($id: ID!) { orderCancel(orderId: $id, reason: OTHER, refund: false, restock: true, notifyCustomer: false, staffNote: "Test order removed") { job { id done } orderCancelUserErrors { field message } } }`,
+    { id: gid },
+  );
+  const ce = c.orderCancel.orderCancelUserErrors;
+  if (ce?.length && !/already|cancel/i.test(ce.map((e: any) => e.message).join(" "))) throw new Error(ce.map((e: any) => e.message).join("; "));
+  // cancelling runs as a job: wait until Shopify shows it cancelled
+  for (let i = 0; i < 15; i++) {
+    const d = await gql(`query($id: ID!) { order(id: $id) { cancelledAt } }`, { id: gid });
+    if (d.order?.cancelledAt) break;
+    await new Promise((ok) => setTimeout(ok, 1500));
+  }
+  const r = await gql(`mutation($id: ID!) { orderDelete(orderId: $id) { deletedId userErrors { field message } } }`, { id: gid });
+  const re = r.orderDelete.userErrors;
+  if (re?.length) throw new Error(re.map((e: any) => e.message).join("; "));
+  await admin.from("orders").delete().eq("id", orderId);
+  return { cancelled: true, deleted: r.orderDelete.deletedId };
+}
+
 /** Cash collected on delivery: mark the order paid in Shopify. */
 async function markOrderPaid(orderId: string) {
   if (!/^\d+$/.test(String(orderId))) throw new Error("bad order id");
@@ -1311,6 +1334,7 @@ Deno.serve(async (req) => {
       if (cb.action === "setup") return json(await setup()); // re-creates missing webhooks
       if (cb.action === "create-order" && cb.sale) return json(await createOfflineOrder(cb.sale)); // orders placed for the owner from chat
       if (cb.action === "mark-paid" && cb.orderId) return json(await markOrderPaid(String(cb.orderId)));
+      if (cb.action === "cancel-delete-order" && cb.orderId) return json(await cancelAndDeleteOrder(String(cb.orderId))); // only on the owner's confirmation
       if (cb.action === "nok-status") return json(await nokStatus().catch(async (e) => { await nokIssue(`Hourly Nok status check failed: ${String(e.message)}`); throw e; })); // hourly courier status check
       if (cb.action === "nok-api-get" && typeof cb.path === "string" && /^\/(governorates|product-types|subaccounts|draft-shipments|shipment)\b/.test(cb.path)) return json(await nokApi(cb.path)); // read-only
       if (cb.action === "awb-upload-url" && /^[0-9a-f-]{36}$/.test(String(cb.id))) {

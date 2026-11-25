@@ -119,7 +119,7 @@ async function pull() {
   // all downloads at once (one round trip of waiting instead of ten)
   const movesCursor = (await getMeta("cursor:movements")) ?? EPOCH;
   const syncedTables = Promise.all([
-    pullSynced("orders", db.orders),
+    pullSynced("orders", db.orders).then(dropDeletedOrders),
     pullSynced("customers", db.customers),
     pullSynced("invoices", db.invoices),
     pullSynced("shipments", db.shipments).then(dropDeletedShipments),
@@ -165,6 +165,15 @@ async function pull() {
     await setMeta(v.key, v.cursor);
   });
   await syncedTables;
+}
+
+/** Orders deleted in Shopify disappear here too. */
+async function dropDeletedOrders() {
+  const { data, error } = await supabase!.from("orders").select("id").limit(10000);
+  if (error || !data || !data.length) return;
+  const live = new Set(data.map((r) => r.id as string));
+  const gone = (await db.orders.toCollection().primaryKeys()).filter((id) => !live.has(id as string));
+  if (gone.length) await db.orders.bulkDelete(gone);
 }
 
 /** Shipments deleted on another device disappear here too. */
