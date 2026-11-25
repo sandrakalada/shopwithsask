@@ -5,8 +5,8 @@ import { supabase } from "./supabase";
 /** WhatsApp order flow alerts: unread count for the menu badge and new ones for the pop up. */
 export type AlertRow = { id: number; created_at: string; order_name: string; customer: string | null; kind: string; detail: string | null; total?: number | null };
 
-type State = { unseen: number; fresh: AlertRow[] };
-let state: State = { unseen: 0, fresh: [] };
+type State = { unseen: number; fresh: AlertRow[]; nokProblems: number };
+let state: State = { unseen: 0, fresh: [], nokProblems: 0 };
 const listeners = new Set<() => void>();
 const set = (s: Partial<State>) => {
   state = { ...state, ...s };
@@ -63,7 +63,7 @@ export async function checkAlerts() {
   const keep = [...state.fresh, ...add];
   // keep every delivery pop up, and the latest 3 others
   const others = keep.filter((a) => !isDeliveredAlert(a)).slice(-3);
-  set({ unseen: rows.length, fresh: keep.filter((a) => isDeliveredAlert(a) || others.includes(a)) });
+  set({ unseen: rows.length, nokProblems: rows.filter((r) => r.kind === "Nok problem").length, fresh: keep.filter((a) => isDeliveredAlert(a) || others.includes(a)) });
   if (add.some(isDeliveredAlert)) celebrate();
   else if (add.length) chime();
 }

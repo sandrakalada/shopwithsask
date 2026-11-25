@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
 import { supabase, signedInUser } from "@/lib/supabase";
 import { resetLocal } from "@/lib/sync";
 import { useRole } from "./Shell";
+import { FLAG, useProblems } from "@/lib/problems";
 import { useAlerts } from "./AlertWatcher";
 
 import { BoxIcon, ChartIcon, ClockIcon, GearIcon, HomeIcon, PrintIcon, ReceiptIcon, ScanIcon, TruckIcon, UsersIcon, WalletIcon } from "./Icons";
@@ -94,6 +95,7 @@ function useNav() {
 function NavContent({ onNavigate }: { onNavigate?: () => void }) {
   const { sections, who, isActive } = useNav();
   const { unseen } = useAlerts();
+  const problems = useProblems();
   return (
     <>
       <div className="px-6 pt-6 pb-4">
@@ -118,6 +120,9 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                     >
                       <Icon className="h-[21px] w-[21px] text-taupe lg:h-5 lg:w-5" />
                       {label}
+                      {((href === "/shipments" && problems.tracking > 0) || (href === "/settlement" && problems.settlement > 0)) && (
+                        <span className={`ml-auto ${FLAG}`} title="Something needs attention here" aria-label="Problem">!</span>
+                      )}
                       {href === "/alerts" && unseen > 0 && (
                         <span className="ml-auto min-w-6 rounded-full bg-danger px-1.5 text-center text-xs leading-6 font-semibold text-white" aria-label={`${unseen} new`}>
                           {unseen > 99 ? "99+" : unseen}
@@ -157,6 +162,7 @@ export function DesktopSidebar() {
  * Escape or swiping it left. The page behind cannot scroll while it is open. */
 export default function SideMenu() {
   const { unseen } = useAlerts();
+  const problems = useProblems();
   const role = useRole();
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
@@ -191,7 +197,7 @@ export default function SideMenu() {
         <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden>
           <path d="M4 7h16M4 12h16M4 17h16" />
         </svg>
-        {unseen > 0 && role !== "shipping" && <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-danger ring-2 ring-canvas" aria-label="New WhatsApp alerts" />}
+        {(unseen > 0 || problems.any > 0) && role !== "shipping" && <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-danger ring-2 ring-canvas" aria-label="Needs attention" />}
       </button>
       {shown &&
         createPortal(

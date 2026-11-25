@@ -12,6 +12,7 @@ import { STATUS_TONE, statusText } from "@/lib/shipments";
 import { showTags } from "@/components/orderUi";
 import CreateShipmentButton from "@/components/CreateShipmentButton";
 import NokProblems from "@/components/NokProblems";
+import { FLAG, shipmentProblem } from "@/lib/problems";
 
 type Filter = "active" | ShipmentStatus | "all";
 const FILTERS: [Filter, string][] = [["active", "Open"], ["ready", "Created"], ["picked_up", "In transit"], ["delivered", "Delivered"], ["returned", "Returned"], ["all", "All"]];
@@ -104,7 +105,7 @@ export default function ShipmentsPage() {
                   <td className="px-4 py-3">{s.order_name ?? "Manual"}</td>
                   <td className="px-4 py-3">{s.recipient.name}</td>
                   <td className="px-4 py-3">{s.recipient.city}</td>
-                  <td className="px-4 py-3"><span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${STATUS_TONE[s.status]}`}>{statusText(s)}</span></td>
+                  <td className="px-4 py-3"><span className="inline-flex items-center gap-1.5"><span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${STATUS_TONE[s.status]}`}>{statusText(s)}</span>{shipmentProblem(s) && <span className={FLAG} title={shipmentProblem(s)!}>!</span>}</span></td>
                   <td className="px-4 py-3 text-right">{s.cod_amount > 0 ? egp(s.cod_amount) : "-"}</td>
                 </tr>
               ))}
@@ -121,9 +122,10 @@ export default function ShipmentsPage() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[15px] font-semibold">{s.recipient.name ?? "Customer"}{s.order_name ? ` · ${s.order_name}` : ""}</p>
                   <p className="truncate text-xs text-taupe"><span dir="ltr">{s.tracking}</span>{s.recipient.city ? ` · ${s.recipient.city}` : ""}</p>
+                  {shipmentProblem(s) && <p className="truncate text-xs font-semibold text-danger">{shipmentProblem(s)}</p>}
                 </div>
                 <div className="text-right">
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_TONE[s.status]}`}>{statusText(s)}</span>
+                  <span className="inline-flex items-center gap-1.5">{shipmentProblem(s) && <span className={FLAG} title={shipmentProblem(s)!}>!</span>}<span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_TONE[s.status]}`}>{statusText(s)}</span></span>
                   {s.cod_amount > 0 && <p className="mt-1 text-xs font-semibold">{egp(s.cod_amount)}</p>}
                 </div>
               </Link>

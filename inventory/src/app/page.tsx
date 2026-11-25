@@ -5,6 +5,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db, WRITE_OFF } from "@/lib/db";
 import { productMatcher } from "@/lib/lines";
 import { costInEgp } from "@/lib/stock";
+import { FLAG, useProblems } from "@/lib/problems";
 import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
 import { ReceiptIcon, ScanIcon, SearchIcon, TruckIcon, WalletIcon } from "@/components/Icons";
@@ -23,6 +24,7 @@ function useFirstName() {
 
 export default function Home() {
   const firstName = useFirstName();
+  const problems = useProblems();
   // 0 = this month, -1 = last month, ...
   const [monthOffset, setMonthOffset] = useState(0);
   const shown = new Date(new Date().getFullYear(), new Date().getMonth() + monthOffset, 1);
@@ -128,12 +130,16 @@ export default function Home() {
             { href: "/invoice?new=1", label: "New sale", Icon: ReceiptIcon },
             { href: "/shipments", label: "Order tracking", Icon: TruckIcon },
             { href: "/settlement", label: "Settlement", Icon: WalletIcon },
-          ].map(({ href, label, Icon }) => (
-            <Link key={href} href={href} className="card flex min-h-[72px] flex-col items-center justify-center gap-1.5 px-1 text-center text-[12px] leading-tight font-semibold active:bg-sand">
-              <Icon className="h-6 w-6 text-caramel" />
-              {label}
-            </Link>
-          ))}
+          ].map(({ href, label, Icon }) => {
+            const flag = (href === "/shipments" && problems.tracking > 0) || (href === "/settlement" && problems.settlement > 0);
+            return (
+              <Link key={href} href={href} className="card relative flex min-h-[72px] flex-col items-center justify-center gap-1.5 px-1 text-center text-[12px] leading-tight font-semibold active:bg-sand">
+                {flag && <span className={`absolute top-1.5 right-1.5 ${FLAG}`} title="Something needs attention here" aria-label="Problem">!</span>}
+                <Icon className="h-6 w-6 text-caramel" />
+                {label}
+              </Link>
+            );
+          })}
         </nav>
         {data?.empty && <p className="card p-4 text-sm text-taupe">Your products download from Shopify automatically when you are online.</p>}
 

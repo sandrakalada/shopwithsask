@@ -202,6 +202,6 @@ export async function deleteShipment(s: Shipment) {
 }
 
 /** Nok locks a shipment once it is in a pickup request; removing it is done by Nok. */
-export const NOK_WHATSAPP = "201022102205";
+export const NOK_WHATSAPP = "201024084844";
 export const nokRemoveMessage = (s: Shipment) =>
   `Hello, this is Shop With Sask. Please remove this shipment from our pickup request: AWB ${s.tracking}${s.order_name ? `, REF ${s.order_name.replace(/\D/g, "")}` : ""}. Thank you.`;

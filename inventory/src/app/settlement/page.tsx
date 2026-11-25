@@ -6,6 +6,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db, type Shipment } from "@/lib/db";
 import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
+import { FLAG, settlementProblem } from "@/lib/problems";
 import { NOK_ZONES, RETURN_SHARE, VAT, lastMonday, nextMonday, settle, type Stage } from "@/lib/settlement";
 
 type Row = Shipment & ReturnType<typeof settle> & { deducted: boolean; overdue: boolean };
@@ -100,7 +101,8 @@ export default function SettlementPage() {
                   <li key={r.id}>
                     <Link href={`/shipment?id=${r.id}`} className="row">
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold">{r.order_name ?? r.tracking} · {r.recipient.name ?? "Customer"}</p>
+                        <p className="flex items-center gap-1.5 text-sm font-semibold">{settlementProblem(r) && <span className={FLAG} title={settlementProblem(r)!}>!</span>}{r.order_name ?? r.tracking} · {r.recipient.name ?? "Customer"}</p>
+                        {settlementProblem(r) && <p className="text-xs font-semibold text-danger">{settlementProblem(r)}</p>}
                         <p className="text-xs text-taupe">
                           {[r.nok_status ?? "Not checked yet", NOK_ZONES[r.zone].label, r.stage === "returned" ? `return fee ${egp(r.fee)}` : `COD ${egp(r.cod)} · fee ${egp(r.fee)}`, r.overdue ? "overdue" : ""].filter(Boolean).join(" · ")}
                         </p>

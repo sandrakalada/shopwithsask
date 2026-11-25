@@ -1020,6 +1020,13 @@ async function nokCreate(i: NokShipmentInput) {
   return { awb: String(draft.air_way_bill), draftId: draft.id, shipmentId, pickupId, pickupError, pdf, pdfError, existed: drafts.some((d: any) => d.id === draft.id) };
 }
 
+/** Nok's own message on a page (alerts / errors), as plain text. */
+function nokMessage(html: string) {
+  const m = html.match(/class="[^"]*(?:alert|error|invalid-feedback|messages)[^"]*"[^>]*>([\s\S]{0,600}?)<\/(?:div|li|ul|span)>/i);
+  const t = stripTags(m ? m[1] : html.replace(/<(script|style)[\s\S]*?<\/\1>/g, "")).slice(0, 300);
+  return t || "no message";
+}
+
 /** Takes a shipment out of the open pickup request with the portal's own "Remove" button (only shown
  * until the pickup is locked). The shipment goes back to "Created" in Nok, with the same AWB. */
 async function nokRemoveFromPickup(awb: string) {
@@ -1028,6 +1035,7 @@ async function nokRemoveFromPickup(awb: string) {
   await ses.login();
   const list = await ses.get(`/sender/subaccounts/${NOK_SUBACCOUNT}/pickups/`);
   const pickups = [...new Set([...list.html.matchAll(/\/sender\/pickup\/(\d+)\/sender\//g)].map((m) => m[1]))];
+  let lastFail = "";
   for (const id of pickups.slice(0, 5)) {
     const page = await ses.get(`/sender/pickup/${id}/sender/`);
     const html = page.html;
@@ -1044,18 +1052,24 @@ async function nokRemoveFromPickup(awb: string) {
         for (const i of f[2].matchAll(/<input[^>]*name="([^"]+)"[^>]*value="([^"]*)"[^>]*>/g)) fields[i[1]] = i[2];
         const r = await ses.post(f[1], fields, `${NOK}/sender/pickup/${id}/sender/`);
         if (r.status < 400) return { removed: true, pickupId: id, via: f[1] };
+        lastFail = `Nok answered ${r.status}: ${nokMessage(r.html)}`;
       }
       // or a link / button with a remove address
       const link = b.match(/(?:href|data-url|data-href|formaction)="([^"]*(?:remove|postpone|unassign)[^"]*)"/i)?.[1];
       if (link) {
         const r = await ses.post(link, { csrfmiddlewaretoken: csrf }, `${NOK}/sender/pickup/${id}/sender/`);
         if (r.status < 400) return { removed: true, pickupId: id, via: link };
+        lastFail = `Nok answered ${r.status}: ${nokMessage(r.html)}`;
       }
     }
-    if (/Adding Shipments Disabled/i.test(html)) throw new Error("This pickup is locked already. Only Nok can remove it now.");
-    throw new Error("Nok's Remove button was not found for this shipment.");
+    if (lastFail) throw new Error(lastFail);
+    if (/Adding Shipments Disabled/i.test(html)) {
+      const why = stripTags(html.match(/Adding Shipments Disabled[\s\S]{0,300}?(?=<\/div>\s*<\/div>|Add Shipment)/i)?.[0] ?? "Adding Shipments Disabled");
+      throw new Error(`Pickup #${id} is locked by Nok ("${why}"). Only Nok can remove AWB ${awb} now.`);
+    }
+    throw new Error(`Nok shows no Remove button for AWB ${awb} in pickup #${id}.`);
   }
-  throw new Error("This AWB is not in an open pickup.");
+  throw new Error(`AWB ${awb} was not found in your recent Nok pickups.`);
 }
 
 /** Read-only check of the API key: subaccounts, product types, governorates. */

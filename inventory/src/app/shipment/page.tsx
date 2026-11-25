@@ -12,6 +12,7 @@ import { useShippingLabel } from "@/components/useShippingLabel";
 import AwbUpload, { type AwbResult } from "@/components/AwbUpload";
 import NokPanel from "@/components/NokPanel";
 import NokProblems from "@/components/NokProblems";
+import { FLAG, settlementProblem, shipmentProblem } from "@/lib/problems";
 import { uploadAwb } from "@/lib/awb";
 import { shopify } from "@/lib/sync";
 import {
@@ -203,7 +204,7 @@ function ShipmentView({ id }: { id: string }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [notify, setNotify] = useState(false);
-  const [locked, setLocked] = useState(false);
+  const [removeErr, setRemoveErr] = useState<string | null>(null);
   useEffect(() => {
     const k = `ship-note-${id}`;
     const n = sessionStorage.getItem(k);
@@ -235,6 +236,9 @@ function ShipmentView({ id }: { id: string }) {
       <main className="p-4 pb-28 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-6">
         <div className="space-y-4">
           <NokProblems />
+          {[shipmentProblem(s), settlementProblem(s)].filter(Boolean).map((p) => (
+            <p key={p} className="card flex items-center gap-2 border-l-4 border-danger p-3 text-sm font-semibold text-danger" role="alert"><span className={FLAG}>!</span>{p}</p>
+          ))}
           {edit ? (
             <ShipmentForm editing={s} onDone={() => setEdit(false)} />
           ) : (
@@ -324,44 +328,47 @@ function ShipmentView({ id }: { id: string }) {
 
               <section className="card space-y-2 p-4 text-sm">
                 <p className="section-title px-0">Remove</p>
-                {/nok/i.test(s.courier) && /^\d{6,}$/.test(s.tracking) && s.status !== "cancelled" && (
+                {/nok/i.test(s.courier) && /^\d{6,}$/.test(s.tracking) ? (
                   <>
+                    <p className="text-taupe">Takes the shipment out of today&apos;s Nok pickup request. It stays in the app as Cancelled.</p>
                     <button
-                      className="btn-light w-full"
-                      disabled={!!busy}
+                      className="btn w-full bg-red-50 text-danger hover:bg-red-100"
+                      disabled={!!busy || s.status === "cancelled"}
                       onClick={() => {
-                        if (!confirm(`Remove AWB ${s.tracking} from today's Nok pickup request? It goes back to "Created" in Nok (same AWB) and can be added again later.`)) return;
-                        void run("remove", async () => {
-                          try {
-                            await shopify("nok-remove", { awb: s.tracking });
-                          } catch (e) {
-                            setLocked(true);
-                            throw e;
-                          }
-                          await saveShipment({ ...s, status: "cancelled", nok_status: "Removed from pickup" });
-                        }, "Removed from the Nok pickup request.");
+                        if (!confirm(`Delete AWB ${s.tracking}${s.order_name ? ` (${s.order_name})` : ""} from today's Nok pickup request? It goes back to "Created" in Nok (same AWB).`)) return;
+                        setRemoveErr(null);
+                        setBusy("remove");
+                        shopify("nok-remove", { awb: s.tracking })
+                          .then(() => saveShipment({ ...s, status: "cancelled", nok_status: "Removed from pickup" }))
+                          .then(() => setMsg({ ok: true, text: "Removed from the Nok pickup request." }))
+                          .catch((e) => setRemoveErr((e as Error).message || "Nok refused the request."))
+                          .finally(() => setBusy(null));
                       }}
                     >
-                      {busy === "remove" ? "Removing from Nok" : "Remove from Nok pickup"}
+                      {busy === "remove" ? "Removing from Nok" : s.status === "cancelled" ? "Removed from the pickup" : "Delete shipment"}
                     </button>
-                    {locked && (
-                      <a className="btn-light w-full" href={waLink(NOK_WHATSAPP, nokRemoveMessage(s))} target="_blank" rel="noreferrer">
-                        <WhatsAppIcon className="h-5 w-5" /> Ask Nok on WhatsApp to remove it
-                      </a>
+                    {removeErr && (
+                      <div className="space-y-2 rounded-xl bg-red-50 p-3" role="alert">
+                        <p className="font-semibold text-danger">Nok refused</p>
+                        <p className="text-ink">{removeErr}</p>
+                        <a className="btn-light w-full" href={waLink(NOK_WHATSAPP, nokRemoveMessage(s))} target="_blank" rel="noreferrer">
+                          <WhatsAppIcon className="h-5 w-5" /> Ask Nok on WhatsApp to remove it
+                        </a>
+                      </div>
                     )}
                   </>
+                ) : (
+                  <button
+                    className="btn w-full bg-red-50 text-danger hover:bg-red-100"
+                    disabled={!!busy}
+                    onClick={() => {
+                      if (!confirm(`Delete shipment ${s.tracking}${s.order_name ? ` (${s.order_name})` : ""}? This cannot be undone.`)) return;
+                      void run("delete", async () => { await deleteShipment(s); router.replace("/shipments"); }, "Deleted.");
+                    }}
+                  >
+                    {busy === "delete" ? "Deleting" : "Delete shipment"}
+                  </button>
                 )}
-                <button
-                  className="btn w-full bg-red-50 text-danger hover:bg-red-100"
-                  disabled={!!busy}
-                  onClick={() => {
-                    const nok = /nok/i.test(s.courier) && /^\d{6,}$/.test(s.tracking);
-                    if (!confirm(`Delete shipment ${s.tracking}${s.order_name ? ` (${s.order_name})` : ""} from the app? This cannot be undone.${nok ? " It is not removed from Nok." : ""}`)) return;
-                    void run("delete", async () => { await deleteShipment(s); router.replace("/shipments"); }, "Deleted.");
-                  }}
-                >
-                  {busy === "delete" ? "Deleting" : "Delete shipment"}
-                </button>
               </section>
             </>
           )}
