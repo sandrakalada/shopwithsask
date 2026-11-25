@@ -513,4 +513,33 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-24 06:35 UTC check: today NEW 58 / 5 ATC / 4 IC, WARM 45 / 5 ATC, BAGS-ACC 10 / 0. No orders yet. No ad issues.
 
 - 2026-11-24 09:35 UTC check: today NEW 120 / 9 ATC / 5 IC, WARM 58 / 9 ATC, BAGS-ACC 32 / 3 ATC. No orders since Nov 22. No ad issues.
-2026-11-24 daily report: Nov 23 Meta 550 EGP (NEW 363 / 2 ATC, WARM 176 / 23 ATC, BAGS 11), 0 orders. #1400 (3,769) and #1401 (1,824) from the high-end campaign were CANCELLED (Nov 23 and Nov 24); #1395 also cancelled. Last 7 days Meta 5,342 EGP, Meta counted 11 purchases (16,168) vs 6 kept Shopify Meta-paid orders (7,155) + 3 cancelled (33%); ROAS 1.34. No order since #1402 (Nov 22). Nothing paused by this report.
+
+## 2026-11-24 FB + IG catalog test (owner asked to run on Facebook)
+- Campaign 52565513827920 "SWS | Sales | IG + FB Feed | Egypt | Nov 2026", ad set 52565513837320 (150/day, Purchase, product set 1646945297477460 SWS in stock, women 20-45, high-end circles residents only, FB feed + IG feed, Advantage+ audience off), ad 52565513871320 catalog creative 1119335180899733 (EN+AR, SHOP_NOW, creative enhancements opted out, owner url_tags with campaign/ad names). Built PAUSED via API because the Ads Manager draft is not reachable; waiting for owner OK on catalog photos (quality rule).
+
+- 2026-11-24 12:35 UTC check: today NEW 157 / 10 ATC / 5 IC, WARM 131 / 13 ATC, BAGS-ACC 53 / 3 ATC. 0 orders since Nov 22. FB catalog test still paused (awaiting photo OK). No ad issues.
+
+- 2026-11-24 ~13:00 UTC: owner team (Mina M. Morcos) published the Ads Manager draft at 10:57 UTC: campaign 52565506125320, ad set 52565506125520 (150/day, Purchase, product set in stock, url_tags OK), live since 11:12. Off vs owner spec: age 18-65 with Advantage+ audience on, all placements (no FB/IG feed limit), locations only Heliopolis + Zamalek cities + 2 mi Rehab circle with travelers included. Fix proposed, awaiting owner OK. API duplicate 52565513827920 stays paused.
+
+- 2026-11-24 owner said "fix it": ad set 52565506125520 now women 20-45, Advantage+ audience off, FB feed + IG feed only, 10 high-end circles residents only. Mobile cart flow tested OK.
+
+- 2026-11-24 owner approved "yes 100": CART RETARGETING ad set 52565583023520 in campaign 52564976948720, 100/day, PURCHASE optimization, audience 52565583013920 (AddToCart or InitiateCheckout 14d, excluding Purchase 14d), women 20-45, high-end circles residents, IG only, Advantage+ off, 25 ads reusing best creatives. Total ~840/day. Owner told to apply Meta music recommendation and dismiss value rules in the app.
+
+- 2026-11-24 15:35 UTC check: ORDER #1403 2,050 black velvet floral cropped jacket, Cairo, from WARM ad 52565276180520 (carousel v2). Jacket now sold out: paused its ads in NEW, WARM, BAGS-ACC, CART RT. Today NEW 170 / 11 ATC, WARM 178 / 18 ATC, BAGS-ACC 63 / 4 ATC, FB test 41 / 0, CART RT just started. No ad issues.
+
+- 2026-11-24 18:35 UTC check: orders today #1403 2,050 (WARM), #1404 1,065 ruffle skirt (FB test catalog), #1405 1,550 embroidered denim puff sleeve jacket New Cairo (no utm; now sold out, not in ads). Spend NEW 177 / 11 ATC, WARM 192 / 20 ATC / 2 pur, BAGS-ACC 66 / 4, FB test 71 / 5 ATC. CART RT 0 impressions 4h: audience ~20 people after filters, too small; proposed widening (30 days, no area filter) to owner. No ad issues.
+
+- 2026-11-24 owner OK: CART RT widened, audience 52565583013920 now 30 days (ATC or IC, excl. Purchase), ad set geo all Egypt (people who came from the high-end ads), women 20-45, IG only.
+
+- 2026-11-24 owner: removed summer items from catalog product set 1646945297477460 (filter: in stock AND product_type != Beach Set AND name excludes summer, sundress, beach, tropical, bermuda, shorts, straw, pineapple, watermelon, ice cream, seaside, starfish, crab, seahorse, popsicle, short-sleeve, one-shoulder, off-shoulder). 249 -> 206 products.
+
+- 2026-11-24 21:35 UTC check: new orders #1405 1,550 puff jacket (New Cairo) and #1408 1,835 black blazer floral lapel (6 October), no utm yet; pixel credits NEW with 2 purchases today. Blazer now sold out: paused its ads. Today NEW 184 / 13 ATC / 2 pur, WARM 206 / 20 ATC / 2 pur, BAGS-ACC 71 / 4, FB test 97 / 8 ATC, CART RT started (30 EGP). 5 orders today, 8,350.
+
+- 2026-11-25 00:35 UTC check: #1408 blazer came via sag_organic (not ads); #1409 1,912 cream floral embroidered jacket + statement earrings, Cairo, no utm. Cream jacket sold out (checked ads for its link). Nov 24 total 5 orders 8,412. Spend today NEW 212, WARM 221, BAGS-ACC 74, FB test 125 (9 ATC), CART RT 47.
+
+- 2026-11-25 03:35 UTC check: new account day just started (UTC-2), quiet overnight, no new orders since #1409, no ad issues.
+
+- 2026-11-25 06:35 UTC check: #1410 1,065 heart playing card handbag, Giza (pixel credits FB catalog test with 1 purchase; handbag now sold out, not in our ads, catalog drops it automatically). Today NEW 9 / 3 ATC, WARM 10, BAGS 2, FB test 24 / 2 ATC / 1 pur. CART RT 0 impressions this morning (small audience still filling).
+
+- 2026-11-25 09:35 UTC check: #1411 1,095 burgundy velvet mini skirt (FB catalog test, 1 left), #1412 885 retro geometric mini dress (no utm, now sold out, not in our ads). FB catalog test: 3 orders in ~22h (#1404, #1410 pixel, #1411) on ~220 EGP = best performer. Today NEW 28 / 5 ATC, WARM 128 / 2 ATC, BAGS 2 (low delivery), FB test 96 / 12 ATC / 2 pur, CART RT 8.
+2026-11-25 daily report: Nov 24 Meta 710 EGP (NEW 215, WARM 245, BAGS 74, FB catalog test 129, CART RT 47), 49 ATC; Meta counted 4 purchases (6,009) vs Shopify 2 Meta-paid orders (3,115). Shopify Nov 24: 4 orders 6,500 (incl. 1 Google Shopping 1,835, 1 direct). Last 7 days Meta 5,239 EGP, Shopify Meta-paid 8 kept (10,270, ROAS 1.96) + 3 cancelled (27%); prior 7 days 1. Today so far 4 orders 4,957. Nothing paused by this report.
