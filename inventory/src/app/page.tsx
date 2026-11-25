@@ -23,6 +23,9 @@ function useFirstName() {
 
 export default function Home() {
   const firstName = useFirstName();
+  // 0 = this month, -1 = last month, ...
+  const [monthOffset, setMonthOffset] = useState(0);
+  const shown = new Date(new Date().getFullYear(), new Date().getMonth() + monthOffset, 1);
   const data = useLiveQuery(async () => {
     const [products, variants, rateRow, orders] = await Promise.all([
       db.products.toArray(),
@@ -38,6 +41,8 @@ export default function Home() {
     const todays = await db.movements.where("created_at").aboveOrEqual(today).toArray();
     const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
     const yearStart = new Date(new Date().getFullYear(), 0, 1).toISOString();
+    const pickStart = new Date(new Date().getFullYear(), new Date().getMonth() + monthOffset, 1).toISOString();
+    const pickEnd = new Date(new Date().getFullYear(), new Date().getMonth() + monthOffset + 1, 1).toISOString();
     // real revenue = orders that are fulfilled AND paid
     const real = orders.filter((o) => !o.cancelled_at && o.fulfillment_status === "FULFILLED" && o.financial_status === "PAID");
     // purchase cost of each sold line: its size's cost, or the product's average cost for old orders
@@ -58,8 +63,8 @@ export default function Home() {
     };
     const writeOffs = (await db.movements.toArray()).filter((m) => WRITE_OFF.includes(m.reason));
     const vmap = new Map(variants.map((v) => [v.id, v]));
-    const sum = (since: string) => {
-      const list = real.filter((o) => o.created_at >= since);
+    const sum = (since: string, until = "9999") => {
+      const list = real.filter((o) => o.created_at >= since && o.created_at < until);
       let items = 0, cost = 0, noCost = 0;
       for (const o of list) {
         items += Number(o.subtotal ?? 0) - Number(o.discounts ?? 0);
@@ -69,16 +74,16 @@ export default function Home() {
           else cost += c;
         }
       }
-      const lost = writeOffs.filter((m) => m.created_at >= since).reduce((t, m) => t + -m.delta * (costInEgp(vmap.get(m.variant_id) ?? {}, rate) ?? 0), 0);
+      const lost = writeOffs.filter((m) => m.created_at >= since && m.created_at < until).reduce((t, m) => t + -m.delta * (costInEgp(vmap.get(m.variant_id) ?? {}, rate) ?? 0), 0);
       return {
         total: list.reduce((t, o) => t + Number(o.total ?? 0), 0),
         count: list.length,
-        allOrders: orders.filter((o) => !o.cancelled_at && o.created_at >= since).length,
+        allOrders: orders.filter((o) => !o.cancelled_at && o.created_at >= since && o.created_at < until).length,
         profit: items - cost - lost,
         noCost,
       };
     };
-    const mtd = sum(monthStart);
+    const mtd = sum(pickStart, pickEnd);
     const ytd = sum(yearStart);
     return {
       products: new Set(inStock.map((v) => v.product_id)).size,
@@ -103,7 +108,7 @@ export default function Home() {
       mtd,
       ytd,
     };
-  }, []);
+  }, [monthOffset]);
 
   return (
     <>
@@ -146,7 +151,12 @@ export default function Home() {
         <section>
           <h2 className="section-title">Sales</h2>
           <div className="card divide-y divide-line overflow-hidden lg:grid lg:grid-cols-2 lg:divide-x lg:divide-y-0">
-            <SalesRow label="Month to date" sub={new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" })} data={data?.mtd} />
+            <SalesRow
+              label={monthOffset === 0 ? "Month to date" : "Month"}
+              sub={shown.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}
+              data={data?.mtd}
+              nav={{ prev: () => setMonthOffset((m) => m - 1), next: monthOffset < 0 ? () => setMonthOffset((m) => m + 1) : undefined }}
+            />
             <SalesRow label="Year to date" sub={String(new Date().getFullYear())} data={data?.ytd} />
           </div>
           <p className="mt-1.5 px-1 text-[12px] text-taupe">Sales and net profit: delivered and paid orders only. Net profit = items sold minus purchase cost and write-offs (delivery fees not counted). Total orders includes all orders not cancelled.</p>
@@ -166,19 +176,41 @@ function Tile({ href, label, value, sub }: { href: string; label: string; value:
   );
 }
 
-function SalesRow({ label, sub, data }: { label: string; sub: string; data?: { total: number; count: number; allOrders: number; profit: number; noCost: number } }) {
+function SalesRow({ label, sub, data, nav }: { label: string; sub: string; data?: { total: number; count: number; allOrders: number; profit: number; noCost: number }; nav?: { prev: () => void; next?: () => void } }) {
+  const Arrow = ({ dir, onClick }: { dir: "prev" | "next"; onClick?: () => void }) => (
+    <button
+      onClick={onClick}
+      disabled={!onClick}
+      aria-label={dir === "prev" ? "Previous month" : "Next month"}
+      className="flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-sand disabled:opacity-25"
+    >
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d={dir === "prev" ? "m15 18-6-6 6-6" : "m9 6 6 6-6 6"} />
+      </svg>
+    </button>
+  );
   return (
-    <Link href="/items?view=top" className="block px-4 py-3 hover:bg-sand/50 lg:px-5 lg:py-4">
-      <div className="flex items-baseline justify-between">
-        <p className="text-[15px] font-medium">{label}</p>
-        <p className="text-[12px] text-taupe">{sub}</p>
+    <div className="lg:flex lg:flex-col">
+      <div className={`flex items-center justify-between ${nav ? "px-2 pt-1 lg:px-3" : "px-4 pt-3 lg:px-5 lg:pt-4"}`}>
+        <p className={`text-[15px] font-medium ${nav ? "pl-2" : ""}`}>{label}</p>
+        {nav ? (
+          <div className="flex items-center">
+            <Arrow dir="prev" onClick={nav.prev} />
+            <p className="min-w-[7.5rem] text-center text-[13px] font-semibold text-taupe">{sub}</p>
+            <Arrow dir="next" onClick={nav.next} />
+          </div>
+        ) : (
+          <p className="text-[12px] text-taupe">{sub}</p>
+        )}
       </div>
+    <Link href="/items?view=top" className="block px-4 pb-3 pt-1 hover:bg-sand/50 lg:px-5 lg:pb-4">
       <div className="mt-2 grid grid-cols-3 gap-2">
         <Cell k="Sales" v={data ? egp(data.total) : "–"} />
         <Cell k="Total orders" v={data ? String(data.allOrders) : "–"} sub={data ? `${data.count} delivered` : ""} />
         <Cell k="Net profit" v={data ? egp(data.profit) : "–"} tone={data && data.profit < 0 ? "text-danger" : "text-success"} sub={data?.noCost ? `${data.noCost} pcs no cost` : ""} />
       </div>
     </Link>
+    </div>
   );
 }
 
