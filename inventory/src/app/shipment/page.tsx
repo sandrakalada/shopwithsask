@@ -264,7 +264,7 @@ function ShipmentView({ id }: { id: string }) {
                 {(s.nok_status || trackLink) && (
                   <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-sand px-3 py-2.5 text-sm">
                     <div className="min-w-0">
-                      <p className="font-semibold">{s.nok_status ? `Nok: ${s.nok_status}` : "Nok status not checked yet"}</p>
+                      <p className="font-semibold">{s.nok_status ? `${s.nok_status} (NOK)` : "Status not checked yet (NOK)"}</p>
                       {(s.nok_location || s.nok_checked_at) && (
                         <p className="text-xs text-taupe">{[s.nok_location, s.nok_checked_at && `checked ${new Date(s.nok_checked_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`].filter(Boolean).join(" · ")}</p>
                       )}

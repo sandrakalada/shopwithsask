@@ -110,7 +110,7 @@ function OrderView() {
               <span className="text-[13px] font-semibold text-caramel">Open</span>
             </Link>
           ) : null}
-          {shipment?.nok_status && <p className="mt-2 text-sm text-taupe">Nok: <span className="font-semibold text-ink">{shipment.nok_status}</span>{shipment.nok_location ? ` · ${shipment.nok_location}` : ""}</p>}
+          {shipment?.nok_status && <p className="mt-2 text-sm text-taupe">Status (NOK): <span className="font-semibold text-ink">{shipment.nok_status}</span>{shipment.nok_location ? ` · ${shipment.nok_location}` : ""}</p>}
           {shipment && (shipment.recipient.phone || order.phone) && (
             <a className="btn-light mt-3 w-full" href={waLink(shipment.recipient.phone || order.phone, trackingMessage(shipment, order))} target="_blank" rel="noreferrer">
               <WhatsAppIcon className="h-5 w-5" /> Send tracking on WhatsApp
@@ -118,8 +118,8 @@ function OrderView() {
           )}
           {shipment ? null : (
             <div className="mt-2 flex items-center justify-between gap-3">
-              <p className="text-sm text-taupe">No shipment yet.</p>
-              <CreateShipmentButton order={order} className="btn-dark px-4" />
+              <p className="text-sm text-taupe">{order.fulfillment_status === "FULFILLED" ? "Delivered without a shipment (personal delivery)." : "No shipment yet."}</p>
+              {!order.cancelled_at && order.fulfillment_status !== "FULFILLED" ? <CreateShipmentButton order={order} className="btn-dark px-4" /> : null}
             </div>
           )}
         </section>
