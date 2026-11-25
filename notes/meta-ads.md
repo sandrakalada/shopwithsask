@@ -544,3 +544,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-25 09:35 UTC check: #1411 1,095 burgundy velvet mini skirt (FB catalog test, 1 left), #1412 885 retro geometric mini dress (no utm, now sold out, not in our ads). FB catalog test: 3 orders in ~22h (#1404, #1410 pixel, #1411) on ~220 EGP = best performer. Today NEW 28 / 5 ATC, WARM 128 / 2 ATC, BAGS 2 (low delivery), FB test 96 / 12 ATC / 2 pur, CART RT 8.
 
 - 2026-11-25 owner "yes": FB catalog campaign 52565506125320 150 -> 250/day; NEW 52564976960720 250 -> 150/day. Total unchanged 840/day.
+
+- 2026-11-25 12:35 UTC check: no new orders since #1412. Today NEW 40 / 5 ATC, WARM 178 / 4 ATC, FB catalog 128 / 12 ATC / 2 pur, BAGS-ACC 1.75 (8 imp) and CART RT 8 (1 imp) barely delivering for 10h: flagged to owner. No ad issues.
