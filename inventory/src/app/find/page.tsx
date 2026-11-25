@@ -11,6 +11,9 @@ import { Header, QtyPill, Thumb } from "@/components/ui";
 type Result = { productId: string; score: number; u: string };
 
 export default function FindPage() {
+  // opened from Barcode stickers: a match goes back there with that product picked
+  const [forLabels, setForLabels] = useState(false);
+  useEffect(() => setForLabels(new URLSearchParams(location.search).get("for") === "labels"), []);
   const camRef = useRef<HTMLInputElement>(null);
   const libRef = useRef<HTMLInputElement>(null);
   const indexRef = useRef<IndexItem[] | null>(null);
@@ -187,7 +190,7 @@ export default function FindPage() {
                 const pct = Math.round(Math.max(0, Math.min(1, (r.score - 0.2) / 0.6)) * 100);
                 return (
                   <li key={r.productId} className="flex items-center">
-                    <Link href={`/item?id=${p.id}`} className={`flex min-w-0 flex-1 items-center gap-3 py-3 pl-4 active:bg-sand ${i === 0 ? "bg-cream" : ""}`}>
+                    <Link href={forLabels ? `/labels?product=${p.id}` : `/item?id=${p.id}`} className={`flex min-w-0 flex-1 items-center gap-3 py-3 pl-4 active:bg-sand ${i === 0 ? "bg-cream" : ""}`}>
                       <Thumb src={r.u || p.image_url} size={56} />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[15px] font-semibold">{p.title}</p>

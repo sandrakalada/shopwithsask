@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -8,7 +9,7 @@ import { db, newestFirst, type Product, type Variant } from "@/lib/db";
 import { stickerLink, variantLabel } from "@/lib/stock";
 import { imagesToPdf, isIOS, preparePdfPrint, preparePrint, printNow, savePdf } from "@/lib/pdf";
 import { Header, Stepper, Thumb } from "@/components/ui";
-import { PrintIcon } from "@/components/Icons";
+import { CameraIcon, PrintIcon } from "@/components/Icons";
 
 // Sticker: 50 x 30 mm. Drawn at 12 px per mm (600 x 360) for sharp thermal printing.
 const W = 50, H = 30, PX = 12;
@@ -189,7 +190,12 @@ function Labels() {
           <Chip on={scope === "instock"} onClick={() => setScope("instock")}>In stock</Chip>
           <Chip on={scope === "all"} onClick={() => setScope("all")}>All items</Chip>
         </div>
-        <input className="field" type="search" placeholder="Search name or SKU" value={q} onChange={(e) => setQ(e.target.value)} />
+        <div className="flex gap-2">
+          <input className="field flex-1" type="search" placeholder="Search name or SKU" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Link href="/find?for=labels" className="btn-light min-h-11 w-12 shrink-0 px-0" aria-label="Find the product with a photo" title="Find with a photo">
+            <CameraIcon className="h-5 w-5" />
+          </Link>
+        </div>
         <div className="flex items-center justify-between px-1 text-[13px]">
           <span className="text-taupe">
             {chosen.length} of {rows.length} selected · {chosen.reduce((t, r) => t + r.copies, 0)} stickers

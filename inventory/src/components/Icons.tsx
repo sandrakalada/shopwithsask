@@ -35,3 +35,5 @@ export const TruckIcon = ({ className }: P) =>
 export const ChartIcon = ({ className }: P) => base(<><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></>, className);
 export const WalletIcon = ({ className }: P) =>
   base(<><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M3 10h18M16 14.5h2" /></>, className);
+export const CameraIcon = ({ className }: P) =>
+  base(<><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></>, className);
