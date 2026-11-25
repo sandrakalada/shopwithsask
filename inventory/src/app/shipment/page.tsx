@@ -13,7 +13,7 @@ import AwbUpload, { type AwbResult } from "@/components/AwbUpload";
 import NokPanel from "@/components/NokPanel";
 import { uploadAwb } from "@/lib/awb";
 import {
-  STATUS_LABEL, STATUS_TONE, statusText, markPaidInShopify, trackingMessage, trackingUrl, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
+  STATUS_LABEL, STATUS_TONE, statusText, markPaidInShopify, deleteShipment, NOK_WHATSAPP, nokRemoveMessage, trackingMessage, trackingUrl, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
 } from "@/lib/shipments";
 
 const CITIES = ["Cairo", "Giza", "Alexandria", "Qalyubia", "Sharqia", "Dakahlia", "Gharbia", "Monufia", "Beheira", "Kafr El Sheikh", "Damietta", "Port Said", "Ismailia", "Suez", "Fayoum", "Beni Suef", "Minya", "Asyut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "Matrouh", "North Sinai", "South Sinai", "New Valley"];
@@ -192,6 +192,7 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
 const FLOW: ShipmentStatus[] = ["ready", "picked_up", "delivered", "returned", "cancelled"];
 
 function ShipmentView({ id }: { id: string }) {
+  const router = useRouter();
   const s = useLiveQuery(async () => (await db.shipments.get(id)) ?? null, [id]);
   const order = useLiveQuery(async () => (s?.order_id ? (await db.orders.get(s.order_id)) ?? null : null), [s?.order_id]);
   const labelOrder = s ? (s.order_id && order === undefined ? undefined : order ?? shipmentAsOrder(s)) : undefined;
@@ -316,6 +317,28 @@ function ShipmentView({ id }: { id: string }) {
                 </section>
               )}
               {msg && <p className={`card p-4 text-sm ${msg.ok ? "text-emerald-700" : "text-red-700"}`}>{msg.text}</p>}
+
+              <section className="card space-y-2 p-4 text-sm">
+                <p className="section-title px-0">Remove</p>
+                {/nok/i.test(s.courier) && /^\d{6,}$/.test(s.tracking) && (
+                  <>
+                    <a className="btn-light w-full" href={waLink(NOK_WHATSAPP, nokRemoveMessage(s))} target="_blank" rel="noreferrer">
+                      <WhatsAppIcon className="h-5 w-5" /> Ask Nok to remove it from the pickup
+                    </a>
+                  </>
+                )}
+                <button
+                  className="btn w-full bg-red-50 text-danger hover:bg-red-100"
+                  disabled={!!busy}
+                  onClick={() => {
+                    const nok = /nok/i.test(s.courier) && /^\d{6,}$/.test(s.tracking);
+                    if (!confirm(`Delete shipment ${s.tracking}${s.order_name ? ` (${s.order_name})` : ""} from the app? This cannot be undone.${nok ? " It is not removed from Nok." : ""}`)) return;
+                    void run("delete", async () => { await deleteShipment(s); router.replace("/shipments"); }, "Deleted.");
+                  }}
+                >
+                  {busy === "delete" ? "Deleting" : "Delete shipment"}
+                </button>
+              </section>
             </>
           )}
         </div>

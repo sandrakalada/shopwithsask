@@ -156,7 +156,18 @@ async function pull() {
   await pullSynced("customers", db.customers);
   await pullSynced("invoices", db.invoices);
   await pullSynced("shipments", db.shipments);
+  await dropDeletedShipments();
   await pullSynced("app_settings", db.settings);
+}
+
+/** Shipments deleted on another device disappear here too. */
+async function dropDeletedShipments() {
+  const { data, error } = await supabase!.from("shipments").select("id").limit(5000);
+  if (error || !data) return;
+  const live = new Set(data.map((r) => r.id as string));
+  const waiting = new Set((await db.outbox.where("table").equals("shipments").toArray()).map((o) => o.row.id as string));
+  const gone = (await db.shipments.toCollection().primaryKeys()).filter((id) => !live.has(id as string) && !waiting.has(id as string));
+  if (gone.length) await db.shipments.bulkDelete(gone);
 }
 
 /** Download rows changed since the last sync for tables stamped with synced_at. */

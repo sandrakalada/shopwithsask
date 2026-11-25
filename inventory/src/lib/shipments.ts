@@ -187,3 +187,21 @@ export function trackingMessage(s: Shipment, o?: Order | null) {
   ].filter(Boolean).join("\n");
   return `${en}\n\n${ar}`;
 }
+
+/** Deletes the shipment from the app (all devices) and its saved label. Needs a connection. */
+export async function deleteShipment(s: Shipment) {
+  if (!navigator.onLine) throw new Error("Connect to the internet to delete");
+  const { error } = await supabase!.from("shipments").delete().eq("id", s.id);
+  if (error) throw error;
+  if (s.awb_path) await supabase!.storage.from("awb").remove([s.awb_path]).catch(() => {});
+  await db.transaction("rw", db.shipments, db.outbox, async () => {
+    await db.shipments.delete(s.id);
+    const queued = await db.outbox.where("table").equals("shipments").toArray();
+    await db.outbox.bulkDelete(queued.filter((o) => o.row.id === s.id).map((o) => o.seq!));
+  });
+}
+
+/** Nok locks a shipment once it is in a pickup request; removing it is done by Nok. */
+export const NOK_WHATSAPP = "201022102205";
+export const nokRemoveMessage = (s: Shipment) =>
+  `Hello, this is Shop With Sask. Please remove this shipment from our pickup request: AWB ${s.tracking}${s.order_name ? `, REF ${s.order_name.replace(/\D/g, "")}` : ""}. Thank you.`;
