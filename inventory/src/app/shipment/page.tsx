@@ -12,6 +12,7 @@ import { useShippingLabel } from "@/components/useShippingLabel";
 import AwbUpload, { type AwbResult } from "@/components/AwbUpload";
 import NokPanel from "@/components/NokPanel";
 import { uploadAwb } from "@/lib/awb";
+import { shopify } from "@/lib/sync";
 import {
   STATUS_LABEL, STATUS_TONE, statusText, markPaidInShopify, deleteShipment, NOK_WHATSAPP, nokRemoveMessage, trackingMessage, trackingUrl, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
 } from "@/lib/shipments";
@@ -201,6 +202,7 @@ function ShipmentView({ id }: { id: string }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [notify, setNotify] = useState(false);
+  const [locked, setLocked] = useState(false);
   useEffect(() => {
     const k = `ship-note-${id}`;
     const n = sessionStorage.getItem(k);
@@ -320,11 +322,31 @@ function ShipmentView({ id }: { id: string }) {
 
               <section className="card space-y-2 p-4 text-sm">
                 <p className="section-title px-0">Remove</p>
-                {/nok/i.test(s.courier) && /^\d{6,}$/.test(s.tracking) && (
+                {/nok/i.test(s.courier) && /^\d{6,}$/.test(s.tracking) && s.status !== "cancelled" && (
                   <>
-                    <a className="btn-light w-full" href={waLink(NOK_WHATSAPP, nokRemoveMessage(s))} target="_blank" rel="noreferrer">
-                      <WhatsAppIcon className="h-5 w-5" /> Ask Nok to remove it from the pickup
-                    </a>
+                    <button
+                      className="btn-light w-full"
+                      disabled={!!busy}
+                      onClick={() => {
+                        if (!confirm(`Remove AWB ${s.tracking} from today's Nok pickup request? It goes back to "Created" in Nok (same AWB) and can be added again later.`)) return;
+                        void run("remove", async () => {
+                          try {
+                            await shopify("nok-remove", { awb: s.tracking });
+                          } catch (e) {
+                            setLocked(true);
+                            throw e;
+                          }
+                          await saveShipment({ ...s, status: "cancelled", nok_status: "Removed from pickup" });
+                        }, "Removed from the Nok pickup request.");
+                      }}
+                    >
+                      {busy === "remove" ? "Removing from Nok" : "Remove from Nok pickup"}
+                    </button>
+                    {locked && (
+                      <a className="btn-light w-full" href={waLink(NOK_WHATSAPP, nokRemoveMessage(s))} target="_blank" rel="noreferrer">
+                        <WhatsAppIcon className="h-5 w-5" /> Ask Nok on WhatsApp to remove it
+                      </a>
+                    )}
                   </>
                 )}
                 <button

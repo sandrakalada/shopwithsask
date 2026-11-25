@@ -1003,6 +1003,44 @@ async function nokCreate(i: NokShipmentInput) {
   return { awb: String(draft.air_way_bill), draftId: draft.id, shipmentId, pickupId, pickupError, pdf, pdfError, existed: drafts.some((d: any) => d.id === draft.id) };
 }
 
+/** Takes a shipment out of the open pickup request with the portal's own "Remove" button (only shown
+ * until the pickup is locked). The shipment goes back to "Created" in Nok, with the same AWB. */
+async function nokRemoveFromPickup(awb: string) {
+  if (!/^\d{6,}$/.test(awb)) throw new Error("Not a Nok AWB");
+  const ses = new NokSession();
+  await ses.login();
+  const list = await ses.get(`/sender/subaccounts/${NOK_SUBACCOUNT}/pickups/`);
+  const pickups = [...new Set([...list.html.matchAll(/\/sender\/pickup\/(\d+)\/sender\//g)].map((m) => m[1]))];
+  for (const id of pickups.slice(0, 5)) {
+    const page = await ses.get(`/sender/pickup/${id}/sender/`);
+    const html = page.html;
+    if (!html.includes(awb)) continue;
+    // the part of the page about this shipment (its row or card)
+    const blocks: string[] = [];
+    for (const m of html.matchAll(new RegExp(awb, "g"))) blocks.push(html.slice(Math.max(0, m.index! - 1500), m.index! + 2500));
+    const csrf = html.match(/name="csrfmiddlewaretoken" value="([^"]+)"/)?.[1] ?? "";
+    for (const b of blocks) {
+      // a form whose action or button says remove
+      for (const f of b.matchAll(/<form[^>]*action="([^"]+)"[^>]*>([\s\S]*?)<\/form>/g)) {
+        if (!/remove|postpone|unassign|return-to-created|delete/i.test(f[1] + f[2])) continue;
+        const fields: Record<string, string> = { csrfmiddlewaretoken: csrf };
+        for (const i of f[2].matchAll(/<input[^>]*name="([^"]+)"[^>]*value="([^"]*)"[^>]*>/g)) fields[i[1]] = i[2];
+        const r = await ses.post(f[1], fields, `${NOK}/sender/pickup/${id}/sender/`);
+        if (r.status < 400) return { removed: true, pickupId: id, via: f[1] };
+      }
+      // or a link / button with a remove address
+      const link = b.match(/(?:href|data-url|data-href|formaction)="([^"]*(?:remove|postpone|unassign)[^"]*)"/i)?.[1];
+      if (link) {
+        const r = await ses.post(link, { csrfmiddlewaretoken: csrf }, `${NOK}/sender/pickup/${id}/sender/`);
+        if (r.status < 400) return { removed: true, pickupId: id, via: link };
+      }
+    }
+    if (/Adding Shipments Disabled/i.test(html)) throw new Error("This pickup is locked already. Only Nok can remove it now.");
+    throw new Error("Nok's Remove button was not found for this shipment.");
+  }
+  throw new Error("This AWB is not in an open pickup.");
+}
+
 /** Read-only check of the API key: subaccounts, product types, governorates. */
 async function nokApiCheck() {
   const [sub, types, gov] = await Promise.all([nokApi("/subaccounts/"), nokApi("/product-types/"), nokApi("/governorates/")]);
@@ -1249,6 +1287,14 @@ Deno.serve(async (req) => {
         if (error) throw error;
         return json({ url: data.signedUrl });
       }
+      if (cb.action === "nok-grep" && typeof cb.path === "string" && cb.path.startsWith("/") && typeof cb.pattern === "string") { // read-only
+        const ses = new NokSession(); await ses.login();
+        const pg = await ses.get(cb.path);
+        const re = new RegExp(cb.pattern, "gi");
+        const hits: string[] = [];
+        for (const m of pg.html.matchAll(re)) { hits.push(pg.html.slice(Math.max(0, m.index! - 300), m.index! + 300)); if (hits.length >= 12) break; }
+        return json({ status: pg.status, hits });
+      }
       if (cb.action === "nok-api-check") return json(await nokApiCheck().catch((e) => ({ key: !!Deno.env.get("NOK_API_KEY"), error: String(e.message) })));
       if (cb.action === "nok-check") return json({ username: !!Deno.env.get("NOK_USERNAME"), password: !!Deno.env.get("NOK_PASSWORD"), login: await new NokSession().login().then(() => "ok", (e) => String(e.message)) });
       if (cb.action === "nok-page" && typeof cb.path === "string" && cb.path.startsWith("/")) return json(await nokPage(cb.path, Number(cb.from ?? 0), Number(cb.len ?? 3000)));
@@ -1283,6 +1329,7 @@ Deno.serve(async (req) => {
     if (action === "nok-governorates") return json((await nokApi("/governorates/")).results ?? []);
     if (action === "nok-zones") return json(await nokZones(Number(body.governorateId)));
     if (action === "nok-create") return json(await nokCreate(body.shipment));
+    if (action === "nok-remove") return json(await nokRemoveFromPickup(String(body.awb)));
     if (action === "nok-awb") return json({ pdf: await nokAwbPdf(Number(body.shipmentId)) });
     return json({ error: "unknown action" }, 400);
   } catch (e) {
