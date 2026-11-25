@@ -538,3 +538,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-25 00:35 UTC check: #1408 blazer came via sag_organic (not ads); #1409 1,912 cream floral embroidered jacket + statement earrings, Cairo, no utm. Cream jacket sold out (checked ads for its link). Nov 24 total 5 orders 8,412. Spend today NEW 212, WARM 221, BAGS-ACC 74, FB test 125 (9 ATC), CART RT 47.
 
 - 2026-11-25 03:35 UTC check: new account day just started (UTC-2), quiet overnight, no new orders since #1409, no ad issues.
+
+- 2026-11-25 06:35 UTC check: #1410 1,065 heart playing card handbag, Giza (pixel credits FB catalog test with 1 purchase; handbag now sold out, not in our ads, catalog drops it automatically). Today NEW 9 / 3 ATC, WARM 10, BAGS 2, FB test 24 / 2 ATC / 1 pur. CART RT 0 impressions this morning (small audience still filling).
