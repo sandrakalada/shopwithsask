@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Header, timeAgo } from "@/components/ui";
+import { checkAlerts, clearUnseen } from "@/lib/alerts";
 
 /** WhatsApp order flow alerts: confirmations, Instapay, cancellations and change requests (saved by the flow app). */
 type Alert = {
@@ -48,7 +49,9 @@ export default function AlertsPage() {
     if (!supabase || !unseen) return;
     const ids = rows!.filter((r) => !r.seen).map((r) => r.id);
     setRows((rs) => rs!.map((r) => ({ ...r, seen: true })));
+    clearUnseen();
     await supabase.from("wa_alerts").update({ seen: true }).in("id", ids);
+    void checkAlerts();
   };
 
   const days = useMemo(() => {

@@ -14,6 +14,7 @@ import SaveBar from "./SaveBar";
 import { DesktopSidebar } from "./SideMenu";
 import { Suspense } from "react";
 import PullToRefresh from "./PullToRefresh";
+import AlertWatcher from "./AlertWatcher";
 import { checkForUpdate } from "@/lib/version";
 
 const tabs = [
@@ -167,6 +168,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       </Suspense>
       <div className="mx-auto max-w-xl pb-[calc(env(safe-area-inset-bottom)+76px)] lg:ml-64 lg:max-w-none lg:pb-10">{children}</div>
       {!shippingOnly && <SaveBar />}
+      {!shippingOnly && <AlertWatcher />}
       <PullToRefresh />
       <nav className="no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/85 backdrop-blur-xl backdrop-saturate-150 pb-safe lg:hidden" aria-label="Tabs">
         <ul className={`mx-auto grid max-w-xl ${shippingOnly ? "grid-cols-1" : "grid-cols-5"}`}>
