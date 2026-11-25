@@ -35,6 +35,12 @@ const PlusBoxIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const BellIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15L6 16Z" /><path d="M10 20.5a2 2 0 0 0 4 0" />
+  </svg>
+);
+
 const SECTIONS: { title: string; items: { href: string; label: string; Icon: (p: { className?: string }) => React.ReactNode }[] }[] = [
   { title: "", items: [{ href: "/", label: "Home", Icon: HomeIcon }] },
   {
@@ -53,6 +59,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; Icon: (p:
     title: "Sales",
     items: [
       { href: "/orders", label: "Orders", Icon: ReceiptIcon },
+      { href: "/alerts", label: "WhatsApp alerts", Icon: BellIcon },
       { href: "/shipments", label: "Shipments", Icon: TruckIcon },
       { href: "/shipment?new=1", label: "New shipment", Icon: PlusBoxIcon },
       { href: "/invoice?new=1", label: "New invoice", Icon: DocIcon },
