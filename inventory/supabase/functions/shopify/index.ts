@@ -879,6 +879,55 @@ async function nokStatus() {
   return { checked, changed };
 }
 
+/* ---------- Nok portal session (login saved as server secrets NOK_USERNAME / NOK_PASSWORD; never returned) ---------- */
+const NOK = "https://ots.nokcourier.com";
+class NokSession {
+  jar = new Map<string, string>();
+  cookie() { return [...this.jar].map(([k, v]) => `${k}=${v}`).join("; "); }
+  keep(res: Response) {
+    const all = (res.headers as any).getSetCookie?.() ?? (res.headers.get("set-cookie") ? [res.headers.get("set-cookie")] : []);
+    for (const c of all) { const [kv] = String(c).split(";"); const i = kv.indexOf("="); if (i > 0) this.jar.set(kv.slice(0, i).trim(), kv.slice(i + 1).trim()); }
+  }
+  async get(path: string) {
+    const res = await fetch(NOK + path, { headers: { cookie: this.cookie(), "user-agent": "Mozilla/5.0" }, redirect: "manual" });
+    this.keep(res);
+    return { status: res.status, location: res.headers.get("location"), html: await res.text() };
+  }
+  async post(path: string, form: Record<string, string>, referer = NOK + path) {
+    const res = await fetch(NOK + path, {
+      method: "POST",
+      headers: { cookie: this.cookie(), "content-type": "application/x-www-form-urlencoded", referer, "x-csrftoken": this.jar.get("csrftoken") ?? "", "user-agent": "Mozilla/5.0" },
+      body: new URLSearchParams(form).toString(),
+      redirect: "manual",
+    });
+    this.keep(res);
+    return { status: res.status, location: res.headers.get("location"), html: await res.text() };
+  }
+  async login() {
+    const user = Deno.env.get("NOK_USERNAME"), pass = Deno.env.get("NOK_PASSWORD");
+    if (!user || !pass) throw new Error("Nok login not saved (NOK_USERNAME / NOK_PASSWORD)");
+    const page = await this.get("/accounts/login/?next=/");
+    const csrf = page.html.match(/name="csrfmiddlewaretoken" value="([^"]+)"/)?.[1] ?? "";
+    const r = await this.post("/accounts/login/?next=/", { csrfmiddlewaretoken: csrf, next: "/", username: user, password: pass }, NOK + "/accounts/login/?next=/");
+    const ok = r.status === 302 && !/login/.test(r.location ?? "");
+    if (!ok) throw new Error("Nok login failed: check the username and password");
+    return true;
+  }
+}
+
+/** Read-only look at a portal page (forms, fields, links) to build the automation. */
+async function nokPage(path: string, from = 0, len = 3000) {
+  const s = new NokSession();
+  await s.login();
+  const p = await s.get(path);
+  const forms = [...p.html.matchAll(/<form[^>]*>/g)].map((m) => m[0]);
+  const fields = [...p.html.matchAll(/<(input|select|textarea)[^>]*name="([^"]+)"[^>]*>/g)].map((m) => `${m[1]}:${m[2]}${/type="hidden"/.test(m[0]) ? "(hidden)" : ""}`);
+  const options = [...p.html.matchAll(/<select[^>]*name="([^"]+)"[^>]*>([\s\S]*?)<\/select>/g)].map((m) => ({ name: m[1], options: [...m[2].matchAll(/<option[^>]*value="([^"]*)"[^>]*>([^<]*)/g)].slice(0, 40).map((o) => `${o[1]}=${o[2].trim()}`) }));
+  const links = [...new Set([...p.html.matchAll(/href="(\/[^"#]*)"/g)].map((m) => m[1]))].filter((h) => !/static|media|\.css|\.js/.test(h)).slice(0, 80);
+  const buttons = [...p.html.matchAll(/<(button|a)[^>]*>([^<]{2,60})<\/(button|a)>/g)].map((m) => m[2].trim()).filter(Boolean).slice(0, 60);
+  return { status: p.status, location: p.location, forms, fields, options, links, buttons, text: stripTags(p.html.replace(/<(script|style)[\s\S]*?<\/\1>/g, "")).slice(from, from + Math.min(len, 60000)) };
+}
+
 /** Monday: Nok transfers the collected cash. Reminder with the expected amount (same rules as the app's Settlement page). */
 const NOK_FEES: Record<string, number> = { cairo: 80, giza: 82, alex: 85, delta: 88, north: 150, upper: 180 };
 function nokZoneOf(r: any) {
@@ -1100,6 +1149,8 @@ Deno.serve(async (req) => {
       if (cb.action === "create-order" && cb.sale) return json(await createOfflineOrder(cb.sale)); // orders placed for the owner from chat
       if (cb.action === "mark-paid" && cb.orderId) return json(await markOrderPaid(String(cb.orderId)));
       if (cb.action === "nok-status") return json(await nokStatus()); // hourly courier status check
+      if (cb.action === "nok-check") return json({ username: !!Deno.env.get("NOK_USERNAME"), password: !!Deno.env.get("NOK_PASSWORD"), login: await new NokSession().login().then(() => "ok", (e) => String(e.message)) });
+      if (cb.action === "nok-page" && typeof cb.path === "string" && cb.path.startsWith("/")) return json(await nokPage(cb.path, Number(cb.from ?? 0), Number(cb.len ?? 3000)));
       if (cb.action === "settlement-reminder") return json(await settlementReminder()); // Monday transfer reminder
       if (cb.action === "fulfill-order" && cb.orderId) return json(await fulfillOrder(String(cb.orderId), cb.tracking ?? {}));
       const fx = await updateRate().catch((e) => ({ error: String(e) }));

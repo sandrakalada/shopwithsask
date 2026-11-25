@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useSyncExternalStore } from "react";
-import { alertStore, checkAlerts, unlockSound } from "@/lib/alerts";
+import { alertStore, checkAlerts, isDeliveredAlert, unlockSound } from "@/lib/alerts";
 
 export const useAlerts = () => useSyncExternalStore(alertStore.subscribe, alertStore.get, alertStore.server);
 
 const isBad = (kind: string) => kind.startsWith("Cancelled") || /^Nok: .*(undeliver|return|cancel|lost|damage|pending|refus)/i.test(kind);
 const tone = (kind: string) => (isBad(kind) ? "border-red-400 bg-red-50" : kind.startsWith("Change") ? "border-amber-300" : kind.startsWith("Nok") ? "border-sky-300" : "border-emerald-300");
 /** delivered by Nok (first time): green celebration */
-export const isDelivered = (a: { kind: string; detail: string | null }) => /^Nok: Delivered$/i.test(a.kind.trim()) || (/^Nok: Delivered/i.test(a.kind) && !/Was Delivered/i.test(a.detail ?? ""));
+const isDelivered = isDeliveredAlert;
 const title = (kind: string) => (kind.startsWith("Nok") || kind.startsWith("Payment") ? kind : `WhatsApp: ${kind}`);
 const CONFETTI = ["#1f7a4d", "#9e7856", "#f2c94c", "#56ccf2", "#eb5757", "#27ae60"];
 
@@ -30,10 +30,11 @@ export default function AlertWatcher() {
     };
   }, []);
 
-  // each pop up closes by itself after 10 seconds
+  // each pop up closes by itself after 10 seconds; a delivery stays until it is closed
   useEffect(() => {
-    if (!fresh.length) return;
-    const id = fresh[0].id;
+    const first = fresh.find((a) => !isDelivered(a));
+    if (!first) return;
+    const id = first.id;
     const t = setTimeout(() => alertStore.dismiss(id), 10_000);
     return () => clearTimeout(t);
   }, [fresh]);
@@ -54,7 +55,7 @@ export default function AlertWatcher() {
           <Link href="/alerts" onClick={() => alertStore.dismiss(a.id)} className="min-w-0 flex-1">
             <p className="text-[17px] font-bold">Delivered {a.order_name}</p>
             <p className="truncate text-sm opacity-90">{[a.customer, a.total ? `${Math.round(Number(a.total)).toLocaleString("en-US")} EGP collected` : ""].filter(Boolean).join(" · ")}</p>
-            <p className="truncate text-xs opacity-80">Comes in the next Monday transfer</p>
+            <p className="truncate text-xs opacity-80">Comes in the next Monday transfer{a.created_at ? ` · ${new Date(a.created_at).toLocaleString("en-GB", { weekday: "short", hour: "2-digit", minute: "2-digit" })}` : ""}</p>
           </Link>
           <button onClick={() => alertStore.dismiss(a.id)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/90 hover:bg-white/15" aria-label="Close">
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
