@@ -9,6 +9,7 @@ import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
 import { TruckIcon } from "@/components/Icons";
 import { STATUS_TONE, statusText } from "@/lib/shipments";
+import { showTags } from "@/components/orderUi";
 
 type Filter = "active" | ShipmentStatus | "all";
 const FILTERS: [Filter, string][] = [["active", "Open"], ["ready", "Created"], ["picked_up", "In transit"], ["delivered", "Delivered"], ["returned", "Returned"], ["all", "All"]];
@@ -48,13 +49,14 @@ export default function ShipmentsPage() {
         {!!waiting?.length && (
           <section>
             <p className="section-title">Waiting for a shipment ({waiting.length})</p>
-            <ul className="card divide-y divide-line overflow-hidden lg:grid lg:grid-cols-2 lg:divide-y-0 lg:gap-px lg:bg-line">
+            <ul className="card divide-y divide-line overflow-hidden lg:grid lg:grid-cols-2 lg:divide-y-0 lg:gap-px lg:bg-line lg:[&>li:last-child:nth-child(odd)]:col-span-2">
               {waiting.slice(0, 12).map((o) => (
                 <li key={o.id} className="flex items-center gap-3 bg-surface px-4 py-3">
-                  <div className="min-w-0 flex-1">
+                  <Link href={`/order?id=${o.id}`} className="min-w-0 flex-1 rounded-lg hover:opacity-70">
                     <p className="text-sm font-semibold">{o.name} · {o.shipping_address?.name ?? "Customer"}</p>
                     <p className="truncate text-xs text-taupe">{[o.shipping_address?.city, egp(o.total)].filter(Boolean).join(" · ")}</p>
-                  </div>
+                    {showTags(o).length > 0 && <p className="mt-1 flex flex-wrap gap-1">{showTags(o).map((t) => <span key={t} className="rounded-full bg-sand px-2 py-0.5 text-[11px] font-semibold text-taupe">{t}</span>)}</p>}
+                  </Link>
                   <Link href={`/shipment?order=${o.id}`} className="btn-light min-h-10 px-3 text-[14px]">
                     <TruckIcon className="h-4 w-4" /> Create shipment
                   </Link>

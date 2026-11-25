@@ -29,9 +29,15 @@ export function StatusPills({ o }: { o: Order }) {
     <span className="flex flex-wrap gap-1">
       {f[0] && <Pill cls={f[1]}>{f[0]}</Pill>}
       {u[0] && <Pill cls={u[1]}>{u[0]}</Pill>}
+      {showTags(o).map((t) => <Pill key={t} cls={tagTone(t)}>{t}</Pill>)}
     </span>
   );
 }
+
+/** Shopify tags worth seeing (internal import tags hidden). */
+export const showTags = (o: Order) => (o.tags ?? []).filter((t) => !/^(original-date-|status-|imported)/i.test(t));
+const tagTone = (t: string) =>
+  /confirm|verified/i.test(t) ? "bg-emerald-50 text-emerald-700" : /change|request/i.test(t) ? "bg-amber-50 text-amber-800" : /cancel|reject|fake/i.test(t) ? "bg-red-50 text-red-700" : "bg-sand text-taupe";
 
 function Pill({ cls, children }: { cls: string; children: React.ReactNode }) {
   return <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${cls}`}>{children}</span>;

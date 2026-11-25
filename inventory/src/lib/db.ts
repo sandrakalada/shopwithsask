@@ -83,6 +83,8 @@ export type LineItem = {
 };
 
 export type Order = {
+  /** Shopify order tags (WhatsApp confirmation, Akeed, offline/sask-app...) */
+  tags?: string[];
   id: string;
   name: string;
   created_at: string;
