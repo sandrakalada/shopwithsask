@@ -31,7 +31,7 @@ export default function AlertsPage() {
 
   const load = useCallback(async () => {
     if (!supabase) return setError("Not connected.");
-    const { data, error } = await supabase.from("wa_alerts").select("*").order("created_at", { ascending: false }).limit(300);
+    const { data, error } = await supabase.from("wa_alerts").select("*").eq("hidden", false).order("created_at", { ascending: false }).limit(300);
     if (error) setError(navigator.onLine ? "Could not load alerts." : "Alerts need a connection.");
     else {
       setError("");
@@ -46,6 +46,12 @@ export default function AlertsPage() {
   }, [load]);
 
   const unseen = rows?.filter((r) => !r.seen).length ?? 0;
+  // X: the alert is closed (read and removed from the list) on every device
+  const close = async (a: Alert) => {
+    setRows((rs) => rs!.filter((r) => r.id !== a.id));
+    await supabase!.from("wa_alerts").update({ seen: true, hidden: true }).eq("id", a.id);
+    void checkAlerts();
+  };
   const router = useRouter();
   // tap an alert: mark it read and open its order (by id, or by the order number on this phone)
   const open = async (a: Alert) => {
@@ -112,6 +118,16 @@ export default function AlertsPage() {
                     {!a.seen && <span className="h-2 w-2 shrink-0 rounded-full bg-danger" aria-label="New" />}
                     <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${tone(a.kind)}`}>{a.kind}</span>
                     <span className="ml-auto shrink-0 text-xs text-taupe">{timeAgo(a.created_at)}</span>
+                    <button
+                      type="button"
+                      aria-label="Close this alert"
+                      title="Close"
+                      onClick={(e) => { e.stopPropagation(); void close(a); }}
+                      onKeyDown={(e) => e.stopPropagation()}
+                      className="-my-2 -mr-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-taupe hover:bg-line active:bg-line"
+                    >
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden><path d="M6 6l12 12M18 6 6 18" /></svg>
+                    </button>
                   </div>
                   <p className="mt-1.5">
                     <span className="font-semibold">{a.order_name}</span>

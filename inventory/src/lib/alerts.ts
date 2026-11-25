@@ -45,6 +45,7 @@ export async function checkAlerts() {
     .from("wa_alerts")
     .select("id, created_at, order_name, customer, kind, detail, total")
     .eq("seen", false)
+    .eq("hidden", false)
     .order("id", { ascending: false })
     .limit(50);
   if (error || !data) return;
