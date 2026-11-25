@@ -8,7 +8,7 @@ import { costInEgp } from "@/lib/stock";
 import { FLAG, useProblems } from "@/lib/problems";
 import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
-import { ReceiptIcon, ScanIcon, SearchIcon, TruckIcon, WalletIcon } from "@/components/Icons";
+import { ReceiptIcon, SearchIcon, TruckIcon, WalletIcon } from "@/components/Icons";
 import { useEffect, useState } from "react";
 import { signedInUser } from "@/lib/supabase";
 
@@ -123,9 +123,8 @@ export default function Home() {
           <h1 className="text-[30px] font-bold tracking-tight">{firstName ? `Hi ${firstName}` : "Hi"}</h1>
         </div>
         {/* the four jobs done most often, one tap away */}
-        <nav aria-label="Quick actions" className="grid grid-cols-5 gap-2">
+        <nav aria-label="Quick actions" className="grid grid-cols-4 gap-2">
           {[
-            { href: "/scan", label: "Scan", Icon: ScanIcon },
             { href: "/find", label: "Find item", Icon: SearchIcon },
             { href: "/invoice?new=1", label: "New sale", Icon: ReceiptIcon },
             { href: "/shipments", label: "Order tracking", Icon: TruckIcon },
