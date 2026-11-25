@@ -10,7 +10,7 @@ import { addressLines, egp, printNow, shareFile, waLink } from "@/lib/pdf";
 import { Header, Thumb } from "@/components/ui";
 import { PhoneIcon, PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
 import { useShippingLabel } from "@/components/useShippingLabel";
-import { STATUS_LABEL, STATUS_TONE, trackingMessage } from "@/lib/shipments";
+import { STATUS_LABEL, STATUS_TONE, statusText, trackingMessage } from "@/lib/shipments";
 import { fmtDate, orderCustomerName, orderPhone, paymentLabel, StatusPills } from "@/components/orderUi";
 import { useRole } from "@/components/Shell";
 
@@ -38,7 +38,7 @@ function OrderView() {
     [id],
   );
   // the label is drawn as soon as the order opens, so Print is a single tap
-  const { label, offscreen } = useShippingLabel(order, shipment);
+  const { label, offscreen, labelWaiting } = useShippingLabel(order, shipment);
 
   if (order === undefined) return <Header title="" back="/orders" />;
   if (!order) return (<><Header title="Order" back="/orders" /><p className="p-4 text-sm text-taupe">This order is not on this phone yet.</p></>);
@@ -51,7 +51,7 @@ function OrderView() {
         <main className="space-y-4 p-4">
           <div className="grid grid-cols-2 gap-2">
             <button className="btn-dark py-4" disabled={!label} onClick={() => label && printNow()}>
-              <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
+              <PrintIcon className="h-5 w-5" /> {label ? "Print label" : labelWaiting ? "Preparing" : "No Nok label yet"}
             </button>
             <button className="btn-light py-4" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
               Share label
@@ -61,7 +61,7 @@ function OrderView() {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={label.url} alt="Shipping label preview" className="mx-auto w-full max-w-sm rounded-xl border border-line" />
           ) : (
-            <div className="mx-auto aspect-[2/3] w-full max-w-sm animate-pulse rounded-xl bg-sand" />
+            labelWaiting ? <div className="mx-auto aspect-[2/3] w-full max-w-sm animate-pulse rounded-xl bg-sand" /> : <p className="card p-4 text-center text-sm text-taupe">No Nok label yet. Create the shipment in Nok and the label appears here.</p>
           )}
         </main>
         {offscreen}
@@ -91,7 +91,7 @@ function OrderView() {
         <section className="card p-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs uppercase tracking-wide text-taupe">Shipping</p>
-            {shipment && <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${STATUS_TONE[shipment.status]}`}>{STATUS_LABEL[shipment.status]}</span>}
+            {shipment && <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${STATUS_TONE[shipment.status]}`}>{statusText(shipment)}</span>}
           </div>
           {shipment ? (
             <Link href={`/shipment?id=${shipment.id}`} className="mt-2 flex items-center gap-3">
@@ -125,7 +125,7 @@ function OrderView() {
         <div className="lg:hidden">
         <div className="grid grid-cols-2 gap-2">
             <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
-              <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
+              <PrintIcon className="h-5 w-5" /> {label ? "Print label" : labelWaiting ? "Preparing" : "No Nok label yet"}
             </button>
             <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
               Share label
@@ -204,7 +204,7 @@ function OrderView() {
           <div className="hidden lg:block">
         <div className="grid grid-cols-2 gap-2">
               <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
-                <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
+                <PrintIcon className="h-5 w-5" /> {label ? "Print label" : labelWaiting ? "Preparing" : "No Nok label yet"}
               </button>
               <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
                 Share label
@@ -223,7 +223,7 @@ function OrderView() {
               <img src={label.url} alt="Shipping label preview" className="mx-auto w-48 rounded border border-line lg:w-full" />
             </section>
           ) : (
-            <div className="hidden aspect-[2/3] w-full animate-pulse rounded-[14px] bg-sand lg:block" />
+            labelWaiting ? <div className="hidden aspect-[2/3] w-full animate-pulse rounded-[14px] bg-sand lg:block" /> : <p className="card p-4 text-center text-sm text-taupe">No Nok label yet. Tap Create shipment to make it in Nok.</p>
           )}
         </aside>
       </main>

@@ -13,7 +13,7 @@ import AwbUpload, { type AwbResult } from "@/components/AwbUpload";
 import NokPanel from "@/components/NokPanel";
 import { uploadAwb } from "@/lib/awb";
 import {
-  STATUS_LABEL, STATUS_TONE, markPaidInShopify, trackingMessage, trackingUrl, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
+  STATUS_LABEL, STATUS_TONE, statusText, markPaidInShopify, trackingMessage, trackingUrl, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
 } from "@/lib/shipments";
 
 const CITIES = ["Cairo", "Giza", "Alexandria", "Qalyubia", "Sharqia", "Dakahlia", "Gharbia", "Monufia", "Beheira", "Kafr El Sheikh", "Damietta", "Port Said", "Ismailia", "Suez", "Fayoum", "Beni Suef", "Minya", "Asyut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "Matrouh", "North Sinai", "South Sinai", "New Valley"];
@@ -197,7 +197,7 @@ function ShipmentView({ id }: { id: string }) {
   const s = useLiveQuery(async () => (await db.shipments.get(id)) ?? null, [id]);
   const order = useLiveQuery(async () => (s?.order_id ? (await db.orders.get(s.order_id)) ?? null : null), [s?.order_id]);
   const labelOrder = s ? (s.order_id && order === undefined ? undefined : order ?? shipmentAsOrder(s)) : undefined;
-  const { label, offscreen } = useShippingLabel(labelOrder, s);
+  const { label, offscreen, labelWaiting } = useShippingLabel(labelOrder, s);
   const [edit, setEdit] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -242,7 +242,7 @@ function ShipmentView({ id }: { id: string }) {
                     <p className="text-xs text-taupe">Tracking number</p>
                     <p className="text-xl font-semibold" dir="ltr">{s.tracking}</p>
                   </div>
-                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-[12px] font-semibold ${STATUS_TONE[s.status]}`}>{STATUS_LABEL[s.status]}</span>
+                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-[12px] font-semibold ${STATUS_TONE[s.status]}`}>{statusText(s)}</span>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
                   <div>
@@ -335,7 +335,7 @@ function ShipmentView({ id }: { id: string }) {
           />
           <div className="grid grid-cols-2 gap-2">
             <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
-              <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
+              <PrintIcon className="h-5 w-5" /> {label ? "Print label" : labelWaiting ? "Preparing" : "No Nok label yet"}
             </button>
             <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${s.tracking}.pdf`)}>
               Share label
@@ -348,7 +348,7 @@ function ShipmentView({ id }: { id: string }) {
               <img src={label.url} alt="Shipping label preview" className="mx-auto w-56 rounded border border-line lg:w-full" />
             </section>
           ) : (
-            <div className="mx-auto aspect-[2/3] w-56 animate-pulse rounded-[14px] bg-sand lg:w-full" />
+            labelWaiting ? <div className="mx-auto aspect-[2/3] w-56 animate-pulse rounded-[14px] bg-sand lg:w-full" /> : <p className="card p-4 text-center text-sm text-taupe">No Nok label yet. Add the Nok AWB above.</p>
           )}
         </aside>
       </main>

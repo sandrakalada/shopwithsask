@@ -8,6 +8,9 @@ import { elementToImage, imagesToPdf, preparePrint, qrDataUrl } from "@/lib/pdf"
 import { loadAwb } from "@/lib/awb";
 import ShippingLabel, { shipmentNumber, type LabelStore } from "./ShippingLabel";
 
+/** Our own label is retired: the label is always Nok's AWB (owner's decision). */
+const OWN_LABEL = false;
+
 /** Draws the 100 x 150 mm label off-screen as soon as the data is there,
  * so Print is a single tap (and prints a clean PDF on a computer). */
 export function useShippingLabel(order: Order | null | undefined, shipment?: Shipment | null) {
@@ -37,7 +40,7 @@ export function useShippingLabel(order: Order | null | undefined, shipment?: Shi
   }, [awbPath]);
 
   useEffect(() => {
-    if (!order || awbPath) return;
+    if (!order || awbPath || !OWN_LABEL) return;
     let cancelled = false;
     (async () => {
       const store: LabelStore = {
@@ -77,11 +80,12 @@ export function useShippingLabel(order: Order | null | undefined, shipment?: Shi
   }, [assets]);
 
   const offscreen =
-    order && assets && !awbPath ? (
+    OWN_LABEL && order && assets && !awbPath ? (
       <div style={{ position: "fixed", left: -10000, top: 0 }} aria-hidden>
         <ShippingLabel ref={ref} order={order} shipment={shipment} store={assets.store} qr={assets.qr} barcode={assets.barcode} logo="/brand-wordmark.png" />
       </div>
     ) : null;
 
-  return { label, offscreen, tracking };
+  // waiting = a Nok AWB exists and is loading; otherwise there is no label until "Create in Nok"
+  return { label, offscreen, tracking, labelWaiting: !!awbPath && !label };
 }

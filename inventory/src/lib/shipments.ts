@@ -6,8 +6,8 @@ import { requestSync, shopify } from "./sync";
 import { signedInUser, supabase } from "./supabase";
 
 export const STATUS_LABEL: Record<ShipmentStatus, string> = {
-  ready: "Ready for pick-up",
-  picked_up: "Out for delivery",
+  ready: "Created",
+  picked_up: "In transit",
   delivered: "Delivered",
   returned: "Returned",
   cancelled: "Cancelled",
@@ -20,6 +20,9 @@ export const STATUS_TONE: Record<ShipmentStatus, string> = {
   returned: "bg-red-100 text-red-700",
   cancelled: "bg-sand text-taupe",
 };
+
+/** Status in Nok's own words when we have it (e.g. "In Transit", "Out For Delivery"), else ours. */
+export const statusText = (s: Pick<Shipment, "status" | "nok_status">) => s.nok_status || STATUS_LABEL[s.status];
 
 /** Courier tracking pages, so the tracking number can be sent to Shopify as a link. */
 export function trackingUrl(courier: string, tracking: string) {

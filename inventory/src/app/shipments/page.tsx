@@ -8,10 +8,10 @@ import { db, type ShipmentStatus } from "@/lib/db";
 import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
 import { PlusIcon, TruckIcon } from "@/components/Icons";
-import { STATUS_LABEL, STATUS_TONE } from "@/lib/shipments";
+import { STATUS_TONE, statusText } from "@/lib/shipments";
 
 type Filter = "active" | ShipmentStatus | "all";
-const FILTERS: [Filter, string][] = [["active", "Open"], ["ready", "Ready"], ["picked_up", "Out for delivery"], ["delivered", "Delivered"], ["returned", "Returned"], ["all", "All"]];
+const FILTERS: [Filter, string][] = [["active", "Open"], ["ready", "Created"], ["picked_up", "In transit"], ["delivered", "Delivered"], ["returned", "Returned"], ["all", "All"]];
 
 export default function ShipmentsPage() {
   const router = useRouter();
@@ -97,7 +97,7 @@ export default function ShipmentsPage() {
                   <td className="px-4 py-3">{s.order_name ?? "Manual"}</td>
                   <td className="px-4 py-3">{s.recipient.name}</td>
                   <td className="px-4 py-3">{s.recipient.city}</td>
-                  <td className="px-4 py-3"><span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${STATUS_TONE[s.status]}`}>{STATUS_LABEL[s.status]}</span></td>
+                  <td className="px-4 py-3"><span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${STATUS_TONE[s.status]}`}>{statusText(s)}</span></td>
                   <td className="px-4 py-3 text-right">{s.cod_amount > 0 ? egp(s.cod_amount) : "-"}</td>
                 </tr>
               ))}
@@ -116,7 +116,7 @@ export default function ShipmentsPage() {
                   <p className="truncate text-xs text-taupe"><span dir="ltr">{s.tracking}</span>{s.recipient.city ? ` · ${s.recipient.city}` : ""}</p>
                 </div>
                 <div className="text-right">
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_TONE[s.status]}`}>{STATUS_LABEL[s.status]}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_TONE[s.status]}`}>{statusText(s)}</span>
                   {s.cod_amount > 0 && <p className="mt-1 text-xs font-semibold">{egp(s.cod_amount)}</p>}
                 </div>
               </Link>
