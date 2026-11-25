@@ -14,10 +14,13 @@ You are on the Nok Courier portal (https://ots.nokcourier.com). Create one shipm
    - COD = "Cash to collect" (agreed product price + agreed delivery fee; this is what the Nok courier collects). If it is 0, the order is already paid.
    - Number of pieces = "Pieces".
    - Description/contents = "Contents".
-   - Reference/order number = "Order" (for example #1406).
+   - Reference/order number = the order number without # (for example 1410; it prints as "REF: 1410").
+   - Description = items like "Heart-Shaped Playing Card Handbag x1". Weight 1 kg unless told otherwise.
    - Notes = "Note", if any.
 4. Before you submit, show me a short summary of what you filled in and wait for my OK.
-5. Submit, then click "Add to opened Pickup Request" so it joins the open pickup. Then tell me the Nok tracking/AWB number so I can paste it into the inventory app.
-6. Do not create duplicate shipments: if one with the same order number already exists, tell me instead.
+5. Submit, then click "Add to opened Pickup Request" so it joins the open pickup.
+6. Find the new shipment card (it shows the AWB number, city, receiver, address, description, phone, COD, weight, with Details / Print AWB / Track buttons). Click "Print AWB" to open the AWB PDF (the shipping label with barcode, Ship To, COD and REF). Check that the name, address, phone, COD and REF match the order.
+7. Tell me the AWB number (e.g. 590064526610) so I can paste it into the inventory app.
+8. Do not create duplicate shipments: if one with the same order number already exists, tell me instead.
 
 ORDER DETAILS:

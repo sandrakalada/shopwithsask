@@ -34,4 +34,8 @@ Shipment statuses
 - Ready to Return: coming back / ready to return.
 - Damage: the order was damaged.
 
+Shipment card and AWB (example order 1410)
+- Card: AWB number (12 digits, e.g. 590064526610), governorate, status (e.g. Transit); Receiver, Address, Description ("Item title x1"), Phone, COD, Weight (1.00 kg), Document Ticket; buttons Details, Print AWB, Track.
+- Print AWB opens the AWB PDF: Nok logo, Ship From: Shop With Sask, description, weight and quantity, AWB barcode and QR, Ship To, address, governorate and zone, receiver contact, notes, COD/Cash/Visa/Inst./Bank table, REF = Shopify order number without #.
+
 More steps from the owner will follow.
