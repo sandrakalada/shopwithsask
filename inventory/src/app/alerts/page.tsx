@@ -49,7 +49,8 @@ export default function AlertsPage() {
   // X: the alert is closed (read and removed from the list) on every device
   const close = async (a: Alert) => {
     setRows((rs) => rs!.filter((r) => r.id !== a.id));
-    await supabase!.from("wa_alerts").update({ seen: true, hidden: true }).eq("id", a.id);
+    const { error: e } = await supabase!.from("wa_alerts").update({ seen: true, hidden: true }).eq("id", a.id);
+    if (e) { setError("Could not close the alert. Try again."); void load(); }
     void checkAlerts();
   };
   const router = useRouter();
