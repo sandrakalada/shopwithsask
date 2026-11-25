@@ -156,9 +156,10 @@ export default function Home() {
               label={monthOffset === 0 ? "Month to date" : "Month"}
               sub={shown.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}
               data={data?.mtd}
+              href={`/sales?m=${monthOffset}`}
               nav={{ prev: () => setMonthOffset((m) => m - 1), next: monthOffset < 0 ? () => setMonthOffset((m) => m + 1) : undefined }}
             />
-            <SalesRow label="Year to date" sub={String(new Date().getFullYear())} data={data?.ytd} />
+            <SalesRow label="Year to date" sub={String(new Date().getFullYear())} data={data?.ytd} href="/sales?y=1" />
           </div>
           <p className="mt-1.5 px-1 text-[12px] text-taupe">Sales and net profit: delivered and paid orders only. Net profit = items sold minus purchase cost and write-offs (delivery fees not counted). Total orders includes all orders not cancelled.</p>
         </section>
@@ -177,7 +178,7 @@ function Tile({ href, label, value, sub }: { href: string; label: string; value:
   );
 }
 
-function SalesRow({ label, sub, data, nav }: { label: string; sub: string; data?: { total: number; count: number; allOrders: number; profit: number; noCost: number }; nav?: { prev: () => void; next?: () => void } }) {
+function SalesRow({ label, sub, data, nav, href }: { href: string; label: string; sub: string; data?: { total: number; count: number; allOrders: number; profit: number; noCost: number }; nav?: { prev: () => void; next?: () => void } }) {
   const Arrow = ({ dir, onClick }: { dir: "prev" | "next"; onClick?: () => void }) => (
     <button
       onClick={onClick}
@@ -204,7 +205,7 @@ function SalesRow({ label, sub, data, nav }: { label: string; sub: string; data?
           <p className="text-[12px] text-taupe">{sub}</p>
         )}
       </div>
-    <Link href="/items?view=top" className="block px-4 pb-3 pt-1 hover:bg-sand/50 lg:px-5 lg:pb-4">
+    <Link href={href} className="block px-4 pb-3 pt-1 hover:bg-sand/50 lg:px-5 lg:pb-4">
       <div className="mt-2 grid grid-cols-3 gap-2">
         <Cell k="Sales" v={data ? egp(data.total) : "–"} />
         <Cell k="Total orders" v={data ? String(data.allOrders) : "–"} sub={data ? `${data.count} delivered` : ""} />
