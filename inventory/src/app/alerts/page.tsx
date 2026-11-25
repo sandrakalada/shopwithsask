@@ -1,0 +1,118 @@
+"use client";
+
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { Header, timeAgo } from "@/components/ui";
+import { checkAlerts, clearUnseen } from "@/lib/alerts";
+
+/** WhatsApp order flow alerts: confirmations, Instapay, cancellations and change requests (saved by the flow app). */
+type Alert = {
+  id: number;
+  created_at: string;
+  order_name: string;
+  order_id: string | null;
+  customer: string | null;
+  phone: string | null;
+  total: number | null;
+  kind: string;
+  detail: string | null;
+  seen: boolean;
+};
+
+const tone = (kind: string) =>
+  kind.startsWith("Cancelled") ? "bg-red-50 text-red-700" : kind.startsWith("Change") ? "bg-amber-50 text-amber-800" : "bg-emerald-50 text-emerald-700";
+
+export default function AlertsPage() {
+  const [rows, setRows] = useState<Alert[] | null>(null);
+  const [error, setError] = useState("");
+
+  const load = useCallback(async () => {
+    if (!supabase) return setError("Not connected.");
+    const { data, error } = await supabase.from("wa_alerts").select("*").order("created_at", { ascending: false }).limit(300);
+    if (error) setError(navigator.onLine ? "Could not load alerts." : "Alerts need a connection.");
+    else {
+      setError("");
+      setRows(data as Alert[]);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+    const t = setInterval(load, 30_000);
+    return () => clearInterval(t);
+  }, [load]);
+
+  const unseen = rows?.filter((r) => !r.seen).length ?? 0;
+
+  const markAllSeen = async () => {
+    if (!supabase || !unseen) return;
+    const ids = rows!.filter((r) => !r.seen).map((r) => r.id);
+    setRows((rs) => rs!.map((r) => ({ ...r, seen: true })));
+    clearUnseen();
+    await supabase.from("wa_alerts").update({ seen: true }).in("id", ids);
+    void checkAlerts();
+  };
+
+  const days = useMemo(() => {
+    const g = new Map<string, Alert[]>();
+    for (const a of rows ?? []) {
+      const d = new Date(a.created_at).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+      g.set(d, [...(g.get(d) ?? []), a]);
+    }
+    return [...g.entries()];
+  }, [rows]);
+
+  return (
+    <>
+      <Header
+        title="Alerts"
+        right={
+          unseen > 0 ? (
+            <button onClick={markAllSeen} className="h-11 rounded-full px-3 text-sm font-semibold text-taupe hover:bg-sand/70 active:bg-sand">
+              Mark all read
+            </button>
+          ) : null
+        }
+      />
+      <main className="mx-auto max-w-xl p-4 lg:max-w-3xl">
+        <p className="text-sm text-taupe">Customer replies from the WhatsApp order message.{unseen > 0 ? ` ${unseen} new.` : ""}</p>
+        {error && <p className="mt-4 text-center text-sm text-danger">{error}</p>}
+        {days.map(([day, list]) => (
+          <section key={day} className="mt-5">
+            <h2 className="mb-2 text-sm font-semibold">{day}</h2>
+            <ul className="card divide-y divide-line">
+              {list.map((a) => (
+                <li key={a.id} className={`px-4 py-3 text-sm ${a.seen ? "" : "bg-sand/50"}`}>
+                  <div className="flex items-center gap-2">
+                    {!a.seen && <span className="h-2 w-2 shrink-0 rounded-full bg-danger" aria-label="New" />}
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${tone(a.kind)}`}>{a.kind}</span>
+                    <span className="ml-auto shrink-0 text-xs text-taupe">{timeAgo(a.created_at)}</span>
+                  </div>
+                  <p className="mt-1.5">
+                    {a.order_id ? (
+                      <Link href={`/order?id=${a.order_id}`} className="font-semibold underline-offset-2 hover:underline">
+                        {a.order_name}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold">{a.order_name}</span>
+                    )}
+                    {a.customer ? ` · ${a.customer}` : ""}
+                    {a.total != null ? ` · EGP ${Number(a.total).toLocaleString("en-US")}` : ""}
+                  </p>
+                  {a.detail && <p className="mt-1 whitespace-pre-wrap text-taupe">{a.detail}</p>}
+                  {a.phone && (
+                    <a href={`https://wa.me/${a.phone.replace(/\D/g, "").replace(/^0/, "20")}`} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-taupe underline">
+                      Message {a.phone}
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+        {rows && rows.length === 0 && !error && <p className="mt-8 text-center text-sm text-taupe">No alerts yet.</p>}
+      </main>
+    </>
+  );
+}
