@@ -540,3 +540,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-25 03:35 UTC check: new account day just started (UTC-2), quiet overnight, no new orders since #1409, no ad issues.
 
 - 2026-11-25 06:35 UTC check: #1410 1,065 heart playing card handbag, Giza (pixel credits FB catalog test with 1 purchase; handbag now sold out, not in our ads, catalog drops it automatically). Today NEW 9 / 3 ATC, WARM 10, BAGS 2, FB test 24 / 2 ATC / 1 pur. CART RT 0 impressions this morning (small audience still filling).
+
+- 2026-11-25 09:35 UTC check: #1411 1,095 burgundy velvet mini skirt (FB catalog test, 1 left), #1412 885 retro geometric mini dress (no utm, now sold out, not in our ads). FB catalog test: 3 orders in ~22h (#1404, #1410 pixel, #1411) on ~220 EGP = best performer. Today NEW 28 / 5 ATC, WARM 128 / 2 ATC, BAGS 2 (low delivery), FB test 96 / 12 ATC / 2 pur, CART RT 8.
