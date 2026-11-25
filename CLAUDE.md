@@ -47,3 +47,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - Instagram study and competitor list: notes/instagram-competitors.md. Read it before any Instagram or marketing work.
 - Instagram captions: follow notes/instagram-captions.md (English only, short, 1-4 emojis, never price or sizes). When the owner sends an image for Instagram, write the caption from it.
 - Instagram skills installed in .claude/skills (ig-caption-writer, ig-humanizer, ig-hashtag-strategist, ig-carousel-planner, ig-content-planner, ig-hook-extractor, ig-profile-optimizer, ig-repurposer, ig-audience-insights). Draft-only use: never publish or ask for Publora/API keys. The owner's rules above override them (English, short, emojis allowed in captions, no price/sizes).
+
+## Shipping (Nok Courier)
+- Courier is Nok Courier (https://ots.nokcourier.com/accounts/login/?next=/). In the inventory app, "Create shipment" on an order opens Nok in a new tab, copies the order details (name, phone, address, city, cash to collect, pieces, contents, order number), and opens the app's shipment form for Nok's tracking number.
+- The shipment is created in Nok with the Claude Chrome extension using notes/nok-shipment-extension-prompt.md. Never type, store or ask for the Nok password; the owner signs in herself. Confirm before submitting.

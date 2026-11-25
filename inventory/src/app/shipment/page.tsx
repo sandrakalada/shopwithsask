@@ -10,7 +10,7 @@ import { Header } from "@/components/ui";
 import { PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
 import { useShippingLabel } from "@/components/useShippingLabel";
 import {
-  STATUS_LABEL, STATUS_TONE, markPaidInShopify, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
+  STATUS_LABEL, STATUS_TONE, markPaidInShopify, openNok, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
 } from "@/lib/shipments";
 
 const CITIES = ["Cairo", "Giza", "Alexandria", "Qalyubia", "Sharqia", "Dakahlia", "Gharbia", "Monufia", "Beheira", "Kafr El Sheikh", "Damietta", "Port Said", "Ismailia", "Suez", "Fayoum", "Beni Suef", "Minya", "Asyut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea", "Matrouh", "North Sinai", "South Sinai", "New Valley"];
@@ -78,6 +78,12 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
         <div className="space-y-4">
           <section className="card space-y-3 p-4">
             <p className="section-title px-0">Shipment</p>
+            {!editing && order && (
+              <p className="rounded-xl bg-sand px-3 py-2.5 text-sm text-espresso">
+                Nok Courier opened in a new tab and the order details are copied. Create the shipment there, then paste Nok&apos;s tracking number below.{" "}
+                <button type="button" onClick={() => openNok(order)} className="font-semibold text-caramel underline">Open Nok again</button>
+              </p>
+            )}
             <label className="block text-sm">
               <span className="text-taupe">Tracking number</span>
               <input className="field mt-1" dir="ltr" value={s.tracking} onChange={(e) => set({ tracking: e.target.value })} placeholder="Tracking number" />

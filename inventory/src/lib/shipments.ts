@@ -72,7 +72,7 @@ export function newShipmentForOrder(o: Order): Shipment {
     id: crypto.randomUUID(),
     order_id: o.id,
     order_name: o.name,
-    courier: "",
+    courier: "Nok Courier",
     tracking: `SWS${o.name.replace(/\D/g, "")}`,
     status: "ready",
     cod_amount: codFor(o),
@@ -94,7 +94,7 @@ export function newManualShipment(): Shipment {
     id: crypto.randomUUID(),
     order_id: null,
     order_name: null,
-    courier: "",
+    courier: "Nok Courier",
     tracking: `SWM${ymd}${String(Math.floor(Math.random() * 900) + 100)}`,
     status: "ready",
     cod_amount: 0,
@@ -131,4 +131,29 @@ export function shipmentAsOrder(s: Shipment): Order {
     shipping_title: s.courier || null,
     line_items: [],
   } as unknown as Order;
+}
+
+/** Nok Courier: the "Create shipment" button opens their portal with the order's details on the clipboard. */
+export const NOK_URL = "https://ots.nokcourier.com/accounts/login/?next=/";
+
+export function nokDetails(o: Order) {
+  const s = newShipmentForOrder(o);
+  const r = s.recipient;
+  return [
+    `Order: ${o.name}`,
+    `Name: ${r.name ?? ""}`,
+    `Phone: ${r.phone ?? ""}`,
+    `Address: ${[r.address1, r.address2].filter(Boolean).join(", ")}`,
+    `City: ${[r.city, r.province].filter(Boolean).join(", ")}`,
+    `Cash to collect: ${s.cod_amount} EGP`,
+    `Pieces: ${s.pieces}`,
+    `Contents: ${s.contents}`,
+    o.note ? `Note: ${o.note}` : "",
+  ].filter(Boolean).join("\n");
+}
+
+/** Must run straight from the tap, so the browser allows the new tab and the clipboard. */
+export function openNok(o: Order) {
+  try { void navigator.clipboard?.writeText(nokDetails(o)).catch(() => {}); } catch {}
+  window.open(NOK_URL, "_blank", "noopener");
 }

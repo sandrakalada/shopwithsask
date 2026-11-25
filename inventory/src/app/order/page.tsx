@@ -10,7 +10,7 @@ import { addressLines, egp, printNow, shareFile, waLink } from "@/lib/pdf";
 import { Header, Thumb } from "@/components/ui";
 import { PhoneIcon, PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
 import { useShippingLabel } from "@/components/useShippingLabel";
-import { STATUS_LABEL, STATUS_TONE } from "@/lib/shipments";
+import { STATUS_LABEL, STATUS_TONE, openNok } from "@/lib/shipments";
 import { fmtDate, orderCustomerName, orderPhone, paymentLabel, StatusPills } from "@/components/orderUi";
 import { useRole } from "@/components/Shell";
 
@@ -108,7 +108,7 @@ function OrderView() {
           ) : (
             <div className="mt-2 flex items-center justify-between gap-3">
               <p className="text-sm text-taupe">No shipment yet.</p>
-              <Link href={`/shipment?order=${order.id}`} className="btn-dark px-4">
+              <Link href={`/shipment?order=${order.id}`} onClick={() => openNok(order)} className="btn-dark px-4">
                 <TruckIcon className="h-5 w-5" /> Create shipment
               </Link>
             </div>
