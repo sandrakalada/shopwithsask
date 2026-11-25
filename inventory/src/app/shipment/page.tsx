@@ -11,6 +11,7 @@ import { PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
 import { useShippingLabel } from "@/components/useShippingLabel";
 import AwbUpload, { type AwbResult } from "@/components/AwbUpload";
 import NokPanel from "@/components/NokPanel";
+import NokProblems from "@/components/NokProblems";
 import { uploadAwb } from "@/lib/awb";
 import { shopify } from "@/lib/sync";
 import {
@@ -233,6 +234,7 @@ function ShipmentView({ id }: { id: string }) {
       <Header title={s.order_name ? `Shipment ${s.order_name}` : "Shipment"} back="/shipments" />
       <main className="p-4 pb-28 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-6">
         <div className="space-y-4">
+          <NokProblems />
           {edit ? (
             <ShipmentForm editing={s} onDone={() => setEdit(false)} />
           ) : (

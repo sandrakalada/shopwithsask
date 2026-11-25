@@ -11,6 +11,7 @@ import { TruckIcon } from "@/components/Icons";
 import { STATUS_TONE, statusText } from "@/lib/shipments";
 import { showTags } from "@/components/orderUi";
 import CreateShipmentButton from "@/components/CreateShipmentButton";
+import NokProblems from "@/components/NokProblems";
 
 type Filter = "active" | ShipmentStatus | "all";
 const FILTERS: [Filter, string][] = [["active", "Open"], ["ready", "Created"], ["picked_up", "In transit"], ["delivered", "Delivered"], ["returned", "Returned"], ["all", "All"]];
@@ -48,6 +49,7 @@ export default function ShipmentsPage() {
           <Link href="/orders?f=open&since=month" className="btn-light w-full lg:w-auto">Orders to ship</Link>
         </div>
 
+        <NokProblems />
         {note && (
           <p role="status" className={`card flex items-start justify-between gap-3 p-3 text-sm ${note.ok ? "text-emerald-800" : "text-amber-800"}`}>
             <span>{note.text}</span>

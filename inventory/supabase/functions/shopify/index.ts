@@ -849,10 +849,10 @@ async function nokStatus() {
     if (!/^\d{6,}$/.test(r.tracking ?? "") || (r.nok_status && NOK_DONE.test(r.nok_status))) continue;
     try {
       const res = await fetch(NOK_TRACK + encodeURIComponent(r.tracking), { headers: { "user-agent": "Mozilla/5.0 (inventory status check)" } });
-      if (!res.ok) continue;
+      if (!res.ok) { await nokIssue(`Status check for AWB ${r.tracking} failed: Nok answered ${res.status}.`, r); continue; }
       const p = parseNok(await res.text());
       checked++;
-      if (!p) continue;
+      if (!p) { await nokIssue(`Could not read the status of AWB ${r.tracking} on Nok's tracking page.`, r); continue; }
       const now = new Date().toISOString();
       const patch: Record<string, unknown> = { nok_checked_at: now, nok_location: p.location };
       if (p.status !== r.nok_status) {
@@ -873,10 +873,24 @@ async function nokStatus() {
       await admin.from("shipments").update(patch).eq("id", r.id);
     } catch (e) {
       console.error("nok", r.tracking, String(e));
+      await nokIssue(`Status check for AWB ${r.tracking} failed: ${String((e as Error).message ?? e)}`, r);
     }
     await new Promise((ok) => setTimeout(ok, 400)); // gentle on their site
   }
   return { checked, changed };
+}
+
+/** Anything that stops Nok work becomes an alert in the app (pop-up + Alerts page), once per 6 hours per problem. */
+async function nokIssue(detail: string, ref?: { order_name?: string | null; order_id?: string | null; customer?: string | null }) {
+  try {
+    const since = new Date(Date.now() - 6 * 3600_000).toISOString();
+    const text = detail.slice(0, 500);
+    const { data } = await admin.from("wa_alerts").select("id").eq("kind", "Nok problem").eq("detail", text).gte("created_at", since).limit(1);
+    if (data?.length) return;
+    await admin.from("wa_alerts").insert({ kind: "Nok problem", detail: text, order_name: ref?.order_name ?? "Nok", order_id: ref?.order_id ?? null, customer: ref?.customer ?? null });
+  } catch (e) {
+    console.error("nokIssue", String(e));
+  }
 }
 
 /* ---------- Nok portal session (login saved as server secrets NOK_USERNAME / NOK_PASSWORD; never returned) ---------- */
@@ -1000,6 +1014,9 @@ async function nokCreate(i: NokShipmentInput) {
   if (shipmentId) {
     try { pdf = await nokAwbPdf(shipmentId); } catch (e) { pdfError = String((e as Error).message); }
   }
+  const who = { order_name: `#${ref}`, customer: i.name };
+  if (pickupError) await nokIssue(`#${ref} (AWB ${draft.air_way_bill}) was created but not added to the pickup: ${pickupError}`, who);
+  if (pdfError) await nokIssue(`#${ref} (AWB ${draft.air_way_bill}): label could not be downloaded: ${pdfError}`, who);
   return { awb: String(draft.air_way_bill), draftId: draft.id, shipmentId, pickupId, pickupError, pdf, pdfError, existed: drafts.some((d: any) => d.id === draft.id) };
 }
 
@@ -1280,7 +1297,7 @@ Deno.serve(async (req) => {
       if (cb.action === "setup") return json(await setup()); // re-creates missing webhooks
       if (cb.action === "create-order" && cb.sale) return json(await createOfflineOrder(cb.sale)); // orders placed for the owner from chat
       if (cb.action === "mark-paid" && cb.orderId) return json(await markOrderPaid(String(cb.orderId)));
-      if (cb.action === "nok-status") return json(await nokStatus()); // hourly courier status check
+      if (cb.action === "nok-status") return json(await nokStatus().catch(async (e) => { await nokIssue(`Hourly Nok status check failed: ${String(e.message)}`); throw e; })); // hourly courier status check
       if (cb.action === "nok-api-get" && typeof cb.path === "string" && /^\/(governorates|product-types|subaccounts|draft-shipments|shipment)\b/.test(cb.path)) return json(await nokApi(cb.path)); // read-only
       if (cb.action === "awb-upload-url" && /^[0-9a-f-]{36}$/.test(String(cb.id))) {
         const { data, error } = await admin.storage.from("awb").createSignedUploadUrl(`${cb.id}.pdf`, { upsert: true });
@@ -1328,8 +1345,8 @@ Deno.serve(async (req) => {
     if (action === "nok-status") return json(await nokStatus());
     if (action === "nok-governorates") return json((await nokApi("/governorates/")).results ?? []);
     if (action === "nok-zones") return json(await nokZones(Number(body.governorateId)));
-    if (action === "nok-create") return json(await nokCreate(body.shipment));
-    if (action === "nok-remove") return json(await nokRemoveFromPickup(String(body.awb)));
+    if (action === "nok-create") return json(await nokCreate(body.shipment).catch(async (e) => { await nokIssue(`Create shipment for ${body.shipment?.orderName ?? "an order"} failed: ${String(e.message)}`, { order_name: body.shipment?.orderName, customer: body.shipment?.name }); throw e; }));
+    if (action === "nok-remove") return json(await nokRemoveFromPickup(String(body.awb)).catch(async (e) => { await nokIssue(`Remove AWB ${body.awb} from the pickup failed: ${String(e.message)}`); throw e; }));
     if (action === "nok-awb") return json({ pdf: await nokAwbPdf(Number(body.shipmentId)) });
     return json({ error: "unknown action" }, 400);
   } catch (e) {

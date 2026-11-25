@@ -6,7 +6,7 @@ import { alertStore, checkAlerts, isDeliveredAlert, unlockSound } from "@/lib/al
 
 export const useAlerts = () => useSyncExternalStore(alertStore.subscribe, alertStore.get, alertStore.server);
 
-const isBad = (kind: string) => kind.startsWith("Cancelled") || /^Nok: .*(undeliver|return|cancel|lost|damage|pending|refus)/i.test(kind);
+const isBad = (kind: string) => kind.startsWith("Cancelled") || kind === "Nok problem" || /^Nok: .*(undeliver|return|cancel|lost|damage|pending|refus)/i.test(kind);
 const tone = (kind: string) => (isBad(kind) ? "border-red-400 bg-red-50" : kind.startsWith("Change") ? "border-amber-300" : kind.startsWith("Nok") ? "border-sky-300" : "border-emerald-300");
 /** delivered by Nok (first time): green celebration */
 const isDelivered = isDeliveredAlert;
