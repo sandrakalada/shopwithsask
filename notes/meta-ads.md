@@ -534,3 +534,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-24 owner: removed summer items from catalog product set 1646945297477460 (filter: in stock AND product_type != Beach Set AND name excludes summer, sundress, beach, tropical, bermuda, shorts, straw, pineapple, watermelon, ice cream, seaside, starfish, crab, seahorse, popsicle, short-sleeve, one-shoulder, off-shoulder). 249 -> 206 products.
 
 - 2026-11-24 21:35 UTC check: new orders #1405 1,550 puff jacket (New Cairo) and #1408 1,835 black blazer floral lapel (6 October), no utm yet; pixel credits NEW with 2 purchases today. Blazer now sold out: paused its ads. Today NEW 184 / 13 ATC / 2 pur, WARM 206 / 20 ATC / 2 pur, BAGS-ACC 71 / 4, FB test 97 / 8 ATC, CART RT started (30 EGP). 5 orders today, 8,350.
+
+- 2026-11-25 00:35 UTC check: #1408 blazer came via sag_organic (not ads); #1409 1,912 cream floral embroidered jacket + statement earrings, Cairo, no utm. Cream jacket sold out (checked ads for its link). Nov 24 total 5 orders 8,412. Spend today NEW 212, WARM 221, BAGS-ACC 74, FB test 125 (9 ATC), CART RT 47.
