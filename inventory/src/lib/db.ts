@@ -129,6 +129,8 @@ export type InvoiceItem = {
   quantity: number;
   price: number;
   variant_id?: string | null;
+  /** product photo for the invoice */
+  image?: string | null;
 };
 
 export type Invoice = {

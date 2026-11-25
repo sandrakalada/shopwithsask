@@ -93,6 +93,16 @@ function InvoiceView({ id }: { id: string }) {
   const [ready, setReady] = useState<{ img: { url: string; ratio: number }; pdf: Blob } | null>(null);
   const [link, setLink] = useState<{ pdf: Blob; url: string } | null>(null);
   const [linkError, setLinkError] = useState(false);
+  const [thumbs, setThumbs] = useState<(string | null)[] | null>(null);
+
+  // product photos for the invoice, turned into data so they are part of the PDF
+  useEffect(() => {
+    if (!inv) return;
+    let off = false;
+    setThumbs(null);
+    void invoiceThumbs(inv).then((t) => !off && setThumbs(t));
+    return () => { off = true; };
+  }, [inv]);
 
   useEffect(() => {
     (async () =>
@@ -105,7 +115,7 @@ function InvoiceView({ id }: { id: string }) {
 
   // the PDF is made as soon as the invoice opens, so sending is a single tap
   useEffect(() => {
-    if (!inv || !store || !docRef.current) return;
+    if (!inv || !store || !thumbs || !docRef.current) return;
     let cancelled = false;
     setReady(null);
     (async () => {
@@ -120,7 +130,7 @@ function InvoiceView({ id }: { id: string }) {
     return () => {
       cancelled = true;
     };
-  }, [inv, store]);
+  }, [inv, store, thumbs]);
 
   // upload the PDF privately and make a long random link, so WhatsApp can open the customer's chat with it
   useEffect(() => {
@@ -208,7 +218,7 @@ function InvoiceView({ id }: { id: string }) {
       </main>
       {store && (
         <div style={{ position: "fixed", left: -10000, top: 0 }} aria-hidden>
-          <InvoiceDoc ref={docRef} inv={inv} store={store} />
+          <InvoiceDoc ref={docRef} inv={inv} store={store} thumbs={thumbs ?? undefined} />
         </div>
       )}
     </>
@@ -240,7 +250,7 @@ function zoneForAddress(text: string): string | null {
   return null;
 }
 
-type Line = InvoiceItem & { image?: string | null; shopify_variant_id?: string | null };
+type Line = InvoiceItem & { shopify_variant_id?: string | null };
 
 /**
  * Invoice form. Three ways in:
@@ -443,7 +453,7 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
         customer_name: name.trim() || null,
         customer_phone: phone.trim() || null,
         customer_address: address.trim() || null,
-        items: items.map(({ image: _i, shopify_variant_id: _s, ...it }) => (void _i, void _s, it)),
+        items: items.map(({ shopify_variant_id: _s, ...it }) => (void _s, it)),
         subtotal,
         shipping: fee,
         discount: disc,
@@ -689,5 +699,29 @@ export default function InvoicePage() {
     <Suspense>
       <InvoiceRouter />
     </Suspense>
+  );
+}
+
+/** Each item's photo (its colour's photo, else the product's) as a small data URL. */
+async function invoiceThumbs(inv: Invoice) {
+  const [variants, products] = await Promise.all([db.variants.toArray(), db.products.toArray()]);
+  const pmap = new Map(products.map((p) => [p.id, p]));
+  const toData = async (url: string) => {
+    try {
+      const u = url.includes("cdn.shopify.com") ? `${url}${url.includes("?") ? "&" : "?"}width=240` : url;
+      const res = await fetch(u, { mode: "cors" });
+      if (!res.ok) return null;
+      const b = await res.blob();
+      return await new Promise<string>((ok) => { const r = new FileReader(); r.onload = () => ok(r.result as string); r.readAsDataURL(b); });
+    } catch {
+      return null;
+    }
+  };
+  return Promise.all(
+    inv.items.map(async (it) => {
+      const v = (it.variant_id && variants.find((x) => x.id === it.variant_id)) || (it.sku && variants.find((x) => x.sku === it.sku)) || null;
+      const url = it.image || v?.image_url || (v ? pmap.get(v.product_id)?.image_url : null) || null;
+      return url ? toData(url) : null;
+    }),
   );
 }
