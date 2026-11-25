@@ -16,7 +16,7 @@ You are on the Nok Courier portal (https://ots.nokcourier.com). Create one shipm
    - Number of pieces = "Pieces".
    - Description/contents = "Contents".
    - Reference/order number = the order number without # (for example 1410; it prints as "REF: 1410").
-   - Description = items like "Heart-Shaped Playing Card Handbag x1". Weight 1 kg unless told otherwise.
+   - Description = items like "Heart-Shaped Playing Card Handbag x1". Weight always 1 kg.
    - Notes = "Note", if any.
 5. Before you submit, show me a short summary of what you filled in and wait for my OK.
 6. Submit, then click "Add to opened Pickup Request" so it joins today's pickup request (the same one for every order today).
