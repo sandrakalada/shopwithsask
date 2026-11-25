@@ -7,7 +7,7 @@ import { productMatcher } from "@/lib/lines";
 import { costInEgp } from "@/lib/stock";
 import { egp } from "@/lib/pdf";
 import { Header } from "@/components/ui";
-import { ReceiptIcon, ScanIcon, SearchIcon, TruckIcon } from "@/components/Icons";
+import { ReceiptIcon, ScanIcon, SearchIcon, WalletIcon } from "@/components/Icons";
 import { useEffect, useState } from "react";
 import { signedInUser } from "@/lib/supabase";
 
@@ -126,7 +126,7 @@ export default function Home() {
             { href: "/scan", label: "Scan", Icon: ScanIcon },
             { href: "/find", label: "Find item", Icon: SearchIcon },
             { href: "/invoice?new=1", label: "New sale", Icon: ReceiptIcon },
-            { href: "/shipment?new=1", label: "Ship", Icon: TruckIcon },
+            { href: "/settlement", label: "Settlement", Icon: WalletIcon },
           ].map(({ href, label, Icon }) => (
             <Link key={href} href={href} className="card flex min-h-[72px] flex-col items-center justify-center gap-1.5 text-[12.5px] font-semibold active:bg-sand">
               <Icon className="h-6 w-6 text-caramel" />

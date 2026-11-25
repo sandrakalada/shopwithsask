@@ -10,7 +10,7 @@ import { resetLocal } from "@/lib/sync";
 import { useRole } from "./Shell";
 import { useAlerts } from "./AlertWatcher";
 
-import { BoxIcon, ChartIcon, ClockIcon, GearIcon, HomeIcon, PrintIcon, ReceiptIcon, ScanIcon, TruckIcon, UsersIcon } from "./Icons";
+import { BoxIcon, ChartIcon, ClockIcon, GearIcon, HomeIcon, PrintIcon, ReceiptIcon, ScanIcon, TruckIcon, UsersIcon, WalletIcon } from "./Icons";
 
 const TagIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -27,12 +27,6 @@ const DocIcon = ({ className }: { className?: string }) => (
 const CameraIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" />
-  </svg>
-);
-
-const PlusBoxIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M21 8.5V16l-9 5-9-5V8l9-5 4.5 2.5" /><path d="M3.3 7.7 12 12.5l3.5-1.9M12 12.5V21" /><path d="M19 2v6M16 5h6" />
   </svg>
 );
 
@@ -62,7 +56,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; Icon: (p:
       { href: "/orders", label: "Orders", Icon: ReceiptIcon },
       { href: "/alerts", label: "WhatsApp alerts", Icon: BellIcon },
       { href: "/shipments", label: "Shipments", Icon: TruckIcon },
-      { href: "/shipment?new=1", label: "New shipment", Icon: PlusBoxIcon },
+      { href: "/settlement", label: "Settlement", Icon: WalletIcon },
       { href: "/invoice?new=1", label: "New invoice", Icon: DocIcon },
       { href: "/customers", label: "Customers", Icon: UsersIcon },
     ],

@@ -879,6 +879,41 @@ async function nokStatus() {
   return { checked, changed };
 }
 
+/** Monday: Nok transfers the collected cash. Reminder with the expected amount (same rules as the app's Settlement page). */
+const NOK_FEES: Record<string, number> = { cairo: 80, giza: 82, alex: 85, delta: 88, north: 150, upper: 180 };
+function nokZoneOf(r: any) {
+  const t = [r?.province, r?.city, r?.address2, r?.address1].filter(Boolean).join(" ").toLowerCase();
+  const has = (w: string[]) => w.some((x) => t.includes(x));
+  if (has(["north coast", "sahel", "الساحل", "matrouh", "مطروح", "alamein", "العلمين"])) return "north";
+  if (has(["alex", "اسكندري", "إسكندري"])) return "alex";
+  if (has(["asyut", "assiut", "أسيوط", "sohag", "سوهاج", "qena", "قنا", "luxor", "الأقصر", "aswan", "أسوان", "minya", "المنيا", "beni suef", "بني سويف", "fayoum", "الفيوم", "red sea", "البحر الأحمر", "hurghada", "الغردقة", "sinai", "سيناء"])) return "upper";
+  if (has(["sharq", "الشرقية", "dakahl", "الدقهلية", "gharb", "الغربية", "monuf", "المنوفية", "behe", "البحيرة", "kafr", "كفر", "damietta", "دمياط", "port said", "بورسعيد", "ismail", "الإسماعيلية", "suez", "السويس", "qalyub", "القليوبية"])) return "delta";
+  if (has(["giza", "الجيزة", "october", "اكتوبر", "أكتوبر", "zayed", "زايد", "haram", "الهرم", "dokki", "mohandes", "faisal"])) return "giza";
+  return "cairo";
+}
+
+async function settlementReminder() {
+  const since = new Date(Date.now() - 60 * 86400_000).toISOString();
+  const { data } = await admin.from("shipments").select("courier, status, cod_amount, recipient, nok_status, updated_at").ilike("courier", "nok%").gte("created_at", since);
+  const lastMonday = new Date(); lastMonday.setUTCHours(0, 0, 0, 0); lastMonday.setUTCDate(lastMonday.getUTCDate() - 7);
+  let total = 0, n = 0;
+  for (const s of data ?? []) {
+    const st = String(s.nok_status ?? "").toLowerCase();
+    const fee = NOK_FEES[nokZoneOf(s.recipient)] * 1.14;
+    if (/settled|lost|damage/.test(st)) continue;
+    if (/undeliver|return|cancel|rto|refus/.test(st)) { if (new Date(s.updated_at) >= lastMonday) { total -= fee * 0.7; n++; } continue; }
+    if (/deliver/.test(st) && !/out for|ready for/.test(st)) { total += Number(s.cod_amount ?? 0) - fee; n++; }
+  }
+  const amount = Math.round(total);
+  await admin.from("wa_alerts").insert({
+    order_name: "Nok transfer",
+    kind: "Payment day: Nok transfer",
+    total: amount,
+    detail: `Today Nok transfers your cash. Expected about ${amount.toLocaleString("en-US")} EGP from ${n} shipments. Check Settlement.`,
+  });
+  return { amount, shipments: n };
+}
+
 /** Cash collected on delivery: mark the order paid in Shopify. */
 async function markOrderPaid(orderId: string) {
   if (!/^\d+$/.test(String(orderId))) throw new Error("bad order id");
@@ -1065,6 +1100,7 @@ Deno.serve(async (req) => {
       if (cb.action === "create-order" && cb.sale) return json(await createOfflineOrder(cb.sale)); // orders placed for the owner from chat
       if (cb.action === "mark-paid" && cb.orderId) return json(await markOrderPaid(String(cb.orderId)));
       if (cb.action === "nok-status") return json(await nokStatus()); // hourly courier status check
+      if (cb.action === "settlement-reminder") return json(await settlementReminder()); // Monday transfer reminder
       if (cb.action === "fulfill-order" && cb.orderId) return json(await fulfillOrder(String(cb.orderId), cb.tracking ?? {}));
       const fx = await updateRate().catch((e) => ({ error: String(e) }));
       const hooks = await setup().catch((e) => ({ error: String(e) })); // re-creates any webhook Shopify removed

@@ -3,7 +3,7 @@
 import { supabase } from "./supabase";
 
 /** WhatsApp order flow alerts: unread count for the menu badge and new ones for the pop up. */
-export type AlertRow = { id: number; created_at: string; order_name: string; customer: string | null; kind: string; detail: string | null };
+export type AlertRow = { id: number; created_at: string; order_name: string; customer: string | null; kind: string; detail: string | null; total?: number | null };
 
 type State = { unseen: number; fresh: AlertRow[] };
 let state: State = { unseen: 0, fresh: [] };
@@ -27,7 +27,7 @@ export async function checkAlerts() {
   if (!supabase || !navigator.onLine) return;
   const { data, error } = await supabase
     .from("wa_alerts")
-    .select("id, created_at, order_name, customer, kind, detail")
+    .select("id, created_at, order_name, customer, kind, detail, total")
     .eq("seen", false)
     .order("id", { ascending: false })
     .limit(50);

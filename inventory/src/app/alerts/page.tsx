@@ -22,7 +22,7 @@ type Alert = {
 };
 
 const tone = (kind: string) =>
-  /^Nok: .*(undeliver|return|lost|damage|pending)/i.test(kind) ? "bg-red-50 text-red-700" : kind.startsWith("Nok") ? "bg-sky-50 text-sky-800" :
+  /^Nok: .*(undeliver|return|cancel|lost|damage|pending|refus)/i.test(kind) ? "bg-red-50 text-red-700" : /^Nok: Delivered/i.test(kind) ? "bg-emerald-100 text-emerald-800" : kind.startsWith("Nok") ? "bg-sky-50 text-sky-800" : kind.startsWith("Payment") ? "bg-amber-50 text-amber-800" :
   kind.startsWith("Cancelled") ? "bg-red-50 text-red-700" : kind.startsWith("Change") ? "bg-amber-50 text-amber-800" : "bg-emerald-50 text-emerald-700";
 
 export default function AlertsPage() {
@@ -53,6 +53,7 @@ export default function AlertsPage() {
       setRows((rs) => rs!.map((r) => (r.id === a.id ? { ...r, seen: true } : r)));
       void supabase.from("wa_alerts").update({ seen: true }).eq("id", a.id).then(() => checkAlerts());
     }
+    if (a.kind.startsWith("Payment")) return router.push("/settlement");
     const name = a.order_name.startsWith("#") ? a.order_name : `#${a.order_name}`;
     const o = (a.order_id ? await db.orders.get(String(a.order_id)) : undefined) ?? (await db.orders.where("name").equals(name).first());
     if (o) router.push(`/order?id=${o.id}`);
