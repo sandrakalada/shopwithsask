@@ -118,8 +118,11 @@ export default function SettlementPage() {
         })}
         {ships && !rows.length && <p className="card p-4 text-sm text-taupe">No Nok shipments yet.</p>}
 
-        <section className="card p-4 text-sm">
-          <p className="section-title px-0">Nok prices (first kg, + {Math.round(VAT * 100)}% VAT)</p>
+        <details className="card group p-4 text-sm">
+          <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+            <span className="section-title mb-0 px-0">Nok prices (1 kg, + {Math.round(VAT * 100)}% VAT)</span>
+            <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0 text-taupe transition-transform group-open:rotate-180" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m6 9 6 6 6-6" /></svg>
+          </summary>
           <ul className="divide-y divide-line">
             {Object.values(NOK_ZONES).map((z) => (
               <li key={z.label} className="flex justify-between py-1.5">
@@ -128,8 +131,8 @@ export default function SettlementPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-2 text-xs text-taupe">Cancelled or returned: {Math.round(RETURN_SHARE * 100)}% of the delivery fee + VAT. Extra kg: 8 EGP + VAT. No pickup fee, no minimum, no cash collection fee. Transfer every Monday, free.</p>
-        </section>
+          <p className="mt-2 text-xs text-taupe">Cancelled or returned: {Math.round(RETURN_SHARE * 100)}% of the delivery fee + VAT. Every parcel counts as 1 kg. No pickup fee, no minimum, no cash collection fee. Transfer every Monday, free.</p>
+        </details>
       </main>
     </>
   );
