@@ -9,6 +9,8 @@ import { egp, printNow, shareFile, waLink } from "@/lib/pdf";
 import { Header } from "@/components/ui";
 import { PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
 import { useShippingLabel } from "@/components/useShippingLabel";
+import AwbUpload, { type AwbResult } from "@/components/AwbUpload";
+import { uploadAwb } from "@/lib/awb";
 import {
   STATUS_LABEL, STATUS_TONE, markPaidInShopify, openNok, newManualShipment, newShipmentForOrder, saveShipment, sendToShopify, shipmentAsOrder,
 } from "@/lib/shipments";
@@ -33,6 +35,7 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
   const [notify, setNotify] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [awb, setAwb] = useState<AwbResult | null>(null);
 
   useEffect(() => {
     if (!s && order) setS(newShipmentForOrder(order));
@@ -50,7 +53,8 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
     setBusy(true);
     setErr(null);
     try {
-      const row = await saveShipment({ ...s, tracking: s.tracking.trim(), cod_amount: Math.max(0, Number(s.cod_amount) || 0), pieces: Math.max(1, Number(s.pieces) || 1) });
+      let row = await saveShipment({ ...s, tracking: s.tracking.trim(), cod_amount: Math.max(0, Number(s.cod_amount) || 0), pieces: Math.max(1, Number(s.pieces) || 1) });
+      if (awb) row = await saveShipment({ ...row, awb_path: await uploadAwb(row.id, awb.url) });
       if (!editing && row.order_id && toShopify) {
         try {
           await sendToShopify(row, notify);
@@ -80,15 +84,28 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
             <p className="section-title px-0">Shipment</p>
             {!editing && order && (
               <p className="rounded-xl bg-sand px-3 py-2.5 text-sm text-espresso">
-                Nok Courier opened in a new tab and the order details are copied. Create the shipment there, then paste Nok&apos;s tracking number below.{" "}
+                Nok Courier opened in a new tab and the order details are copied. Create the shipment there, tap Print AWB, save the PDF, then add it here. The AWB number fills in by itself.{" "}
                 <button type="button" onClick={() => openNok(order)} className="font-semibold text-caramel underline">Open Nok again</button>
               </p>
+            )}
+            {!editing && (
+              <div className="space-y-2">
+                <AwbUpload
+                  label={awb ? "Replace Nok AWB" : "Add Nok AWB (PDF from Print AWB)"}
+                  orderNumber={s.order_name}
+                  onReady={(r) => { setAwb(r); setS((cur) => cur && ({ ...cur, courier: "Nok Courier", tracking: r.awb ?? cur.tracking })); }}
+                />
+                {awb && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={awb.url} alt="Nok AWB label" className="mx-auto w-40 rounded border border-line" />
+                )}
+              </div>
             )}
             <label className="block text-sm">
               <span className="text-taupe">Tracking number</span>
               <input className="field mt-1" dir="ltr" value={s.tracking} onChange={(e) => set({ tracking: e.target.value })} placeholder="Tracking number" />
             </label>
-            <p className="text-xs text-taupe">Keep our number, or paste the delivery company&apos;s number.</p>
+            <p className="text-xs text-taupe">Adding the Nok AWB fills this in, or paste the number.</p>
           </section>
 
           <section className="card space-y-3 p-4">
@@ -281,6 +298,14 @@ function ShipmentView({ id }: { id: string }) {
         </div>
 
         <aside className="mt-4 space-y-3 lg:sticky lg:top-24 lg:mt-0">
+          <AwbUpload
+            label={s.awb_path ? "Replace Nok AWB" : "Add Nok AWB (PDF from Print AWB)"}
+            orderNumber={s.order_name}
+            onReady={async (a) => {
+              const path = await uploadAwb(s.id, a.url);
+              await saveShipment({ ...s, awb_path: path, courier: "Nok Courier", tracking: a.awb ?? s.tracking });
+            }}
+          />
           <div className="grid grid-cols-2 gap-2">
             <button className="btn-dark" disabled={!label} onClick={() => label && printNow()}>
               <PrintIcon className="h-5 w-5" /> {label ? "Print label" : "Preparing"}
@@ -291,7 +316,7 @@ function ShipmentView({ id }: { id: string }) {
           </div>
           {label ? (
             <section className="card p-3">
-              <p className="mb-2 text-xs text-taupe">Shipping label (100 x 150 mm)</p>
+              <p className="mb-2 text-xs text-taupe">{s.awb_path ? "Nok AWB" : "Shipping label"} (100 x 150 mm)</p>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={label.url} alt="Shipping label preview" className="mx-auto w-56 rounded border border-line lg:w-full" />
             </section>

@@ -5,6 +5,7 @@ import JsBarcode from "jsbarcode";
 import type { Order, Shipment } from "@/lib/db";
 import { getSetting } from "@/lib/stock";
 import { elementToImage, imagesToPdf, preparePrint, qrDataUrl } from "@/lib/pdf";
+import { awbPdf, loadAwb } from "@/lib/awb";
 import ShippingLabel, { shipmentNumber, type LabelStore } from "./ShippingLabel";
 
 /** Draws the 100 x 150 mm label off-screen as soon as the data is there,
@@ -14,10 +15,30 @@ export function useShippingLabel(order: Order | null | undefined, shipment?: Shi
   const [assets, setAssets] = useState<{ qr: string; barcode: string; store: LabelStore } | null>(null);
   const [label, setLabel] = useState<{ url: string; pdf: Blob } | null>(null);
   const tracking = shipment?.tracking ?? (order ? shipmentNumber(order) : "");
-  const sig = order ? JSON.stringify([order.id, order.updated_at, shipment?.updated_at, shipment?.tracking, shipment?.cod_amount, shipment?.recipient, shipment?.courier, shipment?.pieces, shipment?.contents]) : "";
+  const sig = order ? JSON.stringify([order.id, order.updated_at, shipment?.updated_at, shipment?.tracking, shipment?.cod_amount, shipment?.recipient, shipment?.courier, shipment?.pieces, shipment?.contents, shipment?.awb_path]) : "";
+
+  const awbPath = shipment?.awb_path ?? null;
+
+  // Nok Courier AWB uploaded: that is the label
+  useEffect(() => {
+    if (!awbPath) return;
+    let cancelled = false;
+    setLabel(null);
+    (async () => {
+      const url = await loadAwb(awbPath).catch(() => null);
+      if (!url || cancelled) return;
+      const pdf = await awbPdf(url);
+      if (cancelled) return;
+      setLabel({ url, pdf });
+      preparePrint([url], 100, 150, pdf);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [awbPath]);
 
   useEffect(() => {
-    if (!order) return;
+    if (!order || awbPath) return;
     let cancelled = false;
     (async () => {
       const store: LabelStore = {
@@ -37,7 +58,7 @@ export function useShippingLabel(order: Order | null | undefined, shipment?: Shi
   }, [sig]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!assets || !ref.current) return;
+    if (!assets || !ref.current || awbPath) return;
     let cancelled = false;
     setLabel(null);
     (async () => {
@@ -57,7 +78,7 @@ export function useShippingLabel(order: Order | null | undefined, shipment?: Shi
   }, [assets]);
 
   const offscreen =
-    order && assets ? (
+    order && assets && !awbPath ? (
       <div style={{ position: "fixed", left: -10000, top: 0 }} aria-hidden>
         <ShippingLabel ref={ref} order={order} shipment={shipment} store={assets.store} qr={assets.qr} barcode={assets.barcode} logo="/brand-wordmark.png" />
       </div>

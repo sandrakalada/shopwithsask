@@ -163,6 +163,8 @@ export type Shipment = {
   contents: string | null;
   note: string | null;
   shopify_fulfilled: boolean;
+  /** Nok Courier AWB label (100 x 150 mm JPEG) in storage bucket awb */
+  awb_path?: string | null;
   created_by?: string | null;
   created_at: string;
   updated_at: string;

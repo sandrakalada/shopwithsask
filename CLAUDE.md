@@ -51,4 +51,5 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 ## Shipping (Nok Courier)
 - Courier is Nok Courier (https://ots.nokcourier.com/accounts/login/?next=/). In the inventory app, "Create shipment" on an order opens Nok in a new tab, copies the order details (name, phone, address, city, cash to collect, pieces, contents, order number), and opens the app's shipment form for Nok's tracking number.
 - The shipment is created in Nok with the Claude Chrome extension using notes/nok-shipment-extension-prompt.md. Never type, store or ask for the Nok password; the owner signs in herself. Confirm before submitting.
+- Label: the Nok AWB PDF (Print AWB) is added on the app's shipment page ("Add Nok AWB"). The app crops it to the label part (no signature box), saves it at 100 x 150 mm in storage bucket awb (shipments.awb_path), fills the tracking number from the AWB and uses it instead of our own label.
 - How the Nok portal works (menus, COD = product price + delivery fee, pickups, statuses): notes/nok-courier-guide.md. The owner will add more steps later.

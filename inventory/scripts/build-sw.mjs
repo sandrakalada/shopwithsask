@@ -17,7 +17,7 @@ const files = [];
 // pages are served at clean addresses (/orders, not /orders.html) by the host
 const precache = files
   // the photo-recognition model (26 MB) is downloaded the first time Find my product is opened, not at install
-  .filter((f) => f !== "/sw.js" && f !== "/version.json" && !f.endsWith(".map") && !f.startsWith("/404") && !f.startsWith("/_not-found") && !f.startsWith("/models/") && !f.startsWith("/ort/") && !f.startsWith("/ocr/") && f !== "/find-index.json" && !/\/ort-wasm/.test(f))
+  .filter((f) => f !== "/sw.js" && f !== "/version.json" && !f.endsWith(".map") && !f.startsWith("/404") && !f.startsWith("/_not-found") && !f.startsWith("/models/") && !f.startsWith("/ort/") && !f.startsWith("/ocr/") && !f.startsWith("/pdfjs/") && f !== "/find-index.json" && !/\/ort-wasm/.test(f))
   .map((f) => (f === "/index.html" ? "/" : f.endsWith(".html") ? f.slice(0, -5) : f));
 const hash = createHash("sha1");
 for (const f of files) if (f !== "/sw.js") hash.update(f).update(readFileSync(join(OUT, f)));
@@ -73,7 +73,7 @@ self.addEventListener("fetch", (e) => {
   if (url.pathname === "/version.json") return; // always from the network
 
   // recognition model and engine: downloaded once, then kept (they never change for a given file name)
-  if (url.pathname.startsWith("/models/") || url.pathname.startsWith("/ort/") || url.pathname.startsWith("/ocr/")) {
+  if (url.pathname.startsWith("/models/") || url.pathname.startsWith("/ort/") || url.pathname.startsWith("/ocr/") || url.pathname.startsWith("/pdfjs/")) {
     e.respondWith(
       caches.open(AI).then(async (c) => {
         const hit = await c.match(req);
