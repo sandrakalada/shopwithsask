@@ -71,7 +71,7 @@ export function orderSteps(o: Order, sh?: Shipment | null): Step[] {
 }
 
 /** One short status for lists: the furthest step reached (or the problem). */
-export function orderStage(o: Order, sh?: Shipment | null): { text: string; tone: string } {
+export function orderStage(o: Order, sh?: Shipment | null): { text: string; tone: string } | null {
   if (!o.cancelled_at && o.fulfillment_status === "FULFILLED" && o.financial_status === "PAID") return { text: "Completed", tone: "bg-emerald-100 text-emerald-800" };
   const steps = orderSteps(o, sh);
   const bad = steps.find((s) => s.state === "bad");
@@ -91,6 +91,8 @@ export function orderStage(o: Order, sh?: Shipment | null): { text: string; tone
   };
   const change = steps.find((s) => s.key === "confirmed" && s.state === "now" && s.note);
   if (change && done.key === "sent") return { text: "Change requested", tone: "bg-amber-50 text-amber-800" };
-  const [text, tone] = map[done.key] ?? ["New order", "bg-sand text-taupe"];
+  // "New order" only for the first 3 days after it came in
+  if (done.key === "placed") return Date.now() - new Date(o.created_at).getTime() < 3 * 86400_000 ? { text: "New order", tone: "bg-sand text-taupe" } : null;
+  const [text, tone] = map[done.key];
   return { text, tone };
 }

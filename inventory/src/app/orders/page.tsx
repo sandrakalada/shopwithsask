@@ -138,7 +138,7 @@ function Orders() {
                   </td>
                   <td className="max-w-[220px] truncate px-3 py-3">{orderCustomerName(o)}</td>
                   <td className="px-3 py-3 whitespace-nowrap text-taupe">{fmtDate(o.created_at)}</td>
-                  <td className="px-3 py-3"><span className="flex flex-wrap items-center gap-1">{(() => { const st = orderStage(o, ships.get(o.id)); return <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${st.tone}`}>{st.text}</span>; })()}<StatusPills o={o} /></span></td>
+                  <td className="px-3 py-3"><span className="flex flex-wrap items-center gap-1">{(() => { const st = orderStage(o, ships.get(o.id)); return st ? <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${st.tone}`}>{st.text}</span> : null; })()}<StatusPills o={o} /></span></td>
                   <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}><Ship o={o} /></td>
                   {role !== "shipping" && <td className="px-5 py-3 text-right font-semibold whitespace-nowrap">{egp(o.total)}</td>}
                 </tr>
@@ -160,7 +160,7 @@ function Orders() {
                 </div>
                 <div className="mt-1 flex items-center justify-between gap-2">
                   <p className="text-xs text-taupe">{fmtDate(o.created_at)}</p>
-                  {(() => { const st = orderStage(o, ships.get(o.id)); return <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${st.tone}`}>{st.text}</span>; })()}
+                  {(() => { const st = orderStage(o, ships.get(o.id)); return st ? <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${st.tone}`}>{st.text}</span> : null; })()}
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <div className="min-w-0 flex-1"><StatusPills o={o} /></div>
