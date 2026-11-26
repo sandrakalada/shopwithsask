@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -17,7 +19,7 @@ function SalesList() {
   const p = useSearchParams();
   const year = p.get("y") === "1";
   const [offset, setOffset] = useState(Number(p.get("m") ?? 0) || 0);
-  const [sort, setSort] = useState<Sort>("date");
+  const [sort, setSort] = useSaved<Sort>("sales-sort", "date");
   const now = new Date();
   const start = year ? new Date(now.getFullYear(), 0, 1) : new Date(now.getFullYear(), now.getMonth() + offset, 1);
   const end = year ? new Date(now.getFullYear() + 1, 0, 1) : new Date(now.getFullYear(), now.getMonth() + offset + 1, 1);

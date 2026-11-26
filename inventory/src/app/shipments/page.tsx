@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -19,7 +21,7 @@ const FILTERS: [Filter, string][] = [["active", "Open"], ["ready", "Created"], [
 
 export default function ShipmentsPage() {
   const router = useRouter();
-  const [f, setF] = useState<Filter>("active");
+  const [f, setF] = useSaved<Filter>("tracking-filter", "active");
   const [q, setQ] = useState("");
   const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);
   const all = useLiveQuery(() => db.shipments.orderBy("created_at").reverse().toArray(), []);

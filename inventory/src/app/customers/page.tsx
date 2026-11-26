@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -15,7 +17,7 @@ type Sort = "recent" | "spent" | "orders";
 export default function Customers() {
   const router = useRouter();
   const [q, setQ] = useState("");
-  const [sort, setSort] = useState<Sort>("recent");
+  const [sort, setSort] = useSaved<Sort>("customers-sort", "recent");
   const customers = useLiveQuery(() => db.customers.toArray(), [], []);
 
   const rows = useMemo(() => {

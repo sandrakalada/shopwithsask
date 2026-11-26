@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -25,7 +27,7 @@ function Inventory() {
   const assign = params.get("assign");
   const [view, setView] = useState<View>((params.get("view") as View) ?? "stock");
   const [q, setQ] = useState("");
-  const [filter, setFilter] = useState<Filter>((params.get("filter") as Filter) ?? "all");
+  const [filter, setFilter] = useSaved<Filter>("items-filter", "all", params.get("filter") as Filter | null);
   const [type, setType] = useState("all");
   const [bag, setBag] = useState("all");
   // sort order, remembered per view on this phone

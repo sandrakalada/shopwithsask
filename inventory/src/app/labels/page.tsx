@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -91,7 +93,11 @@ function Labels() {
   const params = useSearchParams();
   const productId = params.get("product");
   const variantId = params.get("variant");
-  const [scope, setScope] = useState<"one" | "product" | "instock" | "all">(variantId ? "one" : productId ? "product" : "instock");
+  const [scope, setScopeRaw] = useState<"one" | "product" | "instock" | "all">(variantId ? "one" : productId ? "product" : "instock");
+  // In stock / All items is remembered on this phone
+  const [savedScope, setSavedScope] = useSaved<"instock" | "all">("labels-scope", "instock");
+  useEffect(() => { if (!variantId && !productId) setScopeRaw(savedScope); }, [savedScope, variantId, productId]);
+  const setScope = (v: "one" | "product" | "instock" | "all") => { setScopeRaw(v); if (v === "instock" || v === "all") setSavedScope(v); };
   const [q, setQ] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);

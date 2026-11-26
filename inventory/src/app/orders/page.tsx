@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import Link from "next/link";
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -34,8 +36,8 @@ function Orders() {
   const router = useRouter();
   const params = useSearchParams();
   const [q, setQ] = useState(params.get("q") ?? "");
-  const [f, setF] = useState<F>((params.get("f") as F) ?? (role === "shipping" ? "open" : "all"));
-  const [month, setMonth] = useState(params.get("since") === "month");
+  const [f, setF] = useSaved<F>("orders-filter", role === "shipping" ? "open" : "all", params.get("f") as F | null);
+  const [month, setMonth] = useSaved<boolean>("orders-month", false, params.get("since") === "month" ? true : null);
   const orders = useLiveQuery(() => db.orders.orderBy("created_at").reverse().toArray(), [], []);
   // each order's shipment (latest, not cancelled)
   const ships = useLiveQuery(async () => {
