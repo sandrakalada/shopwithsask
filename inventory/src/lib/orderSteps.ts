@@ -52,7 +52,8 @@ export function orderSteps(o: Order, sh?: Shipment | null): Step[] {
   } else {
     steps.push({ key: "delivered", label: "Delivered", state: "todo" });
   }
-  steps.push({ key: "paid", label: /settled/.test(n) ? "Paid to you by the shipping company" : "Paid", state: paid ? "done" : delivered || personal ? "now" : "todo" });
+  const instaPending = has(o, /instapay-pending/i) && !paid;
+  steps.push({ key: "paid", label: /settled/.test(n) ? "Paid to you by the shipping company" : instaPending ? "Pending Instapay" : "Paid", state: paid ? "done" : instaPending ? "now" : delivered || personal ? "now" : "todo", note: instaPending ? "Customer chose Instapay, transfer not received yet" : undefined });
   void shipped;
 
   if (cancelled) return [steps[0], { key: "cancelled", label: "Order cancelled", state: "bad", at: o.cancelled_at }];
@@ -93,6 +94,8 @@ export function orderStage(o: Order, sh?: Shipment | null): { text: string; tone
     delivered: ["Delivered", "bg-emerald-50 text-emerald-700"],
     paid: ["Completed", "bg-emerald-100 text-emerald-800"],
   };
+  // customer chose Instapay on WhatsApp and the transfer has not arrived yet
+  if (has(o, /instapay-pending/i) && o.financial_status !== "PAID") return { text: "Pending Instapay", tone: "bg-amber-50 text-amber-800" };
   const change = steps.find((s) => s.key === "confirmed" && s.state === "now" && s.note);
   if (change && done.key === "sent") return { text: "Change requested", tone: "bg-amber-50 text-amber-800" };
   // "New order" only for the first 3 days after it came in
