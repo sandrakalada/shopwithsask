@@ -40,6 +40,13 @@ export function Header({ title, back, right, logo }: { title: string; back?: boo
           <h1 className="min-w-0 flex-1 truncate pl-1 text-[17px] font-semibold tracking-tight lg:text-[20px]">{title}</h1>
         )}
         {right}
+        {!logo && (
+          <Link href="/" className="flex h-11 min-w-11 items-center justify-center rounded-full text-ink active:bg-sand" aria-label="Home" title="Home">
+            <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" />
+            </svg>
+          </Link>
+        )}
         <AlertsBell />
         <SyncBadge />
       </div>
