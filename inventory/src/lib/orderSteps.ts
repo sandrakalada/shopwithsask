@@ -75,6 +75,9 @@ export function orderSteps(o: Order, sh?: Shipment | null): Step[] {
 }
 
 /** One short status for lists: the furthest step reached (or the problem). */
+/** InstaPay brand colours (purple to magenta, white text). */
+export const INSTAPAY = "bg-linear-to-r from-[#4A2483] to-[#A3238E] text-white";
+
 export function orderStage(o: Order, sh?: Shipment | null): { text: string; tone: string } | null {
   if (!o.cancelled_at && o.fulfillment_status === "FULFILLED" && o.financial_status === "PAID") return { text: "Completed", tone: "bg-emerald-100 text-emerald-800" };
   const steps = orderSteps(o, sh);
@@ -95,7 +98,7 @@ export function orderStage(o: Order, sh?: Shipment | null): { text: string; tone
     paid: ["Completed", "bg-emerald-100 text-emerald-800"],
   };
   // customer chose Instapay on WhatsApp and the transfer has not arrived yet
-  if (has(o, /instapay-pending/i) && o.financial_status !== "PAID") return { text: "Pending Instapay", tone: "bg-amber-50 text-amber-800" };
+  if (has(o, /instapay-pending/i) && o.financial_status !== "PAID") return { text: "Pending Instapay", tone: INSTAPAY };
   const change = steps.find((s) => s.key === "confirmed" && s.state === "now" && s.note);
   if (change && done.key === "sent") return { text: "Change requested", tone: "bg-amber-50 text-amber-800" };
   // "New order" only for the first 3 days after it came in

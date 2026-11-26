@@ -1,7 +1,7 @@
 "use client";
 
 import type { Order, Shipment } from "@/lib/db";
-import { orderSteps } from "@/lib/orderSteps";
+import { INSTAPAY, orderSteps } from "@/lib/orderSteps";
 
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "");
 
@@ -14,7 +14,8 @@ export default function OrderTimeline({ order, shipment }: { order: Order; shipm
       <ol className="relative">
         {steps.map((s, i) => {
           const last = i === steps.length - 1;
-          const dot =
+          const insta = s.label === "Pending Instapay";
+          const dot = insta ? `${INSTAPAY} ring-4 ring-[#A3238E]/20` :
             s.state === "done" ? "bg-success text-white" : s.state === "now" ? "bg-caramel text-white ring-4 ring-caramel/20" : s.state === "bad" ? "bg-danger text-white" : s.state === "skip" ? "bg-sand text-taupe" : "bg-sand text-faint";
           return (
             <li key={s.key} className="relative flex gap-3 pb-4 last:pb-0">
@@ -25,9 +26,9 @@ export default function OrderTimeline({ order, shipment }: { order: Order; shipm
                 ) : s.state === "bad" ? "!" : s.state === "skip" ? "–" : i + 1}
               </span>
               <div className="min-w-0 pt-0.5">
-                <p className={`text-[15px] leading-tight ${s.state === "todo" ? "text-faint" : s.state === "skip" ? "text-taupe line-through decoration-faint" : "font-semibold"} ${s.state === "bad" ? "text-danger" : ""}`}>{s.label}</p>
+                <p className={`text-[15px] leading-tight ${s.state === "todo" ? "text-faint" : s.state === "skip" ? "text-taupe line-through decoration-faint" : "font-semibold"} ${s.state === "bad" ? "text-danger" : ""} ${insta ? "text-[#4A2483]" : ""}`}>{s.label}</p>
                 {(s.note || s.at) && <p className="mt-0.5 text-xs text-taupe">{[s.note, when(s.at)].filter(Boolean).join(" · ")}</p>}
-                {s.state === "now" && <p className="mt-0.5 text-xs font-semibold text-caramel">Next step</p>}
+                {s.state === "now" && <p className={`mt-0.5 text-xs font-semibold ${insta ? "text-[#A3238E]" : "text-caramel"}`}>Next step</p>}
               </div>
             </li>
           );
