@@ -8,7 +8,7 @@ import { db } from "@/lib/db";
 import { productMatcher } from "@/lib/lines";
 import { addressLines, egp, printNow, shareFile, waLink } from "@/lib/pdf";
 import { Header, Thumb } from "@/components/ui";
-import { PhoneIcon, PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
+import { DocIcon, PhoneIcon, PrintIcon, TruckIcon, WhatsAppIcon } from "@/components/Icons";
 import { useShippingLabel } from "@/components/useShippingLabel";
 import CreateShipmentButton from "@/components/CreateShipmentButton";
 import OrderTimeline from "@/components/OrderTimeline";
@@ -132,12 +132,17 @@ function OrderView() {
             <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
               Share label
             </button>
-            {!shippingOnly && (
-              <Link href={invoice ? `/invoice?id=${invoice.id}` : `/invoice?order=${order.id}`} className="btn-light col-span-2">
-                <WhatsAppIcon className="h-5 w-5" /> Send invoice on WhatsApp
-              </Link>
-            )}
           </div>
+          {!shippingOnly && (
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <Link href={invoice ? `/invoice?id=${invoice.id}` : `/invoice?order=${order.id}`} className="btn-light">
+                <DocIcon className="h-5 w-5" /> Invoice PDF
+              </Link>
+              <Link href={invoice ? `/invoice?id=${invoice.id}` : `/invoice?order=${order.id}`} className="btn-light">
+                <WhatsAppIcon className="h-5 w-5" /> Send invoice
+              </Link>
+            </div>
+          )}
         </div>
 
         <section className="card p-4">
@@ -211,12 +216,17 @@ function OrderView() {
               <button className="btn-light" disabled={!label} onClick={() => label && shareFile(label.pdf, `label-${order.name.replace("#", "")}.pdf`)}>
                 Share label
               </button>
-              {!shippingOnly && (
-                <Link href={invoice ? `/invoice?id=${invoice.id}` : `/invoice?order=${order.id}`} className="btn-light col-span-2">
-                  <WhatsAppIcon className="h-5 w-5" /> Send invoice on WhatsApp
-                </Link>
-              )}
             </div>
+          {!shippingOnly && (
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <Link href={invoice ? `/invoice?id=${invoice.id}` : `/invoice?order=${order.id}`} className="btn-light">
+                <DocIcon className="h-5 w-5" /> Invoice PDF
+              </Link>
+              <Link href={invoice ? `/invoice?id=${invoice.id}` : `/invoice?order=${order.id}`} className="btn-light">
+                <WhatsAppIcon className="h-5 w-5" /> Send invoice
+              </Link>
+            </div>
+          )}
           </div>
           {label ? (
             <section className="card p-3">

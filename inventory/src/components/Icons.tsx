@@ -37,3 +37,4 @@ export const WalletIcon = ({ className }: P) =>
   base(<><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M3 10h18M16 14.5h2" /></>, className);
 export const CameraIcon = ({ className }: P) =>
   base(<><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></>, className);
+export const DocIcon = ({ className }: P) => base(<path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5" />, className);
