@@ -570,3 +570,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-26 owner: new product Burgundy Quilted Frog-Button Jacket (1,950, Small x1) was active but unpublished: published to Online Store, Google & YouTube, Facebook & Instagram. Carousel creative 2649459332205342 (images 1,5,3,4 at 1536x1920, checked sharp, EN+AR, SHOP_NOW, url_tags): NEW ad 52566056394920, WARM ad 52566056404320. FB catalog picks it up automatically.
 
 - 2026-11-26 15:35 UTC check: burgundy quilted jacket sold within 1h of launch (#1420 2,110 with pomegranate studs, Maadi, NEW ad 52566056394920): paused both its ads. #1419 1,025 floral print open front jacket, New Cairo, via WARM jacket ad 52566056404320. Today 5 orders 9,085; NEW 148 / 1 pur, WARM 133 / 14 ATC / 1 pur, FB catalog 319 / 4 ATC / 1 pur.
+
+- 2026-11-26 18:35 UTC check: no new orders since #1420. NEW and WARM reached their 150 daily budgets; FB catalog 378 / 4 ATC / 1 pur. No ad issues.
