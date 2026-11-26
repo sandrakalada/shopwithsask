@@ -41,7 +41,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - Suggest sale prices (compare-at) and product reviews to the owner; never change prices without the owner.
 
 ## Google Ads (from 2026-11-24)
-- Live account: NEW 304-790-8933 "SWS | Shop With Sask" (EGP), API via login-customer-id 7821083519 (Sask Manager). Campaign #1 24547367896 PMax, EGP 250/day, high-end Cairo/Giza areas, women, 45+ excluded. Merchant Center 5869936766, GA4 556989735 (G-YFZL7VXZQE). GA4 purchase is the only primary conversion.
+- Live account: NEW 304-790-8933 "SWS | Shop With Sask" (EGP), API via login-customer-id 7821083519 (Sask Manager). Campaign #1 24547367896 PMax, EGP 100/day (from 2026-11-26; paid clicks tagged utm_term=google_ads_pmax), high-end Cairo/Giza areas, women, 45+ excluded. Merchant Center 5869936766, GA4 556989735 (G-YFZL7VXZQE). GA4 purchase is the only primary conversion.
 - OLD account 628-408-8654 is fully paused. Never delete it or touch its billing.
 - Only read and report; change campaign or conversion settings only when the owner asks. Never reconnect the Shopify Google & YouTube app, the Google tag, tokens or linked accounts. Details: notes/google-ads.md.
 
