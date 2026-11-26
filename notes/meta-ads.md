@@ -542,4 +542,26 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-25 06:35 UTC check: #1410 1,065 heart playing card handbag, Giza (pixel credits FB catalog test with 1 purchase; handbag now sold out, not in our ads, catalog drops it automatically). Today NEW 9 / 3 ATC, WARM 10, BAGS 2, FB test 24 / 2 ATC / 1 pur. CART RT 0 impressions this morning (small audience still filling).
 
 - 2026-11-25 09:35 UTC check: #1411 1,095 burgundy velvet mini skirt (FB catalog test, 1 left), #1412 885 retro geometric mini dress (no utm, now sold out, not in our ads). FB catalog test: 3 orders in ~22h (#1404, #1410 pixel, #1411) on ~220 EGP = best performer. Today NEW 28 / 5 ATC, WARM 128 / 2 ATC, BAGS 2 (low delivery), FB test 96 / 12 ATC / 2 pur, CART RT 8.
-2026-11-25 daily report: Nov 24 Meta 710 EGP (NEW 215, WARM 245, BAGS 74, FB catalog test 129, CART RT 47), 49 ATC; Meta counted 4 purchases (6,009) vs Shopify 2 Meta-paid orders (3,115). Shopify Nov 24: 4 orders 6,500 (incl. 1 Google Shopping 1,835, 1 direct). Last 7 days Meta 5,239 EGP, Shopify Meta-paid 8 kept (10,270, ROAS 1.96) + 3 cancelled (27%); prior 7 days 1. Today so far 4 orders 4,957. Nothing paused by this report.
+
+- 2026-11-25 owner "yes": FB catalog campaign 52565506125320 150 -> 250/day; NEW 52564976960720 250 -> 150/day. Total unchanged 840/day.
+
+- 2026-11-25 12:35 UTC check: no new orders since #1412. Today NEW 40 / 5 ATC, WARM 178 / 4 ATC, FB catalog 128 / 12 ATC / 2 pur, BAGS-ACC 1.75 (8 imp) and CART RT 8 (1 imp) barely delivering for 10h: flagged to owner. No ad issues.
+
+- 2026-11-25 15:35 UTC check: #1413 1,015 boho maxi skirt and #1414 1,015 colorblock windbreaker, both FB catalog. Today 5 orders 5,075, 4 from FB catalog (174 EGP spend). Windbreaker sold out (checked ads). BAGS-ACC 8 and CART RT 17 still barely delivering (decision pending with owner).
+
+- 2026-11-25 owner "yes": paused BAGS-ACC 52565323029320 and CART RT 52565583023520 (barely delivering); FB catalog campaign 52565506125320 250 -> 420/day. Total still 840/day (NEW 150, WARM 270, FB catalog 420).
+
+- 2026-11-25 18:35 UTC check: no new orders since #1414. Today NEW 89 / 5 ATC, WARM 220 / 6 ATC, FB catalog 235 / 18 ATC / 4 pur. No ad issues.
+
+- 2026-11-25 21:35 UTC check: no new orders since #1414. Today NEW 125 / 5 ATC, WARM 245 / 6 ATC, FB catalog 335 / 20 ATC / 4 pur. Spend cap 1,746 of 5,000 used (about 4 days left). No ad issues.
+
+- 2026-11-26 00:35 UTC check: no new orders; #1412 no longer listed (likely cancelled). Nov 25 (acct day) NEW 141 / 5 ATC, WARM 325 / 6 ATC / 0 orders, FB catalog 380 / 20 ATC / 4 orders. No ad issues.
+
+- 2026-11-26 03:35 UTC check: #1416 1,065 asymmetric ruffle skirt, New Cairo, FB catalog (skirt 1 left). New day just started. No ad issues. Warm budget shift still waiting on owner.
+
+- 2026-11-26 06:35 UTC check: no new orders since #1416. Today NEW 19, WARM 17 / 5 ATC, FB catalog 60 / 0 ATC so far. No ad issues.
+
+- 2026-11-26 owner "boost my winner ads for that 120": WARM 52564976965920 270 -> 150/day; FB catalog campaign 52565506125320 420 -> 540/day (7 orders in 2 days). Total 840/day: FB catalog 540, NEW 150, WARM 150.
+
+- 2026-11-26 09:35 UTC check: no new orders since #1416 (00:49 UTC). Today NEW 30 / 0 ATC, WARM 48 / 6 ATC, FB catalog 161 / 1 ATC (slow morning after budget raise). No ad issues.
+2026-11-26 daily report: Nov 25 Meta 919 EGP (FB catalog 408 / 21 ATC / Meta 5 pur; WARM 335 / 6 ATC / 0; NEW 148 / 5 ATC; BAGS 10; CART RT 17). Shopify Nov 25: 5 orders 6,102, Meta-paid 3 (3,125). Last 7 days Meta 5,464 EGP, Shopify Meta-paid 8 kept (9,400, ROAS 1.72) + 3 cancelled; prior 7 days 3. Live 840/day (owner). Nothing paused.
