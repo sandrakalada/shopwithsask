@@ -99,7 +99,7 @@ export default function AlertsPage() {
         }
       />
       <main className="mx-auto max-w-xl p-4 lg:max-w-3xl">
-        <p className="text-sm text-taupe">Customer replies from the WhatsApp order message.{unseen > 0 ? ` ${unseen} new.` : ""}</p>
+        <p className="text-sm text-taupe">WhatsApp replies, shipping updates, payment reminders and problems.{unseen > 0 ? ` ${unseen} new.` : ""}</p>
         {error && <p className="mt-4 text-center text-sm text-danger">{error}</p>}
         {days.map(([day, list]) => (
           <section key={day} className="mt-5">

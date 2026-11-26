@@ -281,7 +281,7 @@ function AlertsBell() {
   const role = useRole();
   if (role === "shipping") return null;
   return (
-    <Link href="/alerts" className="relative flex h-11 min-w-11 items-center justify-center rounded-full text-ink active:bg-sand" aria-label={unseen ? `WhatsApp alerts, ${unseen} new` : "WhatsApp alerts"}>
+    <Link href="/alerts" className="relative flex h-11 min-w-11 items-center justify-center rounded-full text-ink active:bg-sand" aria-label={unseen ? `Alerts, ${unseen} new` : "Alerts"}>
       <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15L6 16ZM10 20.5a2 2 0 0 0 4 0" />
       </svg>
