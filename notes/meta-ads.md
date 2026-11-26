@@ -576,3 +576,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-26 owner: NEW 52564976960720 and WARM 52564976965920 each +100 -> 250/day. Total Meta 1,040/day (FB catalog 540, NEW 250, WARM 250). Spend cap 2,600 of 5,000 used: about 2.3 days left.
 
 - 2026-11-26 owner "remove any sold-out product from the ads": audited all 88 active ads in NEW and WARM, 30 linked products, all in stock (sold-out ones were already paused: black velvet floral, black blazer, velvet gold, colorblock shirt jacket, burgundy quilted). FB catalog set filters in stock automatically. 3-hour check keeps doing this.
+
+- 2026-11-26 21:35 UTC check: #1421 1,495 (red/green earrings, pineapple handbag, multicolor necklace), Cairo, FB catalog. Today 6 orders 10,580. Spend NEW 181, WARM 180 / 21 ATC, FB catalog 436 / 9 ATC. Spending limit was reset by owner: 120 of 5,000 used (lasts to about Dec 1). Sold items not in NEW/WARM ads.
