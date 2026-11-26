@@ -22,7 +22,7 @@ type Alert = {
 };
 
 const tone = (kind: string) =>
-  kind === "Nok problem" ? "bg-red-50 text-red-700" : /^Nok: .*(undeliver|return|cancel|lost|damage|pending|refus)/i.test(kind) ? "bg-red-50 text-red-700" : /^Nok: Delivered/i.test(kind) ? "bg-emerald-100 text-emerald-800" : kind.startsWith("Nok") ? "bg-sky-50 text-sky-800" : kind.startsWith("Payment") ? "bg-amber-50 text-amber-800" :
+  kind === "Nok problem" ? "bg-red-50 text-red-700" : /^Nok: .*(undeliver|return|cancel|lost|damage|pending|refus|unsuccess|fail|attempt)/i.test(kind) ? "bg-red-50 text-red-700" : /^Nok: Delivered/i.test(kind) ? "bg-emerald-100 text-emerald-800" : kind.startsWith("Nok") ? "bg-sky-50 text-sky-800" : kind.startsWith("Payment") ? "bg-amber-50 text-amber-800" :
   kind.startsWith("Cancelled") ? "bg-red-50 text-red-700" : kind.startsWith("Change") ? "bg-amber-50 text-amber-800" : "bg-emerald-50 text-emerald-700";
 
 export default function AlertsPage() {

@@ -1,4 +1,5 @@
 import type { Shipment } from "./db";
+import { isDelivered } from "./nokStatus";
 
 /** Nok Courier price list (EGP, first kg). VAT 14% on top. Returns/cancellations: 70% of the delivery fee + VAT. */
 export const NOK_ZONES = {
@@ -38,7 +39,7 @@ export function stage(s: Shipment): Stage {
   if (/settled/.test(n)) return "settled";
   if (/lost|damage/.test(n)) return "lost";
   if (/undeliver|return|cancel|rto|refus/.test(n) || (!n && (s.status === "returned" || s.status === "cancelled"))) return "returned";
-  if ((/deliver/.test(n) && !/out for|ready for/.test(n)) || (!n && s.status === "delivered")) return "transfer";
+  if (isDelivered(n) || (!n && s.status === "delivered")) return "transfer";
   return "on_way";
 }
 

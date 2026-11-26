@@ -1,4 +1,5 @@
 import type { Order, Shipment } from "./db";
+import { isDelivered, isFailedAttempt, isOutForDelivery, isReturned } from "./nokStatus";
 
 export type StepState = "done" | "now" | "todo" | "bad" | "skip";
 export type Step = { key: string; label: string; state: StepState; note?: string; at?: string | null };
@@ -15,9 +16,10 @@ export function orderSteps(o: Order, sh?: Shipment | null): Step[] {
   const refused = has(o, /customer-cancel|wa-cancel|rejected/i);
   const shipped = !!sh || o.fulfillment_status === "FULFILLED";
   const moving = /transit|hub|out for|deliver|settled|cashier|operation|return/.test(n) || sh?.status === "picked_up" || sh?.status === "delivered";
-  const outFor = /out for|deliver|settled|cashier|operation/.test(n) && !/undeliver/.test(n) || sh?.status === "delivered";
-  const delivered = (/deliver|settled|cashier|operation/.test(n) && !/undeliver|out for|ready for/.test(n)) || sh?.status === "delivered";
-  const returned = /undeliver|return|refus|lost|damage/.test(n) || sh?.status === "returned";
+  const failed = isFailedAttempt(n);
+  const delivered = isDelivered(n) || (!n && sh?.status === "delivered");
+  const outFor = isOutForDelivery(n) || failed || delivered;
+  const returned = isReturned(n) || sh?.status === "returned";
   const paid = o.financial_status === "PAID" || /settled/.test(n);
 
   const fulfilled = o.fulfillment_status === "FULFILLED";
@@ -40,9 +42,10 @@ export function orderSteps(o: Order, sh?: Shipment | null): Step[] {
       { key: "shipment", label: `Shipment created${courier ? ` (${courier})` : ""}`, state: "done", note: sh.tracking ? `AWB ${sh.tracking}` : undefined, at: sh.created_at },
       { key: "transit", label: "In transit", state: moving ? "done" : "now" },
       { key: "out", label: "Out for delivery", state: outFor ? "done" : moving ? "now" : "todo" },
+      ...(failed && !delivered && !returned ? [{ key: "attempt", label: "Delivery attempt unsuccessful", state: "bad" as StepState, note: sh.nok_status ?? undefined }] : []),
       returned
         ? { key: "delivered", label: sh.nok_status ?? "Returned", state: "bad" }
-        : { key: "delivered", label: "Delivered", state: delivered ? "done" : outFor ? "now" : "todo" },
+        : { key: "delivered", label: "Delivered", state: delivered ? "done" : failed ? "now" : outFor ? "now" : "todo", note: failed && !delivered ? "Waiting for another attempt" : undefined },
     );
   } else if (personal) {
     steps.push({ key: "delivered", label: "Delivered personally", state: "done" });
@@ -75,6 +78,7 @@ export function orderStage(o: Order, sh?: Shipment | null): { text: string; tone
   if (!o.cancelled_at && o.fulfillment_status === "FULFILLED" && o.financial_status === "PAID") return { text: "Completed", tone: "bg-emerald-100 text-emerald-800" };
   const steps = orderSteps(o, sh);
   const bad = steps.find((s) => s.state === "bad");
+  // a failed delivery attempt is shown even if the order was marked fulfilled
   if (bad) return { text: bad.label, tone: "bg-red-50 text-red-700" };
   const delivered = steps.find((s) => s.key === "delivered")?.state === "done";
   // furthest step on the way to the customer; "Completed" only once delivered and paid

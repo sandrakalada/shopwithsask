@@ -830,7 +830,8 @@ function parseNok(html: string) {
 function appStatus(nok: string, current: string) {
   const n = nok.toLowerCase();
   if (/ready to return|returned|return/.test(n)) return "returned";
-  if (/deliver(ed)?\b/.test(n) && !/out for|undeliver|ready for/.test(n) || /settled|cashier|operation/.test(n)) return "delivered";
+  if (/unsuccess|failed|attempt|not delivered|postpon|reschedul/.test(n)) return "picked_up"; // failed attempt: still with the courier
+  if (/\bdelivered\b/.test(n) && !/out for|undeliver|ready for/.test(n) || /settled|cashier|operation/.test(n)) return "delivered";
   if (/out for delivery|transit|ready for delivery|hub|picked/.test(n)) return "picked_up";
   return current;
 }
@@ -1114,7 +1115,7 @@ async function settlementReminder() {
     const fee = NOK_FEES[nokZoneOf(s.recipient)] * 1.14;
     if (/settled|lost|damage/.test(st)) continue;
     if (/undeliver|return|cancel|rto|refus/.test(st)) { if (new Date(s.updated_at) >= lastMonday) { total -= fee * 0.7; n++; } continue; }
-    if (/deliver/.test(st) && !/out for|ready for/.test(st)) { total += Number(s.cod_amount ?? 0) - fee; n++; }
+    if (/\bdelivered\b|settled|cashier|operation/.test(st) && !/out for|ready for|unsuccess|failed|attempt|undeliver/.test(st)) { total += Number(s.cod_amount ?? 0) - fee; n++; }
   }
   const amount = Math.round(total);
   await admin.from("wa_alerts").insert({

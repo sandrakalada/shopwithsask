@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react";
 import { db, type Shipment } from "./db";
 import { alertStore } from "./alerts";
 import { lastMonday, stage } from "./settlement";
+import { isFailedAttempt } from "./nokStatus";
 
 const isNok = (s: Shipment) => /nok/i.test(s.courier) && /^\d{6,}$/.test(s.tracking);
 
@@ -14,6 +15,7 @@ export function shipmentProblem(s: Shipment): string | null {
   const n = (s.nok_status ?? "").toLowerCase();
   if (/lost|damage/.test(n)) return s.nok_status!;
   if (/undeliver|pending|refus/.test(n)) return `${s.nok_status}: needs your answer to Nok`;
+  if (isFailedAttempt(n)) return `${s.nok_status}: contact the customer`;
   if (isNok(s) && !s.awb_path) return "No shipping label yet";
   if (isNok(s) && !s.nok_status && Date.now() - new Date(s.created_at).getTime() > 3 * 3600_000) return "Nok status not read yet";
   if (s.order_id && !s.shopify_fulfilled) return "Not marked shipped in Shopify";
