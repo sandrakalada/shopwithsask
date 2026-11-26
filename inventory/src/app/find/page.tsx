@@ -3,12 +3,16 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/lib/db";
+import { db, type FindSearch } from "@/lib/db";
 import { variantLabel } from "@/lib/stock";
-import { indexNewPhotos, loadIndex, loadModel, rank, teach, watchModelProgress, type IndexItem } from "@/lib/vision";
+import { indexNewPhotos, loadIndex, loadModel, rankMulti, teach, watchModelProgress, type IndexItem } from "@/lib/vision";
+import { useSaved } from "@/lib/useSaved";
 import { Header, QtyPill, Thumb } from "@/components/ui";
 
 type Result = { productId: string; score: number; u: string };
+const MAX_PHOTOS = 3;
+const KEEP_DAYS = 10;
+const CURRENT = "sask-find-current";
 
 export default function FindPage() {
   // opened from Barcode stickers: a match goes back there with that product picked
@@ -20,12 +24,67 @@ export default function FindPage() {
   const [status, setStatus] = useState<string | null>("Getting ready");
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [photo, setPhoto] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [vectors, setVectors] = useState<Float32Array[]>([]);
   const [results, setResults] = useState<Result[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [type, setType] = useState("all");
-  const [query, setQuery] = useState<Float32Array | null>(null);
+  const [type, setType] = useSaved<string>("find-type", "all");
   const [taught, setTaught] = useState<string | null>(null);
+  const [searchId, setSearchId] = useState<string | null>(null);
+  const history = useLiveQuery(() => db.findHistory.orderBy("updated_at").reverse().toArray(), [], [] as FindSearch[]);
+
+  // come back to the last search (e.g. after opening a product and pressing Back); forget searches older than 10 days
+  useEffect(() => {
+    (async () => {
+      const cutoff = new Date(Date.now() - KEEP_DAYS * 86400_000).toISOString();
+      await db.findHistory.where("updated_at").below(cutoff).delete().catch(() => {});
+      let id: string | null = null;
+      try { id = localStorage.getItem(CURRENT); } catch {}
+      const s = id ? await db.findHistory.get(id) : undefined;
+      if (s) restore(s);
+    })();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function restore(s: FindSearch) {
+    setSearchId(s.id);
+    setPhotos(s.photos);
+    setVectors(s.vectors);
+    setResults(s.results);
+    setTaught(s.taught ?? null);
+    setError(null);
+    try { localStorage.setItem(CURRENT, s.id); } catch {}
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function save(next: Partial<FindSearch> & { photos: string[]; vectors: Float32Array[]; results: Result[] }) {
+    const now = new Date().toISOString();
+    const id = searchId ?? crypto.randomUUID();
+    const prev = searchId ? await db.findHistory.get(searchId) : undefined;
+    await db.findHistory.put({ id, created_at: prev?.created_at ?? now, updated_at: now, type, taught: taught ?? null, ...next });
+    setSearchId(id);
+    try { localStorage.setItem(CURRENT, id); } catch {}
+  }
+
+  function newSearch() {
+    setSearchId(null);
+    setPhotos([]);
+    setVectors([]);
+    setResults(null);
+    setTaught(null);
+    setError(null);
+    try { localStorage.removeItem(CURRENT); } catch {}
+  }
+
+  async function removePhoto(i: number) {
+    const ph = photos.filter((_, k) => k !== i);
+    const vs = vectors.filter((_, k) => k !== i);
+    setPhotos(ph);
+    setVectors(vs);
+    if (!vs.length) return newSearch();
+    const res = indexRef.current ? rankMulti(vs, filtered(indexRef.current), 8) : results ?? [];
+    setResults(res);
+    await save({ photos: ph, vectors: vs, results: res });
+  }
   const [dl, setDl] = useState<number | null>(null);
   const [step, setStep] = useState<string | null>(null);
   useEffect(() => {
@@ -84,11 +143,14 @@ export default function FindPage() {
     };
   }, [!!data]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function onPhoto(file: File | undefined) {
-    if (!file) return;
-    setError(null);
-    setResults(null);
-    setPhoto(URL.createObjectURL(file));
+  async function onPhotos(files: File[]) {
+    const room = MAX_PHOTOS - photos.length;
+    const list = files.slice(0, Math.max(0, room));
+    if (!list.length) {
+      if (files.length) setError(`Up to ${MAX_PHOTOS} photos per search. Remove one, or start a new search.`);
+      return;
+    }
+    setError(files.length > list.length ? `Only the first ${list.length} photo${list.length > 1 ? "s were" : " was"} added (up to ${MAX_PHOTOS}).` : null);
     setBusy(true);
     busyRef.current = true;
     setStatus(null);
@@ -96,12 +158,22 @@ export default function FindPage() {
       setStep(ready ? "Reading your photo" : "Getting the recognition ready, then reading your photo");
       const m = await loadModel();
       const index = indexRef.current ?? (indexRef.current = await loadIndex());
-      const q = await m.embed(await shrink(file));
+      const ph = [...photos];
+      const vs = [...vectors];
+      for (const [k, file] of list.entries()) {
+        setStep(`Reading photo ${ph.length + 1}${list.length > 1 ? ` (${k + 1} of ${list.length})` : ""}`);
+        const small = await shrink(file);
+        vs.push(await m.embed(small));
+        ph.push(await toDataUrl(await shrink(file, 360, 0.8)));
+      }
       setStep(`Comparing with ${new Set(index.map((i) => i.p)).size} products`);
       await new Promise((r) => setTimeout(r, 30));
-      setQuery(q);
+      const res = rankMulti(vs, filtered(index), 8);
+      setPhotos(ph);
+      setVectors(vs);
       setTaught(null);
-      setResults(rank(q, filtered(index), 8));
+      setResults(res);
+      await save({ photos: ph, vectors: vs, results: res, taught: null });
     } catch (e) {
       setError(`Could not read that photo (${(e as Error).message}). Try again, or choose the photo from your library.`);
     }
@@ -114,14 +186,19 @@ export default function FindPage() {
   // only compare with products of the chosen type
   const filtered = (index: IndexItem[]) => (type === "all" ? index : index.filter((it) => data?.pmap.get(it.p)?.product_type === type));
   useEffect(() => {
-    if (query && indexRef.current) setResults(rank(query, filtered(indexRef.current), 8));
-  }, [type]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (vectors.length && indexRef.current) {
+      const res = rankMulti(vectors, filtered(indexRef.current), 8);
+      setResults(res);
+      if (searchId) void db.findHistory.update(searchId, { results: res, type });
+    }
+  }, [type, ready]); // eslint-disable-line react-hooks/exhaustive-deps
   const types = [...new Set((data?.products ?? []).map((p) => p.product_type).filter(Boolean) as string[])].sort();
 
   async function confirm(pid: string) {
-    if (!query || !indexRef.current) return;
+    if (!vectors.length || !indexRef.current) return;
     setTaught(pid);
-    await teach(pid, query, indexRef.current);
+    if (searchId) void db.findHistory.update(searchId, { taught: pid });
+    for (const v of vectors) await teach(pid, v, indexRef.current);
   }
 
   const stockOf = (pid: string) => (data?.variants ?? []).filter((v) => v.product_id === pid && !v.archived);
@@ -132,22 +209,42 @@ export default function FindPage() {
       <main className="space-y-4 p-4 lg:grid lg:grid-cols-[360px_minmax(0,1fr)] lg:items-start lg:gap-6 lg:space-y-0">
         <section className="card space-y-3 p-4">
           <p className="text-sm text-taupe">Take a photo of the item out of the bag. The app compares it with every product photo and shows the closest matches.</p>
-          {photo ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={photo} alt="Your photo" className="mx-auto max-h-72 w-full rounded-xl object-contain bg-sand" />
+          {photos.length ? (
+            <div className="grid grid-cols-3 gap-2">
+              {photos.map((u, i) => (
+                <div key={i} className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={u} alt={`Your photo ${i + 1}`} className="aspect-[3/4] w-full rounded-xl bg-sand object-cover" />
+                  <button onClick={() => void removePhoto(i)} disabled={busy} className="absolute top-1 right-1 flex h-8 w-8 items-center justify-center rounded-full bg-black/55 text-white" aria-label={`Remove photo ${i + 1}`}>
+                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden><path d="M6 6l12 12M18 6 6 18" /></svg>
+                  </button>
+                </div>
+              ))}
+              {photos.length < MAX_PHOTOS && (
+                <button onClick={() => libRef.current?.click()} disabled={busy} className="flex aspect-[3/4] flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-line text-[13px] font-semibold text-taupe hover:bg-sand">
+                  <span className="text-2xl leading-none">+</span>Add photo
+                </button>
+              )}
+            </div>
           ) : (
-            <div className="flex aspect-[4/3] items-center justify-center rounded-xl bg-sand text-sm text-taupe">No photo yet</div>
+            <div className="flex aspect-[4/3] flex-col items-center justify-center gap-1 rounded-xl bg-sand text-center text-sm text-taupe">
+              <span>No photo yet</span>
+              <span className="text-xs">Add up to {MAX_PHOTOS} photos of the same item (front, back, detail) for a better match.</span>
+            </div>
           )}
           <div className="grid grid-cols-2 gap-2">
-            <button className="btn-dark" onClick={() => camRef.current?.click()} disabled={busy}>
+            <button className="btn-dark" onClick={() => camRef.current?.click()} disabled={busy || photos.length >= MAX_PHOTOS}>
               Take photo
             </button>
-            <button className="btn-light" onClick={() => libRef.current?.click()} disabled={busy}>
-              Choose photo
+            <button className="btn-light" onClick={() => libRef.current?.click()} disabled={busy || photos.length >= MAX_PHOTOS}>
+              Choose photos
             </button>
           </div>
-          <input ref={camRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => onPhoto(e.target.files?.[0])} />
-          <input ref={libRef} type="file" accept="image/*" className="hidden" onChange={(e) => onPhoto(e.target.files?.[0])} />
+          {photos.length > 0 && (
+            <button className="btn-plain w-full" onClick={newSearch} disabled={busy}>New search</button>
+          )}
+          <input ref={camRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => { void onPhotos([...(e.target.files ?? [])]); e.target.value = ""; }} />
+          <input ref={libRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => { void onPhotos([...(e.target.files ?? [])]); e.target.value = ""; }} />
           <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1">
             {["all", ...types].map((t) => (
               <button key={t} onClick={() => setType(t)} className={`chip text-[13px] ${type === t ? "chip-on" : ""}`}>
@@ -216,19 +313,53 @@ export default function FindPage() {
               })}
           </ul>
           {!!results?.length && !busy && <p className="mt-2 px-1 text-xs text-taupe">Green bar = how close the match is. Pick the type to narrow it down. Tap "This is it" on the right one (find it in Inventory if it is not listed): the app learns your photo, so next time it matches straight away.</p>}
+          {history.length > 0 && (
+            <>
+              <p className="section-title mt-5">Recent searches (last {KEEP_DAYS} days)</p>
+              <ul className="card divide-y divide-line overflow-hidden">
+                {history.slice(0, 30).map((h) => {
+                  const top = h.results[0] ? data?.pmap.get(h.results[0].productId) : undefined;
+                  const picked = h.taught ? data?.pmap.get(h.taught) : undefined;
+                  return (
+                    <li key={h.id} className="flex items-center">
+                      <button onClick={() => restore(h)} className={`row min-w-0 flex-1 text-left ${h.id === searchId ? "bg-cream" : ""}`}>
+                        <div className="flex shrink-0 -space-x-3">
+                          {h.photos.slice(0, 3).map((u, i) => (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img key={i} src={u} alt="" className="h-12 w-9 rounded-md border-2 border-surface object-cover" />
+                          ))}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold">{picked ? `${picked.title} (picked)` : top?.title ?? "No match"}</p>
+                          <p className="text-xs text-taupe">{new Date(h.updated_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })} · {h.photos.length} photo{h.photos.length > 1 ? "s" : ""}</p>
+                        </div>
+                      </button>
+                      <button onClick={() => { void db.findHistory.delete(h.id); if (h.id === searchId) newSearch(); }} className="mx-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-taupe hover:bg-sand" aria-label="Delete this search">
+                        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden><path d="M6 6l12 12M18 6 6 18" /></svg>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </>
+          )}
         </section>
       </main>
     </>
   );
 }
 
+async function toDataUrl(b: Blob) {
+  return new Promise<string>((ok) => { const r = new FileReader(); r.onload = () => ok(r.result as string); r.readAsDataURL(b); });
+}
+
 /** Phone photos are 12 MP; the model only needs 256 px, so shrink first (faster, less memory). */
-async function shrink(file: File): Promise<Blob> {
+async function shrink(file: File, max = 640, quality = 0.9): Promise<Blob> {
   const bmp = await createImageBitmap(file);
-  const s = Math.min(1, 640 / Math.max(bmp.width, bmp.height));
+  const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
   const c = document.createElement("canvas");
   c.width = Math.round(bmp.width * s);
   c.height = Math.round(bmp.height * s);
   c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
-  return new Promise((res) => c.toBlob((b) => res(b ?? file), "image/jpeg", 0.9));
+  return new Promise((res) => c.toBlob((b) => res(b ?? file), "image/jpeg", quality));
 }

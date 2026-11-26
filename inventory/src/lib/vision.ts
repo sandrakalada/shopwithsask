@@ -153,6 +153,21 @@ export function rank(q: Float32Array, index: IndexItem[], top = 6) {
     .slice(0, top);
 }
 
+/** Several photos of the same item (up to 3): each product's score is the average over the photos. */
+export function rankMulti(qs: Float32Array[], index: IndexItem[], top = 8) {
+  if (qs.length === 1) return rank(qs[0], index, top);
+  const all = qs.map((q) => new Map(rank(q, index, 100000).map((r) => [r.productId, r])));
+  const ids = new Set(all.flatMap((m) => [...m.keys()]));
+  return [...ids]
+    .map((id) => {
+      const rs = all.map((m) => m.get(id));
+      const score = rs.reduce((t, r) => t + (r?.score ?? 0), 0) / qs.length;
+      return { productId: id, u: rs.find((r) => r?.u)?.u ?? "", score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, top);
+}
+
 /** "This is it": remember this photo for that product, so similar photos match it next time. */
 export async function teach(productId: string, q: Float32Array, index: IndexItem[]) {
   const e = toB64(q);

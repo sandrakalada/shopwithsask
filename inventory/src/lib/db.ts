@@ -221,6 +221,19 @@ export const db = new Dexie("sask-inventory") as Dexie & {
   settings: EntityTable<Setting, "key">;
   shipments: EntityTable<Shipment, "id">;
   embeddings: EntityTable<Embedding, "url">;
+  findHistory: EntityTable<FindSearch, "id">;
+};
+
+/** A Find my product search, kept on this phone for 10 days. */
+export type FindSearch = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  photos: string[]; // small JPEG data URLs
+  vectors: Float32Array[];
+  type: string;
+  results: { productId: string; score: number; u: string }[];
+  taught?: string | null;
 };
 
 db.version(1).stores({
@@ -245,6 +258,10 @@ db.version(3).stores({
 
 db.version(4).stores({
   embeddings: "url, product_id",
+});
+
+db.version(5).stores({
+  findHistory: "id, updated_at",
 });
 
 export async function getMeta(key: string) {
