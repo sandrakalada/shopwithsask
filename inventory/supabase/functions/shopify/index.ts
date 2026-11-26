@@ -1336,6 +1336,11 @@ Deno.serve(async (req) => {
       if (cb.action === "create-order" && cb.sale) return json(await createOfflineOrder(cb.sale)); // orders placed for the owner from chat
       if (cb.action === "mark-paid" && cb.orderId) return json(await markOrderPaid(String(cb.orderId)));
       if (cb.action === "cancel-delete-order" && cb.orderId) return json(await cancelAndDeleteOrder(String(cb.orderId))); // only on the owner's confirmation
+      if (cb.action === "asset-upload-url" && typeof cb.path === "string" && /^(models|ort|ocr)\/[\w./-]+$/.test(cb.path) && !cb.path.includes("..")) { // app files moved out of each app update
+        const { data, error } = await admin.storage.from("app-assets").createSignedUploadUrl(cb.path, { upsert: true });
+        if (error) throw error;
+        return json({ url: data.signedUrl });
+      }
       if (cb.action === "nok-status") return json(await nokStatus().catch(async (e) => { await nokIssue(`Hourly Nok status check failed: ${String(e.message)}`); throw e; })); // hourly courier status check
       if (cb.action === "nok-api-check") return json(await nokApiCheck().catch((e) => ({ key: !!Deno.env.get("NOK_API_KEY"), error: String(e.message) })));
       if (cb.action === "nok-check") return json({ username: !!Deno.env.get("NOK_USERNAME"), password: !!Deno.env.get("NOK_PASSWORD"), login: await new NokSession().login().then(() => "ok", (e) => String(e.message)) });

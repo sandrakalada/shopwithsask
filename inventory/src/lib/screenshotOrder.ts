@@ -1,5 +1,7 @@
 "use client";
 
+import { ASSETS } from "./vision";
+
 import type { Product, Variant } from "./db";
 import { loadIndex, loadModel, rank, type IndexItem } from "./vision";
 
@@ -20,7 +22,7 @@ function ocrWorker() {
     return (await createWorker(["eng", "ara"], 1, {
       workerPath: "/ocr/worker.min.js",
       corePath: "/ocr/",
-      langPath: "/ocr/lang",
+      langPath: `${ASSETS}/ocr/lang`,
       gzip: true,
       workerBlobURL: false,
     })) as unknown as Worker;

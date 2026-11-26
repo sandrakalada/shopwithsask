@@ -21,6 +21,37 @@ export function watchModelProgress(cb: Progress | null) {
   onProgress = cb;
 }
 
+/** App files kept in storage instead of in every app update (recognition model, engine, text-reading languages). */
+export const ASSETS = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/app-assets`;
+const MODEL_FILE = "vision_model_q4f16.onnx";
+const MODEL_PARTS = [27000000, 26686874]; // stored in two parts (storage takes files up to 50 MB)
+
+/** Fetch for the model: the model file is joined back from its two parts, with download progress. */
+async function assetFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const url = String(input instanceof Request ? input.url : input);
+  if (!url.endsWith(MODEL_FILE)) return fetch(input, init);
+  const total = MODEL_PARTS.reduce((a, b) => a + b, 0);
+  const got = MODEL_PARTS.map(() => 0);
+  const chunks = await Promise.all(
+    MODEL_PARTS.map(async (_, i) => {
+      const res = await fetch(`${url}.part${i}`);
+      if (!res.ok || !res.body) throw new Error(`model part ${i + 1} could not download (${res.status})`);
+      const reader = res.body.getReader();
+      const parts: Uint8Array[] = [];
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        parts.push(value);
+        got[i] += value.length;
+        onProgress?.(Math.min(99, Math.round((got.reduce((a, b) => a + b, 0) / total) * 100)));
+      }
+      return new Blob(parts as BlobPart[]);
+    }),
+  );
+  const blob = new Blob(chunks);
+  return new Response(blob, { status: 200, headers: { "content-type": "application/octet-stream", "content-length": String(blob.size) } });
+}
+
 export function loadModel(): Promise<Model> {
   modelP ??= (async () => {
     try {
@@ -29,11 +60,14 @@ export function loadModel(): Promise<Model> {
     const T = await import("@huggingface/transformers");
     T.env.allowRemoteModels = false;
     T.env.allowLocalModels = true;
-    T.env.localModelPath = "/models/";
-    // load the engine straight from /ort (no blob scripts, so the security policy stays strict); the service worker keeps a copy
+    // the big files live in the app's file storage (not in every app update); the service worker keeps a copy for offline
+    T.env.localModelPath = `${ASSETS}/models/`;
+    (T.env as unknown as { useBrowserCache: boolean }).useBrowserCache = false;
+    (T.env as unknown as { fetch: typeof fetch }).fetch = assetFetch;
+    // the engine script stays in the app (no blob scripts, so the security policy stays strict); its .wasm comes from storage
     (T.env as unknown as { useWasmCache: boolean }).useWasmCache = false;
     const onnx = T.env.backends.onnx as unknown as { wasm: { wasmPaths: unknown; numThreads: number } };
-    onnx.wasm.wasmPaths = { mjs: "/ort/ort-wasm-simd-threaded.mjs", wasm: "/ort/ort-wasm-simd-threaded.wasm" };
+    onnx.wasm.wasmPaths = { mjs: "/ort/ort-wasm-simd-threaded.mjs", wasm: `${ASSETS}/ort/ort-wasm-simd-threaded.wasm` };
     onnx.wasm.numThreads = 1;
     const processor = await T.AutoProcessor.from_pretrained(MODEL);
     const files = new Map<string, number>();

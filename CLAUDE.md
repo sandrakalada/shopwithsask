@@ -65,3 +65,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - Nok prices (first kg, + 14% VAT): Cairo 80, Giza 82, Alex 85, Delta & Canal 88, North Coast 150, Upper Egypt & Red Sea 180; always count every parcel as 1 kg (never add extra kg charges). Cancelled/returned = 70% of the delivery fee + VAT. No pickup fee, no minimum, no cash collection fee. COD transferred every Monday, free. The app's Settlement page (src/lib/settlement.ts) computes: delivered = COD - fee x 1.14; returned = -(fee x 0.7 x 1.14).
 - Alerts: Monday reminder (cron sask-nok-payday, action settlement-reminder) with the expected transfer; red pop-up on cancelled/returning; green celebration pop-up on delivered.
 - How the Nok portal works (menus, COD = product price + delivery fee, pickups, statuses): notes/nok-courier-guide.md. The owner will add more steps later.
+
+## Inventory app hosting
+- Publish app updates in batches (not after every small change): each Vercel deployment counts toward the 10 GB free Deployment Storage.
+- Big static files are NOT in the app: the recognition model (2 parts, joined in src/lib/vision.ts), the ONNX .wasm and the OCR languages live in Supabase Storage public bucket "app-assets" (originals in asset-store/). Upload changes there (edge action asset-upload-url), never back into inventory/public.

@@ -86,6 +86,19 @@ self.addEventListener("fetch", (e) => {
     );
     return;
   }
+  // recognition model, engine and text-reading languages kept in file storage: downloaded once, then kept
+  if (url.pathname.includes("/storage/v1/object/public/app-assets/")) {
+    e.respondWith(
+      caches.open(AI).then(async (c) => {
+        const hit = await c.match(req.url);
+        if (hit) return hit;
+        const res = await fetch(req);
+        if (res.ok) c.put(req.url, res.clone());
+        return res;
+      }),
+    );
+    return;
+  }
   if (url.origin !== self.location.origin) return; // Supabase etc. go straight to the network
   if (url.pathname === "/version.json") return; // always from the network
 
