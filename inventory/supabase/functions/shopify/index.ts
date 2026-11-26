@@ -1336,23 +1336,8 @@ Deno.serve(async (req) => {
       if (cb.action === "mark-paid" && cb.orderId) return json(await markOrderPaid(String(cb.orderId)));
       if (cb.action === "cancel-delete-order" && cb.orderId) return json(await cancelAndDeleteOrder(String(cb.orderId))); // only on the owner's confirmation
       if (cb.action === "nok-status") return json(await nokStatus().catch(async (e) => { await nokIssue(`Hourly Nok status check failed: ${String(e.message)}`); throw e; })); // hourly courier status check
-      if (cb.action === "nok-api-get" && typeof cb.path === "string" && /^\/(governorates|product-types|subaccounts|draft-shipments|shipment)\b/.test(cb.path)) return json(await nokApi(cb.path)); // read-only
-      if (cb.action === "awb-upload-url" && /^[0-9a-f-]{36}$/.test(String(cb.id))) {
-        const { data, error } = await admin.storage.from("awb").createSignedUploadUrl(`${cb.id}.pdf`, { upsert: true });
-        if (error) throw error;
-        return json({ url: data.signedUrl });
-      }
-      if (cb.action === "nok-grep" && typeof cb.path === "string" && cb.path.startsWith("/") && typeof cb.pattern === "string") { // read-only
-        const ses = new NokSession(); await ses.login();
-        const pg = await ses.get(cb.path);
-        const re = new RegExp(cb.pattern, "gi");
-        const hits: string[] = [];
-        for (const m of pg.html.matchAll(re)) { hits.push(pg.html.slice(Math.max(0, m.index! - 300), m.index! + 300)); if (hits.length >= 12) break; }
-        return json({ status: pg.status, hits });
-      }
       if (cb.action === "nok-api-check") return json(await nokApiCheck().catch((e) => ({ key: !!Deno.env.get("NOK_API_KEY"), error: String(e.message) })));
       if (cb.action === "nok-check") return json({ username: !!Deno.env.get("NOK_USERNAME"), password: !!Deno.env.get("NOK_PASSWORD"), login: await new NokSession().login().then(() => "ok", (e) => String(e.message)) });
-      if (cb.action === "nok-page" && typeof cb.path === "string" && cb.path.startsWith("/")) return json(await nokPage(cb.path, Number(cb.from ?? 0), Number(cb.len ?? 3000)));
       if (cb.action === "settlement-reminder") return json(await settlementReminder()); // Monday transfer reminder
       if (cb.action === "fulfill-order" && cb.orderId) return json(await fulfillOrder(String(cb.orderId), cb.tracking ?? {}));
       const fx = await updateRate().catch((e) => ({ error: String(e) }));
