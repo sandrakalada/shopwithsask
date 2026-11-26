@@ -554,3 +554,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-25 18:35 UTC check: no new orders since #1414. Today NEW 89 / 5 ATC, WARM 220 / 6 ATC, FB catalog 235 / 18 ATC / 4 pur. No ad issues.
 
 - 2026-11-25 21:35 UTC check: no new orders since #1414. Today NEW 125 / 5 ATC, WARM 245 / 6 ATC, FB catalog 335 / 20 ATC / 4 pur. Spend cap 1,746 of 5,000 used (about 4 days left). No ad issues.
+
+- 2026-11-26 00:35 UTC check: no new orders; #1412 no longer listed (likely cancelled). Nov 25 (acct day) NEW 141 / 5 ATC, WARM 325 / 6 ATC / 0 orders, FB catalog 380 / 20 ATC / 4 orders. No ad issues.
