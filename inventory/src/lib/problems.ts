@@ -11,6 +11,24 @@ const isNok = (s: Shipment) => /nok/i.test(s.courier) && /^\d{6,}$/.test(s.track
 
 /** What is wrong with a shipment, in a few words (null = fine). */
 export function shipmentProblem(s: Shipment): string | null {
+  const p = rawProblem(s);
+  // seen by the owner (alert read or closed): no red flag until something new happens
+  return p && s.problem_ack === p ? null : p;
+}
+
+/** Marks a shipment's current problem as seen. */
+export async function ackShipmentProblems(orderIds: (string | null | undefined)[]) {
+  const { saveShipment } = await import("./shipments");
+  for (const id of orderIds) {
+    if (!id) continue;
+    for (const s of await db.shipments.where("order_id").equals(String(id)).toArray()) {
+      const p = rawProblem(s);
+      if (p && s.problem_ack !== p) await saveShipment({ ...s, problem_ack: p });
+    }
+  }
+}
+
+function rawProblem(s: Shipment): string | null {
   if (s.status === "cancelled") return null;
   const n = (s.nok_status ?? "").toLowerCase();
   if (/lost|damage/.test(n)) return s.nok_status!;

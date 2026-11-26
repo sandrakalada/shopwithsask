@@ -173,6 +173,8 @@ export type Shipment = {
   nok_status?: string | null;
   nok_location?: string | null;
   nok_checked_at?: string | null;
+  /** problem the owner already saw (cleared from the red flags until the status changes) */
+  problem_ack?: string | null;
   created_by?: string | null;
   created_at: string;
   updated_at: string;

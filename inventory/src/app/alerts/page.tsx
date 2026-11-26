@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 import { Header, timeAgo } from "@/components/ui";
 import { checkAlerts, clearUnseen } from "@/lib/alerts";
+import { ackShipmentProblems } from "@/lib/problems";
 
 /** WhatsApp order flow alerts: confirmations, Instapay, cancellations and change requests (saved by the flow app). */
 type Alert = {
@@ -49,6 +50,7 @@ export default function AlertsPage() {
   // X: the alert is closed (read and removed from the list) on every device
   const close = async (a: Alert) => {
     setRows((rs) => rs!.filter((r) => r.id !== a.id));
+    void ackShipmentProblems([a.order_id]);
     const { error: e } = await supabase!.from("wa_alerts").update({ seen: true, hidden: true }).eq("id", a.id);
     if (e) { setError("Could not close the alert. Try again."); void load(); }
     void checkAlerts();
@@ -59,6 +61,7 @@ export default function AlertsPage() {
     if (!a.seen && supabase) {
       setRows((rs) => rs!.map((r) => (r.id === a.id ? { ...r, seen: true } : r)));
       void supabase.from("wa_alerts").update({ seen: true }).eq("id", a.id).then(() => checkAlerts());
+      void ackShipmentProblems([a.order_id]);
     }
     if (a.kind.startsWith("Payment")) return router.push("/settlement");
     if (a.kind === "Nok problem" && !a.order_id && !/^#\d/.test(a.order_name)) return router.push("/shipments");
@@ -71,6 +74,7 @@ export default function AlertsPage() {
   const markAllSeen = async () => {
     if (!supabase || !unseen) return;
     const ids = rows!.filter((r) => !r.seen).map((r) => r.id);
+    void ackShipmentProblems(rows!.filter((r) => !r.seen).map((r) => r.order_id));
     setRows((rs) => rs!.map((r) => ({ ...r, seen: true })));
     clearUnseen();
     await supabase.from("wa_alerts").update({ seen: true }).in("id", ids);
