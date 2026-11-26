@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -26,7 +28,7 @@ const GROUPS: { key: string; title: string; note: string; test: (r: Row) => bool
 
 export default function SettlementPage() {
   const ships = useLiveQuery(() => db.shipments.toArray(), []);
-  const [month, setMonth] = useState(0);
+  const [month, setMonth] = useSaved<number>("settlement-month", 0, null, "session");
 
   const rows = useMemo<Row[]>(() => {
     const lm = lastMonday().getTime();

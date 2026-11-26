@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import Link from "next/link";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, WRITE_OFF } from "@/lib/db";
@@ -26,7 +28,7 @@ export default function Home() {
   const firstName = useFirstName();
   const problems = useProblems();
   // 0 = this month, -1 = last month, ...
-  const [monthOffset, setMonthOffset] = useState(0);
+  const [monthOffset, setMonthOffset] = useSaved<number>("home-month", 0, null, "session");
   const shown = new Date(new Date().getFullYear(), new Date().getMonth() + monthOffset, 1);
   const data = useLiveQuery(async () => {
     const [products, variants, rateRow, orders] = await Promise.all([

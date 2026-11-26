@@ -22,7 +22,7 @@ const FILTERS: [Filter, string][] = [["active", "Open"], ["ready", "Created"], [
 export default function ShipmentsPage() {
   const router = useRouter();
   const [f, setF] = useSaved<Filter>("tracking-filter", "active");
-  const [q, setQ] = useState("");
+  const [q, setQ] = useSaved<string>("shipments-q", "", null, "session");
   const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);
   const all = useLiveQuery(() => db.shipments.orderBy("created_at").reverse().toArray(), []);
 

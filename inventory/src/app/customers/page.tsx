@@ -16,7 +16,7 @@ type Sort = "recent" | "spent" | "orders";
 
 export default function Customers() {
   const router = useRouter();
-  const [q, setQ] = useState("");
+  const [q, setQ] = useSaved<string>("customers-q", "", null, "session");
   const [sort, setSort] = useSaved<Sort>("customers-sort", "recent");
   const customers = useLiveQuery(() => db.customers.toArray(), [], []);
 

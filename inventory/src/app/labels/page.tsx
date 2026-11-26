@@ -98,7 +98,7 @@ function Labels() {
   const [savedScope, setSavedScope] = useSaved<"instock" | "all">("labels-scope", "instock");
   useEffect(() => { if (!variantId && !productId) setScopeRaw(savedScope); }, [savedScope, variantId, productId]);
   const setScope = (v: "one" | "product" | "instock" | "all") => { setScopeRaw(v); if (v === "instock" || v === "all") setSavedScope(v); };
-  const [q, setQ] = useState("");
+  const [q, setQ] = useSaved<string>("labels-q", "", null, "session");
   const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);
   const [file, setFile] = useState<{ sig: string; pdf: Blob } | null>(null);

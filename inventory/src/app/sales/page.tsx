@@ -18,7 +18,7 @@ type Sort = "date" | "total" | "profit";
 function SalesList() {
   const p = useSearchParams();
   const year = p.get("y") === "1";
-  const [offset, setOffset] = useState(Number(p.get("m") ?? 0) || 0);
+  const [offset, setOffset] = useSaved<number>("sales-month", 0, p.get("m") != null ? Number(p.get("m")) || 0 : null, "session");
   const [sort, setSort] = useSaved<Sort>("sales-sort", "date");
   const now = new Date();
   const start = year ? new Date(now.getFullYear(), 0, 1) : new Date(now.getFullYear(), now.getMonth() + offset, 1);

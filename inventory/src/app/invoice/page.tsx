@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -271,17 +273,17 @@ function InvoiceBuilder({ customerId, editId, fromOrder: fromOrderId }: { custom
   const [discount, setDiscount] = useState("");
   const [payment, setPayment] = useState("Cash on delivery");
   const [note, setNote] = useState("");
-  const [lang, setLang] = useState<"en" | "ar">("en");
+  const [lang, setLang] = useSaved<"en" | "ar">("invoice-lang", "en");
   const [search, setSearch] = useState("");
   const [custQ, setCustQ] = useState("");
   const [orderQ, setOrderQ] = useState("");
   const [linkedOrder, setLinkedOrder] = useState<Order | null>(null);
   const [editing, setEditing] = useState<Invoice | null>(null);
   // offline sale options
-  const [record, setRecord] = useState(true);
+  const [record, setRecord] = useSaved<boolean>("invoice-record", true);
   const [paid, setPaid] = useState(false);
   const [handedOver, setHandedOver] = useState(false);
-  const [deduct, setDeduct] = useState(true);
+  const [deduct, setDeduct] = useSaved<boolean>("invoice-deduct", true);
   const [custom, setCustom] = useState({ title: "", price: "" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

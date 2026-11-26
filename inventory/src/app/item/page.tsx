@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -26,7 +28,7 @@ function Item() {
     return main?.id ?? null;
   }, [rawId]);
   const id = alias ?? rawId;
-  const [colour, setColour] = useState<string>(params.get("colour") ?? "all");
+  const [colour, setColour] = useSaved<string>(`item-colour-${params.get("id") ?? ""}`, "all", params.get("colour"), "session");
   useEffect(() => {
     if (alias) setColour("Beige");
   }, [alias]);
@@ -44,7 +46,7 @@ function Item() {
   );
   const [sheet, setSheet] = useState<{ v: Variant; r: Reason } | null>(null);
   const [edit, setEdit] = useState<Variant | "new" | "product" | null>(null);
-  const [showHistory, setShowHistory] = useState(false);
+  const [showHistory, setShowHistory] = useSaved<boolean>("item-history", false);
   const [toast, setToast] = useState<string | null>(null);
   const pend = usePending();
 

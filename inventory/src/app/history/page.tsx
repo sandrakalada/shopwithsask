@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -16,7 +18,7 @@ export default function HistoryPage() {
 }
 
 function History() {
-  const [reason, setReason] = useState(useSearchParams().get("reason") ?? "all");
+  const [reason, setReason] = useSaved<string>("history-reason", "all", useSearchParams().get("reason"));
   const data = useLiveQuery(async () => {
     const [products, variants, moves] = await Promise.all([
       db.products.toArray(),

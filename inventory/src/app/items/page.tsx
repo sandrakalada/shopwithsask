@@ -26,7 +26,7 @@ function Inventory() {
   const router = useRouter();
   const assign = params.get("assign");
   const [view, setView] = useSaved<View>("items-view", "stock", params.get("view") as View | null);
-  const [q, setQ] = useState("");
+  const [q, setQ] = useSaved<string>("items-q", "", null, "session");
   const [filter, setFilter] = useSaved<Filter>("items-filter", "all", params.get("filter") as Filter | null);
   const [type, setType] = useSaved<string>("items-type", "all");
   const [bag, setBag] = useSaved<string>("items-bag", "all");

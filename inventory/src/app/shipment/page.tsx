@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -35,7 +37,7 @@ function ShipmentForm({ orderId, editing, onDone }: { orderId?: string | null; e
   const router = useRouter();
   const order = useLiveQuery(async () => (orderId ? (await db.orders.get(orderId)) ?? null : null), [orderId]);
   const [s, setS] = useState<Shipment | null>(editing ?? (orderId ? null : newManualShipment()));
-  const [toShopify, setToShopify] = useState(true);
+  const [toShopify, setToShopify] = useSaved<boolean>("shipment-shopify", true);
   const [notify, setNotify] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);

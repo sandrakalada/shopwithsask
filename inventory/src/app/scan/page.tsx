@@ -1,5 +1,7 @@
 "use client";
 
+import { useSaved } from "@/lib/useSaved";
+
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -35,7 +37,7 @@ function beep(ok: boolean) {
 
 export default function ScanPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>("lookup");
+  const [mode, setMode] = useSaved<Mode>("scan-mode", "lookup");
   const [found, setFound] = useState<{ v: Variant; p?: Product } | null>(null);
   const [sheet, setSheet] = useState<Reason | null>(null);
   const [unknown, setUnknown] = useState<string | null>(null);
