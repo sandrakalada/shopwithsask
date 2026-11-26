@@ -564,3 +564,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-26 owner "boost my winner ads for that 120": WARM 52564976965920 270 -> 150/day; FB catalog campaign 52565506125320 420 -> 540/day (7 orders in 2 days). Total 840/day: FB catalog 540, NEW 150, WARM 150.
 
 - 2026-11-26 09:35 UTC check: no new orders since #1416 (00:49 UTC). Today NEW 30 / 0 ATC, WARM 48 / 6 ATC, FB catalog 161 / 1 ATC (slow morning after budget raise). No ad issues.
+
+- 2026-11-26 12:35 UTC check: #1417 1,635 colorblock shirt jacket, Haram, from NEW ad 52565275285920; #1418 3,250 black velvet gold jacket + embroidered boho jacket, Nasr City (no utm; pixel credits FB catalog). Colorblock shirt jacket and velvet gold jacket sold out: paused their ads. Today NEW 74 / 2 ATC / 1 pur, WARM 63 / 6 ATC, FB catalog 242 / 3 ATC / 1 pur.
