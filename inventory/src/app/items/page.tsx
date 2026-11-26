@@ -25,11 +25,11 @@ function Inventory() {
   const params = useSearchParams();
   const router = useRouter();
   const assign = params.get("assign");
-  const [view, setView] = useState<View>((params.get("view") as View) ?? "stock");
+  const [view, setView] = useSaved<View>("items-view", "stock", params.get("view") as View | null);
   const [q, setQ] = useState("");
   const [filter, setFilter] = useSaved<Filter>("items-filter", "all", params.get("filter") as Filter | null);
-  const [type, setType] = useState("all");
-  const [bag, setBag] = useState("all");
+  const [type, setType] = useSaved<string>("items-type", "all");
+  const [bag, setBag] = useSaved<string>("items-bag", "all");
   // sort order, remembered per view on this phone
   const [sort, setSortState] = useState<string>("newest");
   useEffect(() => {
@@ -46,9 +46,11 @@ function Inventory() {
   const [toast, setToast] = useState<string | null>(null);
   // menu links such as /items?view=top switch the view even when already on this page
   useEffect(() => {
-    setView((params.get("view") as View) ?? "stock");
-    setFilter((params.get("filter") as Filter) ?? "all");
-  }, [params]);
+    const v = params.get("view") as View | null;
+    const f = params.get("filter") as Filter | null;
+    if (v) setView(v);
+    if (f) setFilter(f);
+  }, [params]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const data = useLiveQuery(async () => {
     const [products, variants, rate] = await Promise.all([db.products.toArray(), db.variants.toArray(), db.settings.get("sar_to_egp")]);

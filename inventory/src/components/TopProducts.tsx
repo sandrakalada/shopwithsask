@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useSaved } from "@/lib/useSaved";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db";
 import { costInEgp } from "@/lib/stock";
@@ -14,9 +15,9 @@ type Sort = "units" | "revenue" | "profit" | "through";
 
 /** Products ranked by sales from Shopify orders. Real revenue = orders that are fulfilled AND paid. */
 export default function TopProducts() {
-  const [period, setPeriod] = useState<Period>(90);
-  const [sort, setSort] = useState<Sort>("units");
-  const [realOnly, setRealOnly] = useState(true);
+  const [period, setPeriod] = useSaved<Period>("top-period", 90);
+  const [sort, setSort] = useSaved<Sort>("top-sort", "units");
+  const [realOnly, setRealOnly] = useSaved<boolean>("top-real", true);
 
   const data = useLiveQuery(async () => {
     const [orders, products, variants, rateRow] = await Promise.all([db.orders.toArray(), db.products.toArray(), db.variants.toArray(), db.settings.get("sar_to_egp")]);
