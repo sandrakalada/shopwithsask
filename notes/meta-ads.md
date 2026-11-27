@@ -594,3 +594,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-27 15:35 UTC check: #1427 2,490 (tunic + 2 boho maxi skirts, New Cairo, sag_organic), #1428 575 necklace (FB catalog), #1429 1,135 embroidered boho jacket (FB catalog), #1430 1,065 chevron windbreaker (no utm). Embroidered boho jacket sold out: paused its post ads in NEW and WARM. Today 7 orders 8,260. Spend NEW 102 / 0 ATC, WARM 116 / 3 ATC, FB catalog 401 / 16 ATC / 7 pur.
 
 - 2026-11-27 18:35 UTC check: no new orders since #1430. Today NEW 130 / 2 ATC, WARM 129 / 3 ATC, FB catalog 500 / 16 ATC / 7 pur. Spend limit 1,025 of 5,000 used. No ad issues.
+
+- 2026-11-27 21:35 UTC check: no new orders since #1430 (17:00 Cairo). Today NEW 165 / 2 ATC, WARM 142 / 3 ATC, FB catalog 580 / 17 ATC / 7 pur. No ad issues.
