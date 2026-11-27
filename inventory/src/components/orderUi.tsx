@@ -35,9 +35,19 @@ export function StatusPills({ o }: { o: Order }) {
 }
 
 /** Shopify tags worth seeing (internal import tags hidden). */
-export const showTags = (o: Order) => (o.tags ?? []).filter((t) => !/^(original-date-|status-|imported)/i.test(t));
+export const showTags = (o: Order) => {
+  const tags = o.tags ?? [];
+  const wa = waStatus(o);
+  const rest = tags.filter((t) => !/^(original-date-|status-|imported|wa-(sent|delivered|read|failed)$)/i.test(t));
+  return wa ? [wa, ...rest] : rest;
+};
+/** WhatsApp confirmation message status from the wa-* tags (best one wins). */
+export const waStatus = (o: Order) => {
+  const has = (t: string) => (o.tags ?? []).some((x) => x.toLowerCase() === t);
+  return has("wa-failed") ? "WhatsApp failed" : has("wa-read") ? "WhatsApp read" : has("wa-delivered") ? "WhatsApp delivered" : has("wa-sent") ? "WhatsApp sent" : null;
+};
 const tagTone = (t: string) =>
-  /confirm|verified/i.test(t) ? "bg-emerald-50 text-emerald-700" : /change|request/i.test(t) ? "bg-amber-50 text-amber-800" : /cancel|reject|fake/i.test(t) ? "bg-red-50 text-red-700" : "bg-sand text-taupe";
+  t === "WhatsApp read" ? "bg-sky-50 text-sky-700" : t === "WhatsApp failed" ? "bg-red-50 text-red-700" : /^WhatsApp/.test(t) ? "bg-sand text-taupe" : /confirm|verified/i.test(t) ? "bg-emerald-50 text-emerald-700" : /change|request/i.test(t) ? "bg-amber-50 text-amber-800" : /cancel|reject|fake/i.test(t) ? "bg-red-50 text-red-700" : "bg-sand text-taupe";
 
 function Pill({ cls, children }: { cls: string; children: React.ReactNode }) {
   return <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${cls}`}>{children}</span>;

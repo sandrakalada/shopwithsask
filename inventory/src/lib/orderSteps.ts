@@ -10,7 +10,7 @@ const has = (o: Order, re: RegExp) => (o.tags ?? []).some((t) => re.test(t));
 export function orderSteps(o: Order, sh?: Shipment | null): Step[] {
   const n = (sh?.nok_status ?? "").toLowerCase();
   const cancelled = !!o.cancelled_at;
-  const sent = has(o, /^wa-sent$/i) || has(o, /confirm|verified|change|cancel/i);
+  const sent = has(o, /^wa-(sent|delivered|read)$/i) || has(o, /confirm|verified|change|cancel/i);
   const confirmed = has(o, /cod-confirmed|confirmed|akeed: verified/i);
   const change = has(o, /change-requested/i);
   const refused = has(o, /customer-cancel|wa-cancel|rejected/i);
@@ -29,7 +29,7 @@ export function orderSteps(o: Order, sh?: Shipment | null): Step[] {
 
   const steps: Step[] = [
     { key: "placed", label: "Order placed", state: "done", at: o.created_at },
-    { key: "sent", label: "Confirmation sent on WhatsApp", state: sent ? "done" : "todo" },
+    { key: "sent", label: has(o, /^wa-read$/i) ? "Confirmation read on WhatsApp" : has(o, /^wa-delivered$/i) ? "Confirmation delivered on WhatsApp" : has(o, /^wa-failed$/i) ? "WhatsApp message failed" : "Confirmation sent on WhatsApp", state: sent ? "done" : has(o, /^wa-failed$/i) ? "bad" : "todo" },
     {
       key: "confirmed",
       label: refused ? "Customer cancelled" : change && !confirmed ? "Customer asked for a change" : "Customer confirmed",
@@ -89,7 +89,7 @@ export function orderStage(o: Order, sh?: Shipment | null): { text: string; tone
   const done = steps.filter((s) => s.state === "done" && (s.key !== "paid" || delivered)).pop()!;
   const map: Record<string, [string, string]> = {
     placed: ["New order", "bg-sand text-taupe"],
-    sent: ["Waiting for customer", "bg-amber-50 text-amber-800"],
+    sent: [has(o, /^wa-read$/i) ? "Read, waiting for reply" : "Waiting for customer", "bg-amber-50 text-amber-800"],
     confirmed: ["Confirmed", "bg-emerald-50 text-emerald-700"],
     shipment: ["Shipment created", "bg-sky-50 text-sky-800"],
     transit: ["In transit", "bg-sky-50 text-sky-800"],
