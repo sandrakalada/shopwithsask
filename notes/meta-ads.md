@@ -564,4 +564,26 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-26 owner "boost my winner ads for that 120": WARM 52564976965920 270 -> 150/day; FB catalog campaign 52565506125320 420 -> 540/day (7 orders in 2 days). Total 840/day: FB catalog 540, NEW 150, WARM 150.
 
 - 2026-11-26 09:35 UTC check: no new orders since #1416 (00:49 UTC). Today NEW 30 / 0 ATC, WARM 48 / 6 ATC, FB catalog 161 / 1 ATC (slow morning after budget raise). No ad issues.
-2026-11-26 daily report: Nov 25 Meta 919 EGP (FB catalog 408 / 21 ATC / Meta 5 pur; WARM 335 / 6 ATC / 0; NEW 148 / 5 ATC; BAGS 10; CART RT 17). Shopify Nov 25: 5 orders 6,102, Meta-paid 3 (3,125). Last 7 days Meta 5,464 EGP, Shopify Meta-paid 8 kept (9,400, ROAS 1.72) + 3 cancelled; prior 7 days 3. Live 840/day (owner). Nothing paused.
+
+- 2026-11-26 12:35 UTC check: #1417 1,635 colorblock shirt jacket, Haram, from NEW ad 52565275285920; #1418 3,250 black velvet gold jacket + embroidered boho jacket, Nasr City (no utm; pixel credits FB catalog). Colorblock shirt jacket and velvet gold jacket sold out: paused their ads. Today NEW 74 / 2 ATC / 1 pur, WARM 63 / 6 ATC, FB catalog 242 / 3 ATC / 1 pur.
+
+- 2026-11-26 owner: new product Burgundy Quilted Frog-Button Jacket (1,950, Small x1) was active but unpublished: published to Online Store, Google & YouTube, Facebook & Instagram. Carousel creative 2649459332205342 (images 1,5,3,4 at 1536x1920, checked sharp, EN+AR, SHOP_NOW, url_tags): NEW ad 52566056394920, WARM ad 52566056404320. FB catalog picks it up automatically.
+
+- 2026-11-26 15:35 UTC check: burgundy quilted jacket sold within 1h of launch (#1420 2,110 with pomegranate studs, Maadi, NEW ad 52566056394920): paused both its ads. #1419 1,025 floral print open front jacket, New Cairo, via WARM jacket ad 52566056404320. Today 5 orders 9,085; NEW 148 / 1 pur, WARM 133 / 14 ATC / 1 pur, FB catalog 319 / 4 ATC / 1 pur.
+
+- 2026-11-26 18:35 UTC check: no new orders since #1420. NEW and WARM reached their 150 daily budgets; FB catalog 378 / 4 ATC / 1 pur. No ad issues.
+
+- 2026-11-26 owner: NEW 52564976960720 and WARM 52564976965920 each +100 -> 250/day. Total Meta 1,040/day (FB catalog 540, NEW 250, WARM 250). Spend cap 2,600 of 5,000 used: about 2.3 days left.
+
+- 2026-11-26 owner "remove any sold-out product from the ads": audited all 88 active ads in NEW and WARM, 30 linked products, all in stock (sold-out ones were already paused: black velvet floral, black blazer, velvet gold, colorblock shirt jacket, burgundy quilted). FB catalog set filters in stock automatically. 3-hour check keeps doing this.
+
+- 2026-11-26 21:35 UTC check: #1421 1,495 (red/green earrings, pineapple handbag, multicolor necklace), Cairo, FB catalog. Today 6 orders 10,580. Spend NEW 181, WARM 180 / 21 ATC, FB catalog 436 / 9 ATC. Spending limit was reset by owner: 120 of 5,000 used (lasts to about Dec 1). Sold items not in NEW/WARM ads.
+
+- 2026-11-27 00:35 UTC check: #1422 1,835 burgundy kimono blouse + floral vest (6 October) and #1423 1,015 boho maxi skirt (Cairo), both FB catalog. Nov 26 total 8 orders 13,430; FB catalog 514 spend / 3 pixel purchases. Spend limit 225 of 5,000 used since owner reset. Sold items not in NEW/WARM ads.
+
+- 2026-11-27 03:35 UTC check: new account day just started, quiet overnight, no new orders since #1423, no ad issues.
+
+- 2026-11-27 06:35 UTC check: quiet Friday morning, 44 EGP spent, no orders yet today, no ad issues.
+
+- 2026-11-27 09:35 UTC check: #1424 885 boho floral patchwork cardigan, Heliopolis, FB catalog (now sold out, not in NEW/WARM ads); #1425 1,015 boho maxi skirt, Cairo, no utm (8 left). Today NEW 25, WARM 48, FB catalog 111 / 4 ATC / 1 pur. No ad issues.
+2026-11-27 daily report: Nov 26 Meta 941 EGP (FB catalog 527 / Meta 4 pur; NEW 226 / 2 pur; WARM 188 / 21 ATC / 1 pur). Meta counted 7 (12,365) vs Shopify 5 Meta-paid (7,330); store 6 orders 10,580 (best day). Last 7 days Meta 5,346 EGP, Shopify Meta-paid 12 kept (15,715, ROAS 2.94) + 3 cancelled (20%); prior 7 days 4. Today so far 4 Meta-paid orders 4,750. Nothing paused.
