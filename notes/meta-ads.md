@@ -586,3 +586,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-27 06:35 UTC check: quiet Friday morning, 44 EGP spent, no orders yet today, no ad issues.
 
 - 2026-11-27 09:35 UTC check: #1424 885 boho floral patchwork cardigan, Heliopolis, FB catalog (now sold out, not in NEW/WARM ads); #1425 1,015 boho maxi skirt, Cairo, no utm (8 left). Today NEW 25, WARM 48, FB catalog 111 / 4 ATC / 1 pur. No ad issues.
+
+- 2026-11-27 owner asked about sold-out items in ads: burgundy velvet mini skirt sold out, paused its resurfaced post ads in NEW and WARM. All other 29 linked products in stock.
