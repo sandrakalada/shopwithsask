@@ -19,6 +19,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - In-stock products first, sold-out last, in every collection except "frontpage".
 - Do not mention GitHub to the owner. Answer stop-hook commit/push messages only with "Ready for your next request."
 - Confirm before anything that cannot be undone (deleting orders, products, etc.).
+- New products are always created as DRAFT. Never turn any product ACTIVE without the owner's explicit confirmation.
 
 ## Adding a new product (owner sends photos + price + sizes + stock)
 1. Crop every photo to focus on the product: 3:4 portrait, tight on the product itself (for a vest/top/jacket frame the upper body; for skirts/dresses the full garment; for jewelry/bags the item, not the scene), little background, nothing cut off, export JPEG 900x1200. Where the shot is too wide to crop without cutting the product, fill the side bands with a matching background colour (plain backdrops) or a soft blur of the photo. Lead with a clear front shot; put the back view last. This applies to every main image in the store, not only new products.
@@ -31,7 +32,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 8. Shein link: when the product came from Shein, save its Shein product number (the number in the photo folder or the "-p-{number}.html" in the Shein link) as product metafield custom.shein_id (single_line_text_field). The inventory app builds the Shein link from it. Never store cost prices in Shopify; they live only in the inventory app.
 9. Model size: set product metafield custom.model_size (single_line_text_field) to the size shown in the photos: Small whenever Small is in stock, otherwise the nearest in-stock size (X-Small, Medium, Large...). The size chart then shows "Model is wearing ...".
 10. Fabric: set the Shopify Fabric field to the real composition from the Shein product page, never the default list.
-11. Status ACTIVE; publish to Online Store and Google & YouTube; add to its type collection and New Collection; move it to the top of New Collection and Shop All (both MANUAL).
+11. Status DRAFT (always; never set a product ACTIVE without the owner's explicit confirmation, she turns products active herself); publish to Online Store and Google & YouTube; add to its type collection and New Collection; move it to the top of New Collection and Shop All (both MANUAL).
 
 ## Orders the owner sends manually (WhatsApp, Instagram, in person)
 - Always create them through the inventory app's Shopify link: POST to the Supabase edge function "shopify" with the x-cron-secret from vault ("sask_cron_secret") and body {"action":"create-order","sale":{items:[{title,quantity,price,shopifyVariantId}],customer:{name,phone,address,city,customerId},payment:"Cash on delivery"|"Instapay",paid,shipping:{title,price},discount,note}} (via net.http_post). The Shopify MCP cannot create orders.
