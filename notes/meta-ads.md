@@ -584,3 +584,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-27 03:35 UTC check: new account day just started, quiet overnight, no new orders since #1423, no ad issues.
 
 - 2026-11-27 06:35 UTC check: quiet Friday morning, 44 EGP spent, no orders yet today, no ad issues.
+
+- 2026-11-27 09:35 UTC check: #1424 885 boho floral patchwork cardigan, Heliopolis, FB catalog (now sold out, not in NEW/WARM ads); #1425 1,015 boho maxi skirt, Cairo, no utm (8 left). Today NEW 25, WARM 48, FB catalog 111 / 4 ATC / 1 pur. No ad issues.
