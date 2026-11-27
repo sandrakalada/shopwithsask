@@ -25,8 +25,14 @@ export async function onNewOrder(order, d) {
 const RANK = { sent: 0, delivered: 1, read: 2, failed: 3 };
 export async function onStatus(st, d) {
   if (!d.msgs || !RANK[st.status]) return 'ignored';
-  const m = await d.msgs.get(st.id);
-  if (!m) return 'unknown-message';
+  let m = await d.msgs.get(st.id);
+  if (!m) {
+    // message sent before receipts were tracked: match the customer's latest order that got the confirmation
+    const o = d.shop.latestOrderFor ? await d.shop.latestOrderFor(st.recipient_id, d.waNumber) : null;
+    if (!o || o.cancelled || !o.tags.includes('wa-sent')) return 'unknown-message';
+    await d.msgs.save(st.id, o.gid);
+    m = { id: st.id, order_gid: o.gid, status: o.tags.includes('wa-read') ? 'read' : o.tags.includes('wa-delivered') ? 'delivered' : 'sent' };
+  }
   if (st.status !== 'failed' && (RANK[m.status] ?? 0) >= RANK[st.status]) return 'old';
   await d.msgs.setStatus(st.id, st.status);
   const tag = `wa-${st.status}`;
