@@ -89,9 +89,10 @@ async function unpushedByVariant(variantIds: string[]) {
     .select("variant_id, delta")
     .eq("source", "app")
     .is("shopify_pushed_at", null)
-    .in("variant_id", variantIds);
+    .limit(5000); // only a handful wait at any time; filtering by id here made the request too long for big pulls
   if (error) throw error;
-  for (const m of data) map.set(m.variant_id, (map.get(m.variant_id) ?? 0) + m.delta);
+  const want = new Set(variantIds);
+  for (const m of data) if (want.has(m.variant_id)) map.set(m.variant_id, (map.get(m.variant_id) ?? 0) + m.delta);
   return map;
 }
 
@@ -1398,6 +1399,7 @@ Deno.serve(async (req) => {
       if (cb.action === "nok-check") return json({ username: !!Deno.env.get("NOK_USERNAME"), password: !!Deno.env.get("NOK_PASSWORD"), login: await new NokSession().login().then(() => "ok", (e) => String(e.message)) });
       if (cb.action === "settlement-reminder") return json(await settlementReminder()); // Monday transfer reminder
       if (cb.action === "returns-sync") return json(await returnsSync()); // website return requests, every 5 minutes
+      if (cb.action === "push") return json(await push()); // live sync: a database trigger calls this on every stock change made in the app
       if (cb.action === "fulfill-order" && cb.orderId) return json(await fulfillOrder(String(cb.orderId), cb.tracking ?? {}));
       const fx = await updateRate().catch((e) => ({ error: String(e) }));
       const hooks = await setup().catch((e) => ({ error: String(e) })); // re-creates any webhook Shopify removed

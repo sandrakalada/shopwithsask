@@ -69,6 +69,10 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 ## Returns
 - Website return/exchange requests (Shopify metaobject return_request, saved by the sask-returns server) are copied every 5 minutes (cron sask-returns, edge action returns-sync) into table public.returns. Each new one pops an alert ("Return request" / "Exchange request"). App page: Returns (/returns) with code, products, customer, photos and status (edge action return-status updates Shopify).
 
+## Stock sync (live)
+- App -> Shopify: database triggers (stock_push_live on stock_movements, variant_push_live on variants) call edge action push within seconds. Shopify -> app: inventory webhook. Daily full check: cron sask-daily-sync.
+- Shein selling price: cost in SAR x 29, rounded to the nearest 10 EGP.
+
 ## Inventory app hosting
 - Publish app updates in batches (not after every small change): each Vercel deployment counts toward the 10 GB free Deployment Storage.
 - Big static files are NOT in the app: the recognition model (2 parts, joined in src/lib/vision.ts), the ONNX .wasm and the OCR languages live in Supabase Storage public bucket "app-assets" (originals in asset-store/). Upload changes there (edge action asset-upload-url), never back into inventory/public.
