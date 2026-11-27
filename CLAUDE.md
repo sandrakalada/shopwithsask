@@ -72,7 +72,7 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 
 ## Stock sync (live)
 - App -> Shopify: database triggers (stock_push_live on stock_movements, variant_push_live on variants) call edge action push within seconds. Shopify -> app: inventory webhook. Daily full check: cron sask-daily-sync.
-- Shein selling price: cost in SAR x 29, rounded to the nearest 10 EGP.
+- Shein selling price: average cost in SAR across all purchases of that product (table supplier_purchases, by supplier_sku) x 29, rounded to the nearest 10 EGP; one price for all sizes. The app cost of every variant = that same average. Recalculate both whenever a new purchase of the product is added.
 
 ## Inventory app hosting
 - Publish app updates in batches (not after every small change): each Vercel deployment counts toward the 10 GB free Deployment Storage.
