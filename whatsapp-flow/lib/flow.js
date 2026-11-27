@@ -56,6 +56,8 @@ export async function onButton(from, payload, d) {
   const order = await d.shop.getOrder(orderId);
   if (!order) return 'no-order';
   if (d.waNumber(order.phone) !== from) return 'wrong-customer';
+  // a button tap means the confirmation was read
+  if (!order.tags.includes('wa-read')) await d.shop.addTags(order.gid, ['wa-read']).then(() => d.shop.removeTags(order.gid, ['wa-delivered', 'wa-failed'])).catch(() => {});
 
   switch (btn) {
     case BTN.CONFIRM:

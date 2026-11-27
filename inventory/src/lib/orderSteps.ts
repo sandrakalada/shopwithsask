@@ -29,7 +29,7 @@ export function orderSteps(o: Order, sh?: Shipment | null): Step[] {
 
   const steps: Step[] = [
     { key: "placed", label: "Order placed", state: "done", at: o.created_at },
-    { key: "sent", label: has(o, /^wa-read$/i) ? "Confirmation read on WhatsApp" : has(o, /^wa-delivered$/i) ? "Confirmation delivered on WhatsApp" : has(o, /^wa-failed$/i) ? "WhatsApp message failed" : "Confirmation sent on WhatsApp", state: sent ? "done" : has(o, /^wa-failed$/i) ? "bad" : "todo" },
+    { key: "sent", label: has(o, /^(wa-read|cod-confirmed|instapay-pending|change-requested|cancel-requested)$/i) ? "Confirmation read on WhatsApp" : has(o, /^wa-delivered$/i) ? "Confirmation delivered on WhatsApp" : has(o, /^wa-failed$/i) ? "WhatsApp message failed" : "Confirmation sent on WhatsApp", state: sent ? "done" : has(o, /^wa-failed$/i) ? "bad" : "todo" },
     {
       key: "confirmed",
       label: refused ? "Customer cancelled" : change && !confirmed ? "Customer asked for a change" : "Customer confirmed",
