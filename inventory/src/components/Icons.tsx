@@ -32,6 +32,7 @@ export const PhoneIcon = ({ className }: P) =>
   base(<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />, className);
 export const TruckIcon = ({ className }: P) =>
   base(<><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7" /><circle cx="7" cy="17.5" r="1.8" /><circle cx="17" cy="17.5" r="1.8" /></>, className);
+export const ReturnIcon = ({ className }: P) => base(<><path d="M4 9h11a5 5 0 0 1 0 10H9M4 9l4-4M4 9l4 4" /></>, className);
 export const ChartIcon = ({ className }: P) => base(<><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></>, className);
 export const WalletIcon = ({ className }: P) =>
   base(<><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M3 10h18M16 14.5h2" /></>, className);

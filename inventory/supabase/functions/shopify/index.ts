@@ -1127,6 +1127,54 @@ async function settlementReminder() {
   return { amount, shipments: n };
 }
 
+/** Return / exchange requests from the website form: copy Shopify metaobjects into public.returns and pop an alert for each new one. */
+const RETURN_STATUSES = ["New", "Approved", "Item received", "Refunded", "Exchanged", "Rejected"];
+async function returnsSync() {
+  const d = await gql(`{ metaobjects(type: "return_request", first: 50, sortKey: "updated_at", reverse: true) { nodes { id updatedAt
+    fields { key value references(first: 3) { nodes { ... on MediaImage { image { url } } } } } } } }`);
+  const nodes = d.metaobjects?.nodes ?? [];
+  if (!nodes.length) return { synced: 0, new: 0 };
+  const { data: known } = await admin.from("returns").select("id").in("id", nodes.map((n: any) => n.id));
+  const seen = new Set((known ?? []).map((r: any) => r.id));
+  const rows = nodes.map((n: any) => {
+    const f: Record<string, any> = {};
+    for (const x of n.fields) f[x.key] = x;
+    const v = (k: string) => f[k]?.value ?? null;
+    let items: unknown = [];
+    try { items = JSON.parse(v("items") ?? "[]"); } catch { /* keep empty */ }
+    return {
+      id: n.id, number: v("request_number") ?? n.id.split("/").pop(), type: v("request_type") ?? "return", status: v("status") ?? "New",
+      order_name: v("order_name"), order_id: v("order_id"), customer_name: v("customer_name"), contact: v("contact"), governorate: v("governorate"),
+      fee: v("fee") != null ? Number(v("fee")) : null, items, reason: v("reason"), details: v("details"),
+      exchange_request: v("exchange_request"), refund_instapay: v("refund_instapay"),
+      photos: (f.photos?.references?.nodes ?? []).map((r: any) => r?.image?.url).filter(Boolean),
+      delivered_at: v("delivered_at"), submitted_at: v("submitted_at") ?? n.updatedAt, synced_at: new Date().toISOString(),
+    };
+  });
+  const { error } = await admin.from("returns").upsert(rows);
+  if (error) throw new Error(`returns save: ${error.message}`);
+  const fresh = rows.filter((r: any) => !seen.has(r.id));
+  for (const r of fresh) {
+    const n = (r.items as any[]).reduce((a, i) => a + (Number(i.qty) || 1), 0);
+    await admin.from("wa_alerts").insert({
+      kind: r.type === "exchange" ? "Exchange request" : "Return request",
+      order_name: r.order_name ?? r.number, order_id: r.order_id ? String(r.order_id).split("/").pop() : null, customer: r.customer_name, total: r.fee,
+      detail: `${r.number} · ${n} item${n === 1 ? "" : "s"} · ${r.customer_name ?? ""}`.trim(),
+    });
+  }
+  return { synced: rows.length, new: fresh.length };
+}
+
+async function returnStatus(id: string, status: string) {
+  if (!RETURN_STATUSES.includes(status)) throw new Error("Unknown status");
+  const r = await gql(`mutation($id: ID!, $m: MetaobjectUpdateInput!) { metaobjectUpdate(id: $id, metaobject: $m) { userErrors { message } } }`,
+    { id, m: { fields: [{ key: "status", value: status }] } });
+  const err = r.metaobjectUpdate?.userErrors?.[0]?.message;
+  if (err) throw new Error(err);
+  await admin.from("returns").update({ status }).eq("id", id);
+  return { ok: true, status };
+}
+
 /** Owner-confirmed: cancel (stock back, no email, no refund) then delete an order. */
 async function cancelAndDeleteOrder(orderId: string) {
   if (!/^\d+$/.test(orderId)) throw new Error("bad order id");
@@ -1345,6 +1393,7 @@ Deno.serve(async (req) => {
       if (cb.action === "nok-api-check") return json(await nokApiCheck().catch((e) => ({ key: !!Deno.env.get("NOK_API_KEY"), error: String(e.message) })));
       if (cb.action === "nok-check") return json({ username: !!Deno.env.get("NOK_USERNAME"), password: !!Deno.env.get("NOK_PASSWORD"), login: await new NokSession().login().then(() => "ok", (e) => String(e.message)) });
       if (cb.action === "settlement-reminder") return json(await settlementReminder()); // Monday transfer reminder
+      if (cb.action === "returns-sync") return json(await returnsSync()); // website return requests, every 5 minutes
       if (cb.action === "fulfill-order" && cb.orderId) return json(await fulfillOrder(String(cb.orderId), cb.tracking ?? {}));
       const fx = await updateRate().catch((e) => ({ error: String(e) }));
       const hooks = await setup().catch((e) => ({ error: String(e) })); // re-creates any webhook Shopify removed
@@ -1377,6 +1426,8 @@ Deno.serve(async (req) => {
     if (action === "nok-create") return json(await nokCreate(body.shipment).catch(async (e) => { await nokIssue(`Create shipment for ${body.shipment?.orderName ?? "an order"} failed: ${String(e.message)}`, { order_name: body.shipment?.orderName, customer: body.shipment?.name }); throw e; }));
     if (action === "nok-remove") return json(await nokRemoveFromPickup(String(body.awb)).catch(async (e) => { await nokIssue(`Remove AWB ${body.awb} from the pickup failed: ${String(e.message)}`); throw e; }));
     if (action === "nok-awb") return json({ pdf: await nokAwbPdf(Number(body.shipmentId)) });
+    if (action === "returns-sync") return json(await returnsSync());
+    if (action === "return-status") return json(await returnStatus(String(body.id), String(body.status)));
     return json({ error: "unknown action" }, 400);
   } catch (e) {
     console.error(e);

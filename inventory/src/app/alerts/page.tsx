@@ -24,7 +24,7 @@ type Alert = {
 
 const tone = (kind: string) =>
   kind === "Nok problem" ? "bg-red-50 text-red-700" : /^Nok: .*(undeliver|return|cancel|lost|damage|pending|refus|unsuccess|fail|attempt)/i.test(kind) ? "bg-red-50 text-red-700" : /^Nok: Delivered/i.test(kind) ? "bg-emerald-100 text-emerald-800" : kind.startsWith("Nok") ? "bg-sky-50 text-sky-800" : kind.startsWith("Payment") ? "bg-amber-50 text-amber-800" :
-  kind.startsWith("Cancelled") ? "bg-red-50 text-red-700" : kind.startsWith("Change") ? "bg-amber-50 text-amber-800" : "bg-emerald-50 text-emerald-700";
+  kind.startsWith("Cancelled") ? "bg-red-50 text-red-700" : kind.endsWith(" request") ? "bg-amber-50 text-amber-800" : kind.startsWith("Change") ? "bg-amber-50 text-amber-800" : "bg-emerald-50 text-emerald-700";
 
 export default function AlertsPage() {
   const [rows, setRows] = useState<Alert[] | null>(null);
@@ -64,6 +64,7 @@ export default function AlertsPage() {
       void ackShipmentProblems([a.order_id]);
     }
     if (a.kind.startsWith("Payment")) return router.push("/settlement");
+    if (a.kind === "Return request" || a.kind === "Exchange request") return router.push("/returns");
     if (a.kind === "Nok problem" && !a.order_id && !/^#\d/.test(a.order_name)) return router.push("/shipments");
     const name = a.order_name.startsWith("#") ? a.order_name : `#${a.order_name}`;
     const o = (a.order_id ? await db.orders.get(String(a.order_id)) : undefined) ?? (await db.orders.where("name").equals(name).first());

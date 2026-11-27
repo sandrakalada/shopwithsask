@@ -11,7 +11,7 @@ import { useRole } from "./Shell";
 import { FLAG, useProblems } from "@/lib/problems";
 import { useAlerts } from "./AlertWatcher";
 
-import { BoxIcon, ChartIcon, ClockIcon, GearIcon, HomeIcon, PrintIcon, ReceiptIcon, ScanIcon, TruckIcon, UsersIcon, WalletIcon } from "./Icons";
+import { BoxIcon, ChartIcon, ClockIcon, GearIcon, HomeIcon, PrintIcon, ReceiptIcon, ReturnIcon, ScanIcon, TruckIcon, UsersIcon, WalletIcon } from "./Icons";
 
 const TagIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -57,6 +57,7 @@ const SECTIONS: { title: string; items: { href: string; label: string; Icon: (p:
       { href: "/orders", label: "Orders", Icon: ReceiptIcon },
       { href: "/alerts", label: "Alerts", Icon: BellIcon },
       { href: "/shipments", label: "Order tracking", Icon: TruckIcon },
+      { href: "/returns", label: "Returns", Icon: ReturnIcon },
       { href: "/settlement", label: "Settlement", Icon: WalletIcon },
       { href: "/invoice?new=1", label: "New invoice", Icon: DocIcon },
       { href: "/customers", label: "Customers", Icon: UsersIcon },

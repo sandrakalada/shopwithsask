@@ -7,10 +7,11 @@ import { alertStore, checkAlerts, isDeliveredAlert, unlockSound } from "@/lib/al
 export const useAlerts = () => useSyncExternalStore(alertStore.subscribe, alertStore.get, alertStore.server);
 
 const isBad = (kind: string) => kind.startsWith("Cancelled") || kind === "Nok problem" || /^Nok: .*(undeliver|return|cancel|lost|damage|pending|refus|unsuccess|fail|attempt)/i.test(kind);
-const tone = (kind: string) => (isBad(kind) ? "border-red-400 bg-red-50" : kind.startsWith("Change") ? "border-amber-300" : kind.startsWith("Nok") ? "border-sky-300" : "border-emerald-300");
+const tone = (kind: string) => (isBad(kind) ? "border-red-400 bg-red-50" : kind.startsWith("Change") || kind.endsWith("request") ? "border-amber-300" : kind.startsWith("Nok") ? "border-sky-300" : "border-emerald-300");
 /** delivered by Nok (first time): green celebration */
 const isDelivered = isDeliveredAlert;
-const title = (kind: string) => (kind.startsWith("Nok") || kind.startsWith("Payment") ? kind : `WhatsApp: ${kind}`);
+const isReturn = (kind: string) => kind === "Return request" || kind === "Exchange request";
+const title = (kind: string) => (kind.startsWith("Nok") || kind.startsWith("Payment") || isReturn(kind) ? kind : `WhatsApp: ${kind}`);
 const CONFETTI = ["#1f7a4d", "#9e7856", "#f2c94c", "#56ccf2", "#eb5757", "#27ae60"];
 
 /** Checks for new WhatsApp alerts every 15 seconds while the app is open; shows a pop up and plays a sound. */
@@ -65,7 +66,7 @@ export default function AlertWatcher() {
         </div>
       ) : (
         <div key={a.id} role="alert" className={`pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-2xl border-l-4 ${tone(a.kind)} bg-canvas p-3 shadow-xl ring-1 ring-line`}>
-          <Link href={a.kind.startsWith("Payment") ? "/settlement" : "/alerts"} onClick={() => alertStore.dismiss(a.id)} className="min-w-0 flex-1">
+          <Link href={a.kind.startsWith("Payment") ? "/settlement" : isReturn(a.kind) ? "/returns" : "/alerts"} onClick={() => alertStore.dismiss(a.id)} className="min-w-0 flex-1">
             <p className="text-[13px] font-semibold">{title(a.kind)}</p>
             <p className="truncate text-sm">
               {a.order_name}

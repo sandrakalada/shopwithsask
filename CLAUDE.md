@@ -66,6 +66,9 @@ The owner's rules for the Shopify store "Shop With Sask" (admin wfud64-tq.myshop
 - Alerts: Monday reminder (cron sask-nok-payday, action settlement-reminder) with the expected transfer; red pop-up on cancelled/returning; green celebration pop-up on delivered.
 - How the Nok portal works (menus, COD = product price + delivery fee, pickups, statuses): notes/nok-courier-guide.md. The owner will add more steps later.
 
+## Returns
+- Website return/exchange requests (Shopify metaobject return_request, saved by the sask-returns server) are copied every 5 minutes (cron sask-returns, edge action returns-sync) into table public.returns. Each new one pops an alert ("Return request" / "Exchange request"). App page: Returns (/returns) with code, products, customer, photos and status (edge action return-status updates Shopify).
+
 ## Inventory app hosting
 - Publish app updates in batches (not after every small change): each Vercel deployment counts toward the 10 GB free Deployment Storage.
 - Big static files are NOT in the app: the recognition model (2 parts, joined in src/lib/vision.ts), the ONNX .wasm and the OCR languages live in Supabase Storage public bucket "app-assets" (originals in asset-store/). Upload changes there (edge action asset-upload-url), never back into inventory/public.
