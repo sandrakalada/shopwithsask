@@ -32,12 +32,12 @@ export function cors(req, res) {
 }
 // Fee areas follow the store's shipping zones (province codes).
 const AREAS = {
-  cairo: { en: 'Cairo', ar: 'القاهرة', codes: ['C', 'HU'], ret: 85, exch: 180 },
-  giza: { en: 'Giza', ar: 'الجيزة', codes: ['GZ', 'SU'], ret: 85, exch: 185 },
-  alex: { en: 'Alexandria', ar: 'الإسكندرية', codes: ['ALX'], ret: 120, exch: 195 },
-  delta: { en: 'Delta & Canal', ar: 'الدلتا والقناة', codes: ['SHR', 'BH', 'DK', 'DT', 'GH', 'IS', 'KFS', 'MNF', 'PTS', 'KB', 'SUZ'], ret: 100, exch: 200 },
-  north: { en: 'North Coast', ar: 'الساحل الشمالي', codes: ['MT'], ret: 165, exch: 340 },
-  upper: { en: 'Upper Egypt & Red Sea', ar: 'الصعيد والبحر الأحمر', codes: ['ASN', 'AST', 'BNS', 'FYM', 'LX', 'MN', 'WAD', 'KN', 'BA', 'SHG', 'JS', 'SIN'], ret: 199, exch: 410 },
+  cairo: { en: 'Cairo', ar: 'القاهرة', codes: ['C', 'HU'], ret: 85, exch: 160 },
+  giza: { en: 'Giza', ar: 'الجيزة', codes: ['GZ', 'SU'], ret: 85, exch: 160 },
+  alex: { en: 'Alexandria', ar: 'الإسكندرية', codes: ['ALX'], ret: 120, exch: 230 },
+  delta: { en: 'Delta & Canal', ar: 'الدلتا والقناة', codes: ['SHR', 'BH', 'DK', 'DT', 'GH', 'IS', 'KFS', 'MNF', 'PTS', 'KB', 'SUZ'], ret: 100, exch: 190 },
+  north: { en: 'North Coast', ar: 'الساحل الشمالي', codes: ['MT', 'JS', 'SIN'], ret: 165, exch: 320 },
+  upper: { en: 'Upper Egypt & Red Sea', ar: 'الصعيد والبحر الأحمر', codes: ['ASN', 'AST', 'BNS', 'FYM', 'LX', 'MN', 'WAD', 'KN', 'BA', 'SHG'], ret: 199, exch: 388 },
 };
 export function areaFor(code, name) {
   const c = (code || '').toUpperCase();
