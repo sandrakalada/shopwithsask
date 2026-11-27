@@ -226,6 +226,10 @@ async function pushStock() {
       continue;
     }
     try {
+      // Shopify requires the quantity we expect before the change (changeFromQuantity)
+      const lv = await gql(`query($id: ID!, $loc: ID!) { inventoryItem(id: $id) { inventoryLevel(locationId: $loc) { quantities(names: ["available"]) { quantity } } } }`,
+        { id: gid("InventoryItem", item), loc });
+      const from = lv.inventoryItem?.inventoryLevel?.quantities?.[0]?.quantity ?? 0;
       const d = await gql(
         `mutation($input: InventoryAdjustQuantitiesInput!, $key: String!) {
           inventoryAdjustQuantities(input: $input) @idempotent(key: $key) { userErrors { code message } }
@@ -235,7 +239,7 @@ async function pushStock() {
           input: {
             name: "available",
             reason: SHOPIFY_REASON[r.reason] ?? "correction",
-            changes: [{ delta: r.delta, inventoryItemId: gid("InventoryItem", item), locationId: loc }],
+            changes: [{ delta: r.delta, changeFromQuantity: from, inventoryItemId: gid("InventoryItem", item), locationId: loc }],
           },
         },
       );
