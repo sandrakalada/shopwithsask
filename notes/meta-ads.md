@@ -602,3 +602,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-28 03:35 UTC check: new day just started, 16 EGP spent, no new orders since #1430, no ad issues.
 
 - 2026-11-28 06:35 UTC check: quiet Saturday morning, 85 EGP spent, no new orders since #1430 (Nov 27 17:00 Cairo), no ad issues.
+
+- 2026-11-28 09:35 UTC check: no orders today yet (last #1430 Nov 27 17:00 Cairo, ~17h). Today NEW 87 / 0 ATC (meets pause-losers threshold, NOT paused: owner said judge Sunday), WARM 75 / 1 ATC, FB catalog 172 / 2 ATC. No ad issues.
