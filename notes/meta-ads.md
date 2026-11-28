@@ -606,3 +606,5 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-28 09:35 UTC check: no orders today yet (last #1430 Nov 27 17:00 Cairo, ~17h). Today NEW 87 / 0 ATC (meets pause-losers threshold, NOT paused: owner said judge Sunday), WARM 75 / 1 ATC, FB catalog 172 / 2 ATC. No ad issues.
 
 - 2026-11-28 12:35 UTC check: #1431 1,015 boho maxi skirt (no utm). Today NEW 225 / 2 ATC, WARM 121 / 3 ATC, FB catalog 250 / 3 ATC, 0 ad orders yet. New campaign seen (not created here): 52566373910120 "SWS | Bags | one ad per bag | Nov 2026", ad set 52566373912320 "Bags | SWS audience | 55/day" (created Nov 27 19:29 UTC, Purchase, FB+IG, women 18-65, high-end circles), delivering since today. Spend limit 1,947 of 5,000 used.
+
+- 2026-11-28 15:35 UTC check: #1432 1,015 boho maxi skirt (Instagram bio link, Nasr City). Today NEW 236 / 2 ATC, WARM 224 / 3 ATC, FB catalog 301 / 4 ATC / 1 pur, Bags 34 / 0. 2 orders today, none traced to ads. Bags campaign question pending with owner. No ad issues.
