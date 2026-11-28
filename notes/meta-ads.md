@@ -586,4 +586,22 @@ New campaign 52564976948720 "HIGH-END AREAS | Instagram only" (OUTCOME_SALES, AD
 - 2026-11-27 06:35 UTC check: quiet Friday morning, 44 EGP spent, no orders yet today, no ad issues.
 
 - 2026-11-27 09:35 UTC check: #1424 885 boho floral patchwork cardigan, Heliopolis, FB catalog (now sold out, not in NEW/WARM ads); #1425 1,015 boho maxi skirt, Cairo, no utm (8 left). Today NEW 25, WARM 48, FB catalog 111 / 4 ATC / 1 pur. No ad issues.
-2026-11-27 daily report: Nov 26 Meta 941 EGP (FB catalog 527 / Meta 4 pur; NEW 226 / 2 pur; WARM 188 / 21 ATC / 1 pur). Meta counted 7 (12,365) vs Shopify 5 Meta-paid (7,330); store 6 orders 10,580 (best day). Last 7 days Meta 5,346 EGP, Shopify Meta-paid 12 kept (15,715, ROAS 2.94) + 3 cancelled (20%); prior 7 days 4. Today so far 4 Meta-paid orders 4,750. Nothing paused.
+
+- 2026-11-27 owner asked about sold-out items in ads: burgundy velvet mini skirt sold out, paused its resurfaced post ads in NEW and WARM. All other 29 linked products in stock.
+
+- 2026-11-27 12:35 UTC check: no new orders since #1426. Today NEW 55 / 0 ATC, WARM 90 / 0 ATC (Friday morning, owner judging losers Sunday), FB catalog 260 / 8 ATC / 3 pur. No ad issues.
+
+- 2026-11-27 15:35 UTC check: #1427 2,490 (tunic + 2 boho maxi skirts, New Cairo, sag_organic), #1428 575 necklace (FB catalog), #1429 1,135 embroidered boho jacket (FB catalog), #1430 1,065 chevron windbreaker (no utm). Embroidered boho jacket sold out: paused its post ads in NEW and WARM. Today 7 orders 8,260. Spend NEW 102 / 0 ATC, WARM 116 / 3 ATC, FB catalog 401 / 16 ATC / 7 pur.
+
+- 2026-11-27 18:35 UTC check: no new orders since #1430. Today NEW 130 / 2 ATC, WARM 129 / 3 ATC, FB catalog 500 / 16 ATC / 7 pur. Spend limit 1,025 of 5,000 used. No ad issues.
+
+- 2026-11-27 21:35 UTC check: no new orders since #1430 (17:00 Cairo). Today NEW 165 / 2 ATC, WARM 142 / 3 ATC, FB catalog 580 / 17 ATC / 7 pur. No ad issues.
+
+- 2026-11-28 00:35 UTC check: Nov 27 (acct day) final: 7 orders 8,260 (5 FB catalog, 1 Google organic, 1 no utm); spend NEW 213, WARM 196, FB catalog 622 = 1,031. Spend limit 1,294 of 5,000 used. No ad issues, no new orders.
+
+- 2026-11-28 03:35 UTC check: new day just started, 16 EGP spent, no new orders since #1430, no ad issues.
+
+- 2026-11-28 06:35 UTC check: quiet Saturday morning, 85 EGP spent, no new orders since #1430 (Nov 27 17:00 Cairo), no ad issues.
+
+- 2026-11-28 09:35 UTC check: no orders today yet (last #1430 Nov 27 17:00 Cairo, ~17h). Today NEW 87 / 0 ATC (meets pause-losers threshold, NOT paused: owner said judge Sunday), WARM 75 / 1 ATC, FB catalog 172 / 2 ATC. No ad issues.
+2026-11-28 daily report: Nov 27 Meta 1,085 EGP (FB catalog 637 / 18 ATC / 7 pur; NEW 225 / 2 ATC / 0; WARM 223 / 3 ATC / 0). Meta 7 purchases = Shopify 7 Meta-paid (7,555); store 9 orders 11,110. Last 7 days Meta 5,603 EGP, Shopify Meta-paid 19 kept (23,270, ROAS 4.15) + 2 cancelled; prior 7 days 3. NEW/WARM no orders 2 days; owner judging Sunday. Nothing paused.
